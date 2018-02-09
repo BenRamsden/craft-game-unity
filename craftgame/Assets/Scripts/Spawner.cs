@@ -4,24 +4,29 @@ using UnityEngine;
 
 public class Spawner : MonoBehaviour {
 
+	const int CHUNK_WIDTH = 16;
+	Color bedrock_color = new Color (0, 0, 0);
+	Color mud_color = new Color (0.65f, 0.15f, 0.15f);
+	Color grass_color = Color.green;
+
 	// Use this for initialization
 	void Start () {
-		for (int x = 0; x < 8; x++)
+		for (int x = 0; x < CHUNK_WIDTH; x++)
 		{
-			for (int y = 0; y < 8; y++)
+			for (int y = 0; y < CHUNK_WIDTH; y++)
 			{
-				for (int z = 0; z < 8; z++)
+				for (int z = 0; z < CHUNK_WIDTH; z++)
 				{
 					Color c;
 					if (y <= 3)
-						c = new Color (0, 0, 0);
+						c = bedrock_color;
 					else if (y <= 6)
-						c = new Color (0.65f, 0.15f, 0.15f);
+						c = mud_color;
 					else
-						c = Color.green;
+						c = grass_color;
 
 					GameObject cube = GameObject.CreatePrimitive (PrimitiveType.Cube);
-					cube.transform.position = new Vector3 (x + 10, y + 10, z + 10);
+					cube.transform.position = new Vector3 (x, y, z);
 					cube.GetComponent<Renderer> ().material.color = c;
 				}
 			}
