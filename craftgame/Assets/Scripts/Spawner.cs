@@ -1,14 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor;
 
-[InitializeOnLoad]
-public class Startup
-{
+public class Spawner : MonoBehaviour {
+
 	// Use this for initialization
-	static Startup()
-	{
+	void Start () {
 		for (int x = 0; x < 8; x++)
 		{
 			for (int y = 0; y < 8; y++)
@@ -30,5 +27,9 @@ public class Startup
 			}
 		}
 	}
-
+	
+	// Update is called once per frame
+	void Update () {
+		
+	}
 }
