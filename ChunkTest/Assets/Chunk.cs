@@ -60,7 +60,15 @@ public class Chunk{
 					if (blocks [r, l, c] != null)
 					{
 						blockToDraw = blocks [r, l, c];
-						blockToDraw.setPosition(offsetX+r,l,offsetZ+c);
+						int x = offsetX + r;
+						int z = offsetZ + c;
+
+						float perlinX = ((float)x) / CHUNK_SIZE;
+						float perlinZ = ((float)z) / CHUNK_SIZE;
+						float perlinY = Mathf.PerlinNoise (perlinX, perlinZ);
+						int y = l + (int)(perlinY * 10);
+
+						blockToDraw.setPosition(x,y,z);
 					}
 				}
 			}

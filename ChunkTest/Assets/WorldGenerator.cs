@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class WorldGenerator : MonoBehaviour {
-	const int CHUNK_WIDTH = 2;
+	const int CHUNK_WIDTH = 5;
 	Chunk[,] currentFOV = new Chunk[CHUNK_WIDTH,CHUNK_WIDTH];
 
 	// Use this for initialization
