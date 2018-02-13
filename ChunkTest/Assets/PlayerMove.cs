@@ -36,10 +36,10 @@ public class PlayerMove : MonoBehaviour {
 		mouseX = Input.GetAxis("Mouse X");
 		mouseY = -Input.GetAxis("Mouse Y"); // "-" because it is inverted up and down 
 		rotY += mouseX * mouseSensitivity * Time.deltaTime;
-		rotX += mouseY * mouseSensitivity * Time.deltaTime;
+		//rotX += mouseY * mouseSensitivity * Time.deltaTime;
 		//stop the player being able to look up/down too much
-		rotX = Mathf.Clamp(rotX, -x_AxisRotateClamp, x_AxisRotateClamp);
-		rb.transform.rotation= Quaternion.Euler(rotX, rotY, 0.0f);
+		//rotX = Mathf.Clamp(rotX, -x_AxisRotateClamp, x_AxisRotateClamp);
+		rb.transform.rotation= Quaternion.Euler(0.0f, rotY, 0.0f);
 	}
 
 
