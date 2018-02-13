@@ -14,28 +14,29 @@ public class Chunk{
 	public Chunk(int offsetX, int offsetZ){
 		this.offsetX = offsetX;
 		this.offsetZ = offsetZ;
-	/*START SECTION*/
-		/*This section intialises the chunk, in future this will
+
+        /*START SECTION*/
+        /*This section intialises the chunk, in future this will
 		 *be done by the procedural generation algorithm.*/
-		for(int i = 0; i < CHUNK_SIZE; i++)
-		{
-			layerIsAir[i] = (i > 2) ? true : false;
-		}
-		Block tempBlock;
+
+        Block tempBlock;
+        int world_x, world_y, world_z;
+        float perlinX, perlinY, perlinZ;
+
 		for (int x = 0; x < CHUNK_SIZE; x++) {
 			for (int y = 0; y < CHUNK_SIZE; y++) {
 				for (int z = 0; z < CHUNK_SIZE; z++) {
-					//Calculate absolute position of block (world space)
-					int world_x = offsetX + x;
-					int world_z = offsetZ + z;
+                    //Calculate absolute position of block (world space)
+                    world_x = offsetX + x;
+                    world_z = offsetZ + z;
 
 					//Generate a scaled X and Z for input into PerlinNoise function
-					float perlinX = ((float)world_x) / CHUNK_SIZE;
-					float perlinZ = ((float)world_z) / CHUNK_SIZE;
+					perlinX = ((float)world_x) / CHUNK_SIZE;
+					perlinZ = ((float)world_z) / CHUNK_SIZE;
 
 					//Generate the PerlinNoise value, offset the block's height by this
-					float perlinY = Mathf.PerlinNoise (perlinX, perlinZ);
-					int world_y = y + (int)(perlinY * 5);
+					perlinY = Mathf.PerlinNoise (perlinX, perlinZ);
+                    world_y = y + (int)(perlinY * 5);
 
 					//Debug.Log ("world_x:" + world_x + " world_z:" + world_z + " = " + world_y);
 
@@ -54,7 +55,8 @@ public class Chunk{
 						continue;
 					}
 
-					tempBlock.setPosition(world_x,world_y,world_z);
+					tempBlock.setPosition(world_x, world_y, world_z);
+                    tempBlock.setChunkPosition(offsetX, 0, offsetZ);
 					blocks [x, world_y, z] = tempBlock;
 				}
 			}
@@ -70,21 +72,35 @@ public class Chunk{
 	{
 		Block blockToDraw;
 		//Iterate through each layer (y-axis)
-		for (int l = CHUNK_SIZE-1; l >= 0; l--)
+		for (int y = CHUNK_SIZE-1; y >= 0; y--)
 		{
 			//If the current layer is completely air, continue to the next
 			//layer down, there is no point iterating through that layer as
 			//there is nothing to draw.
 			//if(layerIsAir[l]) continue;
 			//Iterate through each row (x-axis)
-			for (int r = 0; r < CHUNK_SIZE; r++)
+			for (int x = 0; x < CHUNK_SIZE; x++)
 			{
 				//Iterate through each column (z-axis)
-				for (int c = 0; c < CHUNK_SIZE; c++)
+				for (int z = 0; z < CHUNK_SIZE; z++)
 				{
-					if (blocks [r, l, c] != null)
+					if (blocks [x, y, z] != null)
 					{
-						blockToDraw = blocks [r, l, c];
+						blockToDraw = blocks [x, y, z];
+                        //If statement to handle Blocks at the edge of a chunk
+                        if (x == 0 || x == CHUNK_SIZE-1 ||
+                            y == 0 || y == CHUNK_SIZE-1 ||
+                            z == 0 || z == CHUNK_SIZE-1)
+                        {
+                            blockToDraw.draw();
+                        }
+                        //If statement to handle Blocks within a chunk
+                        else if(blocks[x + 1 , y, z] == null || blocks[x - 1, y, z] == null ||
+                                blocks[x, y + 1, z] == null || blocks[x, y - 1, z] == null ||
+                                blocks[x, y, z + 1] == null || blocks[x, y, z - 1] == null)
+                        {
+                            blockToDraw.draw();
+                        }
 					}
 				}
 			}
