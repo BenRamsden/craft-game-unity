@@ -22,16 +22,41 @@ public class Chunk{
 			layerIsAir[i] = (i > 2) ? true : false;
 		}
 		Block tempBlock;
-		for(int j = 0; j < CHUNK_SIZE; j++)
-		{
-			for(int k = 0; k < CHUNK_SIZE; k++)
-			{
-				tempBlock = new Block();
-				tempBlock.renderColor (Color.gray);
-				blocks [k, 0, j] = tempBlock;
-				tempBlock = new Block();
-				tempBlock.renderColor (Color.green);
-				blocks [k, 1, j] = tempBlock;
+		for (int x = 0; x < CHUNK_SIZE; x++) {
+			for (int y = 0; y < CHUNK_SIZE; y++) {
+				for (int z = 0; z < CHUNK_SIZE; z++) {
+					//Calculate absolute position of block (world space)
+					int world_x = offsetX + x;
+					int world_z = offsetZ + z;
+
+					//Generate a scaled X and Z for input into PerlinNoise function
+					float perlinX = ((float)world_x) / CHUNK_SIZE;
+					float perlinZ = ((float)world_z) / CHUNK_SIZE;
+
+					//Generate the PerlinNoise value, offset the block's height by this
+					float perlinY = Mathf.PerlinNoise (perlinX, perlinZ);
+					int world_y = y + (int)(perlinY * 5);
+
+					//Debug.Log ("world_x:" + world_x + " world_z:" + world_z + " = " + world_y);
+
+					if (world_y < 0 || world_y > CHUNK_SIZE-1) {
+						Debug.Log ("Cannot insert chunk into block at index " + world_y + " continuing");
+						continue;
+					}
+
+					if (y <= 0) {
+						tempBlock = new Block();
+						tempBlock.renderColor (Color.gray);
+					} else if (y <= 1) {
+						tempBlock = new Block();
+						tempBlock.renderColor (Color.green);
+					} else {
+						continue;
+					}
+
+					tempBlock.setPosition(world_x,world_y,world_z);
+					blocks [x, world_y, z] = tempBlock;
+				}
 			}
 		}
 	/*END SECTION*/
@@ -50,7 +75,7 @@ public class Chunk{
 			//If the current layer is completely air, continue to the next
 			//layer down, there is no point iterating through that layer as
 			//there is nothing to draw.
-			if(layerIsAir[l]) continue;
+			//if(layerIsAir[l]) continue;
 			//Iterate through each row (x-axis)
 			for (int r = 0; r < CHUNK_SIZE; r++)
 			{
@@ -60,20 +85,6 @@ public class Chunk{
 					if (blocks [r, l, c] != null)
 					{
 						blockToDraw = blocks [r, l, c];
-
-						//Calculate absolute position of block (world space)
-						int x = offsetX + r;
-						int z = offsetZ + c;
-
-						//Generate a scaled X and Z for input into PerlinNoise function
-						float perlinX = ((float)x) / CHUNK_SIZE;
-						float perlinZ = ((float)z) / CHUNK_SIZE;
-
-						//Generate the PerlinNoise value, offset the block's height by this
-						float perlinY = Mathf.PerlinNoise (perlinX, perlinZ);
-						int y = l + (int)(perlinY * 10);
-
-						blockToDraw.setPosition(x,y,z);
 					}
 				}
 			}
