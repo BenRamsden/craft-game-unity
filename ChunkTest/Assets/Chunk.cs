@@ -40,7 +40,7 @@ public class Chunk{
 					//Debug.Log ("world_x:" + world_x + " world_z:" + world_z + " = " + world_y);
 
 					if (world_y < 0 || world_y > CHUNK_SIZE-1) {
-						Debug.Log ("Cannot insert chunk into block at index " + world_y + " continuing");
+						//Debug.Log ("Cannot insert chunk into block at index " + world_y + " continuing");
 						continue;
 					}
 
