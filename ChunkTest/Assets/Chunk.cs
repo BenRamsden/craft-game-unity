@@ -47,10 +47,10 @@ public class Chunk{
 
 					if (y <= 0) {
 						tempBlock = new Block();
-						tempBlock.renderColor (Color.gray);
+						tempBlock.setBlockType("StoneBlock");
 					} else if (y <= 1) {
 						tempBlock = new Block();
-						tempBlock.renderColor (Color.green);
+						tempBlock.setBlockType("GrassBlock");
 					} else {
 						continue;
 					}

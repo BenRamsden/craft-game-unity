@@ -4,16 +4,15 @@ using UnityEngine;
 
 public class Block{
     GameObject thisBody;
-	Texture textureProperty;
 	bool isMineable, isPickupable, isBreakable, isTraversable;
 	int blockHealth, blockDamage;
     int worldX, worldY, worldZ;
     int chunkX, chunkY, chunkZ;
-    Color paint;
+    string blockType;
 
     public void draw()
     {
-        thisBody = GameObject.Instantiate(Resources.Load("BlockPrefab"), new Vector3(worldX, worldY, worldZ), Quaternion.identity) as GameObject;
+        thisBody = GameObject.Instantiate(Resources.Load(blockType), new Vector3(worldX, worldY, worldZ), Quaternion.identity) as GameObject;
     }
 
 	public void setPosition(int row, int layer, int column)
@@ -38,9 +37,9 @@ public class Block{
         return chunkZ;
     }
 
-    public void renderColor(Color paint)
+    public void setBlockType(string blockType)
     {
-		this.paint = paint;
+        this.blockType = blockType;
 	}
 
 	// Use this for initialization
