@@ -11,13 +11,16 @@ public class WorldGenerator : MonoBehaviour
 	void Start ()
     {
         //Draw the world
-		for (int x = 0; x < WORLD_SIZE; x++)
-        {
-			for (int z = 0; z < WORLD_SIZE; z++)
-            {
-				currentFOV [x,z] = new Chunk(16*x,16*z);
-			}
-		}
+//		for (int x = 0; x < WORLD_SIZE; x++)
+//        {
+//			for (int z = 0; z < WORLD_SIZE; z++)
+//            {
+//				currentFOV [x,z] = new Chunk(16*x,16*z);
+//			}
+//		}
+
+		ProceduralGenerator generator = new ProceduralGenerator ();
+		generator.generateWorld (16, 0);
 	}
 	
 	// Update is called once per frame
