@@ -35,15 +35,12 @@ public class PlayerMove : MonoBehaviour {
 
 		//use delta time to make it consistent rotation, fps doesnt matter
 		rb.transform.Translate(movement * moveSpeed * Time.deltaTime);
-		if (moveX == 0 &&
-			moveZ != 0) {
-			animator.SetBool ("isMovingVertical", true);
-		} else if (moveX != 0 &&
-			moveZ == 0) {
-			animator.SetBool ("isMovingHorizontal", true);
+
+		//check for which type of movement for appropiate animation
+		if (moveX != 0 || moveZ != 0) {
+			animator.SetBool ("isMoving", true);
 		} else {
-			animator.SetBool ("isMovingVertical", false);
-			animator.SetBool ("isMovingVertical", false);
+			animator.SetBool ("isMoving", false);
 		}
 	}
 
@@ -65,13 +62,8 @@ public class PlayerMove : MonoBehaviour {
 		rb.transform.rotation= Quaternion.Euler(rotX, rotY, 0.0f);
 
 		if(Input.GetKeyDown(KeyCode.Space) && isGrounded){
-
 			rb.AddForce(jump, ForceMode.Impulse);
 			isGrounded = false;
 		}
-			
 	}
-
-
-
 }
