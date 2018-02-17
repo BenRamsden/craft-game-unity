@@ -48,6 +48,7 @@ public class PlayerMove : MonoBehaviour {
 	void OnCollisionStay()
 	{
 		isGrounded = true;
+		animator.SetBool ("isJumping", false);
 	}
 
 	/** Rotating player with mouse*/
@@ -64,6 +65,8 @@ public class PlayerMove : MonoBehaviour {
 		if(Input.GetKeyDown(KeyCode.Space) && isGrounded){
 			rb.AddForce(jump, ForceMode.Impulse);
 			isGrounded = false;
+
+			animator.SetBool ("isJumping", true);
 		}
 	}
 }
