@@ -6,40 +6,97 @@ public class ProceduralGenerator : MonoBehaviour
 {
 	private const int MAP_SIZE = 5;
 
+	private int chunkSize;
+
+	private Vector3Int startOrigin;
+
 	/**
-	 * Generates a new random world
+	 * Initalises the procedual generator
 	 * @param int size The Chunk size
 	 * @param int seed The seed value for the random generator
+	 * @return Vector3Int Returns the starting origin
 	 */
-	public void generateWorld(int size, int seed = 0)
+	public Vector3Int initalise(int size, int seed = 0)
 	{
 		Random.InitState (seed);
 
-		// The start height for the first chunk
-		int startHeight = Random.Range(size * 2, size * 4);
-		//int startHeight = 0;
-		generateMap (new Vector3Int(0, startHeight, 0), size);
+		startOrigin = new Vector3Int(Random.Range(320, 960), Random.Range(size * 2, size * 5), Random.Range (320, 960));
 
-		GameObject player = (GameObject)Instantiate (Resources.Load("Torso"), new Vector3 (size * 2, startHeight, size * 2), Quaternion.identity);
+		this.chunkSize = size;
+
+		return startOrigin;
 	}
 
-	private void generateMap(Vector3Int offset, int size)
+	/**
+	 * Generates a new random map around a point
+	 * @param Vector3Int offset The offset position
+	 */
+	public void generateMap(Vector3Int offset)
 	{
 		// Create the surface
-		for (int x = -2; x < 2; x++)
+		for (int x = -MAP_SIZE; x < MAP_SIZE; x++)
 		{
-			for (int z = -2; z < 2; z++)
+			for (int z = -MAP_SIZE; z < MAP_SIZE; z++)
 			{
-				// Randomise the height of the new chunk, height increase between 0 & 3, cliffs could be higher
-				int height = Random.Range(1, 3);
+				Chunk surface = new Chunk(new Vector3Int(offset.x + (this.chunkSize * x), offset.y, offset.z + (this.chunkSize * z)));
 
-				Chunk surface = new Chunk(new Vector3Int(offset.x + (size * x), offset.y, offset.z + (size * z)));
-
-				for (int y = 1; y < 3; y++)
+				for (int y = 1; y < 5; y++)
 				{
-					Chunk earth = new Chunk(new Vector3Int(offset.x + (size * x), offset.y - (size * y), offset.z + (size * z)), true);
+					Dictionary<Mineral.Type, Vector3Int[]> minerals = this.calculateMinerals (offset.y - (this.chunkSize * y));
+
+					Chunk earth = new Chunk(new Vector3Int(offset.x + (this.chunkSize * x), offset.y - (this.chunkSize * y), offset.z + (this.chunkSize * z)), true, minerals);
 				}
 			}
 		}
+	}
+
+	private Dictionary<Mineral.Type, Vector3Int[]> calculateMinerals(int y)
+	{
+		Dictionary<Mineral.Type, Vector3Int[]> minerals = new Dictionary<Mineral.Type, Vector3Int[]> ();
+		Debug.Log (y);
+		// Generate coal
+		if (y < Mineral.getSpawnLayer (Mineral.Type.Coal))
+		{
+			if (Mineral.hasSpawnChance (Mineral.Type.Coal))
+			{
+				Vector3Int[] positions = this.generateMineralPositions (Mineral.getRandomSize (Mineral.Type.Coal));
+
+				minerals.Add (Mineral.Type.Coal, positions);
+			}
+		}
+		if (y < Mineral.getSpawnLayer (Mineral.Type.Iron))
+		{
+			if (Mineral.hasSpawnChance(Mineral.Type.Iron))
+			{
+				Vector3Int[] positions = this.generateMineralPositions (Mineral.getRandomSize(Mineral.Type.Iron));
+
+				minerals.Add (Mineral.Type.Iron, positions);
+			}
+		}
+
+		return minerals;
+	}
+
+	private Vector3Int[] generateMineralPositions(int size)
+	{
+		Vector3Int[] positions = new Vector3Int[size];
+
+		positions[0] = new Vector3Int (Random.Range (1, this.chunkSize), Random.Range (1, this.chunkSize), Random.Range (1, this.chunkSize));
+
+
+		for (int i = 1; i < size; i++)
+		{
+			int rx = positions[i - 1].x + Random.Range (-1, 1);
+			int ry = positions[i - 1].y + Random.Range (-1, 1);
+			int rz = positions[i - 1].z + Random.Range (-1, 1);
+
+			rx = rx < 0 ? rx * -1 : rx;
+			ry = ry < 0 ? ry * -1 : ry;
+			rz = rz < 0 ? rz * -1 : rz;
+
+			positions [i] = new Vector3Int (rx, ry, rz);
+		}
+
+		return positions;
 	}
 }

@@ -9,14 +9,15 @@ public class Block
 	int blockHealth, blockDamage;
     int worldX, worldY, worldZ;
     int chunkX, chunkY, chunkZ;
-    string blockType;
+    
+	public string BlockType { get; set; }
 
     /**draw() 
      * Draws the physical representation of a Block in the world.
      */
     public void draw()
     {
-        thisBody = GameObject.Instantiate(Resources.Load(blockType), new Vector3(worldX, worldY, worldZ), Quaternion.identity) as GameObject;
+        thisBody = GameObject.Instantiate(Resources.Load(BlockType), new Vector3(worldX, worldY, worldZ), Quaternion.identity) as GameObject;
     }
 
     /**setPosition(int,int,int)
@@ -60,15 +61,6 @@ public class Block
     {
         return chunkZ;
     }
-
-    /**setBlockType(string)
-     * Sets the type of Block.
-     * @param blockType - the type of prefab this Block should draw.
-     */
-    public void setBlockType(string blockType)
-    {
-        this.blockType = blockType;
-	}
 
 	// Use this for initialization
 	void Start ()

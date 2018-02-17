@@ -11,7 +11,7 @@ public class Chunk
     private int highestPoint = 0;
 	private Vector3Int offset;
 
-	public Chunk(Vector3Int offset, bool isBelowSurface = false){
+	public Chunk(Vector3Int offset, bool isBelowSurface = false, Dictionary<Mineral.Type, Vector3Int[]> minerals = null){
 		this.offset = offset;
 
         /* --- START SECTION --- */
@@ -53,25 +53,25 @@ public class Chunk
 						continue;
 					}
 
+					tempBlock = new Block ();
+
 					if (isBelowSurface)
 					{
-						tempBlock = new Block ();
-						tempBlock.setBlockType ("StoneBlock");
+						tempBlock.BlockType ="StoneBlock";
 					}
 					else
 					{
-						tempBlock = new Block ();
 						if (y <= 4)
 						{
-							tempBlock.setBlockType ("StoneBlock");
+							tempBlock.BlockType = "StoneBlock";
 						}
 						else if (y <= 10)
 						{
-							tempBlock.setBlockType ("SoilBlock");
+							tempBlock.BlockType = "SoilBlock";
 						}
 						else
 						{
-							tempBlock.setBlockType ("GrassBlock");
+							tempBlock.BlockType = "GrassBlock";
 						}
 					}
 
@@ -81,12 +81,12 @@ public class Chunk
 					tempBlock.setChunkPosition(offset.x, offset.y, offset.z);
 					blocks [x, world_y, z] = tempBlock;
 
-					if (y <= 4)
+					if (y <= 4 && !isBelowSurface)
 					{
 						for (int i = offset.y; i < world_yNoOffset; i++)
 						{
 							tempBlock = new Block();
-							tempBlock.setBlockType("StoneBlock");
+							tempBlock.BlockType = "StoneBlock";
 							tempBlock.setPosition(world_x, i, world_z);
 							tempBlock.setChunkPosition(offset.x, 0, offset.z);
 							blocks[x, i - offset.y, z] = tempBlock;
@@ -95,6 +95,31 @@ public class Chunk
                 }
 			}
 		}
+
+		if (minerals != null)
+		{
+			Vector3Int[] mineralPosition;
+			if(minerals.ContainsKey(Mineral.Type.Coal))
+			{
+				mineralPosition= minerals [Mineral.Type.Coal];
+
+				for (int mineralIndex = 0; mineralIndex < mineralPosition.Length; mineralIndex++)
+				{
+					blocks [mineralPosition [mineralIndex].x, mineralPosition [mineralIndex].y, mineralPosition [mineralIndex].z].BlockType = Mineral.getBlock(Mineral.Type.Coal);
+				}
+			}
+
+			if (minerals.ContainsKey (Mineral.Type.Iron))
+			{
+				mineralPosition = minerals [Mineral.Type.Iron];
+
+				for (int mineralIndex = 0; mineralIndex < mineralPosition.Length; mineralIndex++)
+				{
+					blocks [mineralPosition [mineralIndex].x, mineralPosition [mineralIndex].y, mineralPosition [mineralIndex].z].BlockType = Mineral.getBlock (Mineral.Type.Iron);
+				}
+			}
+		}
+		
 	    /* --- END SECTION --- */
 		drawChunk();
 	}
@@ -125,6 +150,8 @@ public class Chunk
                             y == 0 || y == CHUNK_SIZE-1 ||
                             z == 0 || z == CHUNK_SIZE-1)
                         {
+//							if (blockToDraw.BlockType == "StoneBlock")
+//								continue;
                             blockToDraw.draw();
                         }
                         //If statement to handle Blocks within a chunk
@@ -132,6 +159,8 @@ public class Chunk
                                 blocks[x, y + 1, z] == null  || blocks[x, y - 1, z] == null ||
                                 blocks[x, y, z + 1] == null  || blocks[x, y, z - 1] == null)
                         {
+//							if (blockToDraw.BlockType == "StoneBlock")
+//								continue;
                             blockToDraw.draw();
                         }
 					}
