@@ -8,7 +8,7 @@ public class WorldGenerator : MonoBehaviour
 	void Start ()
     {
 		ProceduralGenerator generator = new ProceduralGenerator ();
-		Vector3Int origin = generator.initalise (16, 0);
+		Vector3 origin = generator.initalise (16, 0);
 
 		GameObject player = (GameObject)Instantiate (Resources.Load("Torso"), new Vector3 (origin.x + 10, origin.y + 18, origin.z + 10), Quaternion.identity);
 

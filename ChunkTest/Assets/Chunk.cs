@@ -9,9 +9,9 @@ public class Chunk
 	//blocks[,,] is a 3D array in the form [x, y, z]
 	private Block[,,] blocks = new Block[CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE];
     private int highestPoint = 0;
-	private Vector3Int offset;
+	private Vector3 offset;
 
-	public Chunk(Vector3Int offset, bool isBelowSurface = false, Dictionary<Mineral.Type, Vector3Int[]> minerals = null){
+	public Chunk(Vector3 offset, bool isBelowSurface = false, Dictionary<Mineral.Type, Vector3[]> minerals = null){
 		this.offset = offset;
 
         /* --- START SECTION --- */
@@ -30,8 +30,8 @@ public class Chunk
 				for (int z = 0; z < CHUNK_SIZE; z++)
                 {
                     //Calculate absolute position of block (world space)
-                    world_x = offset.x + x;
-                    world_z = offset.z + z;
+					world_x = (int)offset.x + x;
+					world_z = (int)offset.z + z;
 
 					//Generate a scaled X and Z for input into PerlinNoise function
 					perlinX = ((float)world_x) / CHUNK_SIZE;
@@ -44,7 +44,7 @@ public class Chunk
 						perlinY = 0;
 
 					world_y = y + (int)(perlinY * 5);
-					world_yNoOffset = offset.y + world_y;
+					world_yNoOffset = (int)offset.y + world_y;
 						
 					//Debug.Log ("world_x:" + world_x + " world_z:" + world_z + " = " + world_y);
 					if (world_y < 0 || world_y > CHUNK_SIZE-1)
@@ -78,18 +78,18 @@ public class Chunk
                     highestPoint = (world_y > highestPoint) ? world_y : highestPoint;
 
 					tempBlock.setPosition(world_x, world_yNoOffset, world_z);
-					tempBlock.setChunkPosition(offset.x, offset.y, offset.z);
+					tempBlock.setChunkPosition((int)offset.x, (int)offset.y, (int)offset.z);
 					blocks [x, world_y, z] = tempBlock;
 
 					if (y <= 4 && !isBelowSurface)
 					{
-						for (int i = offset.y; i < world_yNoOffset; i++)
+						for (int i = (int)offset.y; i < world_yNoOffset; i++)
 						{
 							tempBlock = new Block();
 							tempBlock.BlockType = "StoneBlock";
 							tempBlock.setPosition(world_x, i, world_z);
-							tempBlock.setChunkPosition(offset.x, 0, offset.z);
-							blocks[x, i - offset.y, z] = tempBlock;
+							tempBlock.setChunkPosition((int)offset.x, 0, (int)offset.z);
+							blocks[x, i - (int)offset.y, z] = tempBlock;
 						}
 					}
                 }
@@ -98,14 +98,14 @@ public class Chunk
 
 		if (minerals != null)
 		{
-			Vector3Int[] mineralPosition;
+			Vector3[] mineralPosition;
 			if(minerals.ContainsKey(Mineral.Type.Coal))
 			{
 				mineralPosition= minerals [Mineral.Type.Coal];
 
 				for (int mineralIndex = 0; mineralIndex < mineralPosition.Length; mineralIndex++)
 				{
-					blocks [mineralPosition [mineralIndex].x, mineralPosition [mineralIndex].y, mineralPosition [mineralIndex].z].BlockType = Mineral.getBlock(Mineral.Type.Coal);
+					blocks [(int)mineralPosition [mineralIndex].x, (int)mineralPosition [mineralIndex].y, (int)mineralPosition [mineralIndex].z].BlockType = Mineral.getBlock(Mineral.Type.Coal);
 				}
 			}
 
@@ -115,7 +115,7 @@ public class Chunk
 
 				for (int mineralIndex = 0; mineralIndex < mineralPosition.Length; mineralIndex++)
 				{
-					blocks [mineralPosition [mineralIndex].x, mineralPosition [mineralIndex].y, mineralPosition [mineralIndex].z].BlockType = Mineral.getBlock (Mineral.Type.Iron);
+					blocks [(int)mineralPosition [mineralIndex].x, (int)mineralPosition [mineralIndex].y, (int)mineralPosition [mineralIndex].z].BlockType = Mineral.getBlock (Mineral.Type.Iron);
 				}
 			}
 		}
