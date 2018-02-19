@@ -9,11 +9,10 @@ public class Chunk
 	//blocks[,,] is a 3D array in the form [x, y, z]
 	private Block[,,] blocks = new Block[CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE];
     private int highestPoint = 0;
-	private int offsetX, offsetZ;
+	private Vector3 offset;
 
-	public Chunk(int offsetX, int offsetZ){
-		this.offsetX = offsetX;
-		this.offsetZ = offsetZ;
+	public Chunk(Vector3 offset, bool isBelowSurface = false, Dictionary<Mineral.Type, Vector3[]> minerals = null){
+		this.offset = offset;
 
         /* --- START SECTION --- */
         /*This section intialises the chunk*/
@@ -22,15 +21,17 @@ public class Chunk
         int world_x, world_y, world_z;
         float perlinX, perlinY, perlinZ;
 
+		int world_yNoOffset;
+
 		for (int x = 0; x < CHUNK_SIZE; x++)
         {
-			for (int y = 0; y < CHUNK_SIZE; y++)
+			for (int y = 0; y < CHUNK_SIZE - (!isBelowSurface ? 4 : 0); y++)
             {
 				for (int z = 0; z < CHUNK_SIZE; z++)
                 {
                     //Calculate absolute position of block (world space)
-                    world_x = offsetX + x;
-                    world_z = offsetZ + z;
+					world_x = (int)offset.x + x;
+					world_z = (int)offset.z + z;
 
 					//Generate a scaled X and Z for input into PerlinNoise function
 					perlinX = ((float)world_x) / CHUNK_SIZE;
@@ -38,8 +39,13 @@ public class Chunk
 
 					//Generate the PerlinNoise value, offset the block's height by this
 					perlinY = Mathf.PerlinNoise (perlinX, perlinZ);
-                    world_y = y + (int)(perlinY * 5);
 
+					if (isBelowSurface)
+						perlinY = 0;
+
+					world_y = y + (int)(perlinY * 5);
+					world_yNoOffset = (int)offset.y + world_y;
+						
 					//Debug.Log ("world_x:" + world_x + " world_z:" + world_z + " = " + world_y);
 					if (world_y < 0 || world_y > CHUNK_SIZE-1)
                     {
@@ -47,42 +53,73 @@ public class Chunk
 						continue;
 					}
 
-					if (y <= 0)
-                    {
-						tempBlock = new Block();
-						tempBlock.setBlockType("StoneBlock");
+					tempBlock = new Block ();
+
+					if (isBelowSurface)
+					{
+						tempBlock.BlockType ="StoneBlock";
 					}
-                    else if (y <= 1)
-                    {
-						tempBlock = new Block();
-						tempBlock.setBlockType("GrassBlock");
-					}
-                    else
-                    {
-						continue;
+					else
+					{
+						if (y <= 4)
+						{
+							tempBlock.BlockType = "StoneBlock";
+						}
+						else if (y <= 10)
+						{
+							tempBlock.BlockType = "SoilBlock";
+						}
+						else
+						{
+							tempBlock.BlockType = "GrassBlock";
+						}
 					}
 
                     highestPoint = (world_y > highestPoint) ? world_y : highestPoint;
 
-					tempBlock.setPosition(world_x, world_y, world_z);
-                    tempBlock.setChunkPosition(offsetX, 0, offsetZ);
+					tempBlock.setPosition(world_x, world_yNoOffset, world_z);
+					tempBlock.setChunkPosition((int)offset.x, (int)offset.y, (int)offset.z);
 					blocks [x, world_y, z] = tempBlock;
 
-                    //Test to fill in all layers below grass with stone (can be deleted when necessary)
-                    if (y == 0)
-                    {
-                        for (int i = 0; i < world_y; i++)
-                        {
-                            tempBlock = new Block();
-                            tempBlock.setBlockType("StoneBlock");
-                            tempBlock.setPosition(world_x, i, world_z);
-                            tempBlock.setChunkPosition(offsetX, 0, offsetZ);
-                            blocks[x, i, z] = tempBlock;
-                        }
-                    }
+					if (y <= 4 && !isBelowSurface)
+					{
+						for (int i = (int)offset.y; i < world_yNoOffset; i++)
+						{
+							tempBlock = new Block();
+							tempBlock.BlockType = "StoneBlock";
+							tempBlock.setPosition(world_x, i, world_z);
+							tempBlock.setChunkPosition((int)offset.x, 0, (int)offset.z);
+							blocks[x, i - (int)offset.y, z] = tempBlock;
+						}
+					}
                 }
 			}
 		}
+
+		if (minerals != null)
+		{
+			Vector3[] mineralPosition;
+			if(minerals.ContainsKey(Mineral.Type.Coal))
+			{
+				mineralPosition= minerals [Mineral.Type.Coal];
+
+				for (int mineralIndex = 0; mineralIndex < mineralPosition.Length; mineralIndex++)
+				{
+					blocks [(int)mineralPosition [mineralIndex].x, (int)mineralPosition [mineralIndex].y, (int)mineralPosition [mineralIndex].z].BlockType = Mineral.getBlock(Mineral.Type.Coal);
+				}
+			}
+
+			if (minerals.ContainsKey (Mineral.Type.Iron))
+			{
+				mineralPosition = minerals [Mineral.Type.Iron];
+
+				for (int mineralIndex = 0; mineralIndex < mineralPosition.Length; mineralIndex++)
+				{
+					blocks [(int)mineralPosition [mineralIndex].x, (int)mineralPosition [mineralIndex].y, (int)mineralPosition [mineralIndex].z].BlockType = Mineral.getBlock (Mineral.Type.Iron);
+				}
+			}
+		}
+		
 	    /* --- END SECTION --- */
 		drawChunk();
 	}
@@ -113,6 +150,8 @@ public class Chunk
                             y == 0 || y == CHUNK_SIZE-1 ||
                             z == 0 || z == CHUNK_SIZE-1)
                         {
+//							if (blockToDraw.BlockType == "StoneBlock")
+//								continue;
                             blockToDraw.draw();
                         }
                         //If statement to handle Blocks within a chunk
@@ -120,6 +159,8 @@ public class Chunk
                                 blocks[x, y + 1, z] == null  || blocks[x, y - 1, z] == null ||
                                 blocks[x, y, z + 1] == null  || blocks[x, y, z - 1] == null)
                         {
+//							if (blockToDraw.BlockType == "StoneBlock")
+//								continue;
                             blockToDraw.draw();
                         }
 					}
