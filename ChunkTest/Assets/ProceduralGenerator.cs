@@ -99,11 +99,13 @@ public class ProceduralGenerator : MonoBehaviour
 			}
 		}
 
-		foreach (Vector3 otherBlock in chunks.Keys) {
-			float dist = Vector3.Distance (offset, otherBlock);
+		foreach (Vector3 otherChunk in chunks.Keys) {
+			float dist = Vector3.Distance (offset, otherChunk);
 
 			if (dist > chunkSize * MAP_SIZE * 2) {
-				Debug.Log ("Would delete chunk " + otherBlock);
+				Chunk chunk = chunks [otherChunk];
+
+				chunk.Delete ();
 			}
 		}
 	}

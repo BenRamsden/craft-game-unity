@@ -152,6 +152,21 @@ public class Chunk
 		drawChunk();
 	}
 
+	public void Delete() {
+		for (int x = 0; x < CHUNK_SIZE; x++) {
+			for (int y = 0; y < CHUNK_SIZE; y++) {
+				for (int z = 0; z < CHUNK_SIZE; z++) {
+
+					if (blocks [x, y, z] != null) {
+						blocks [x, y, z].Delete ();
+					}
+
+				}
+			}
+		}
+
+	}
+
 	public Vector3 getOffset() {
 		return this.offset;
 	}

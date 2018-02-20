@@ -9,8 +9,16 @@ public class Block
 	int blockHealth, blockDamage;
     int worldX, worldY, worldZ;
     int chunkX, chunkY, chunkZ;
+	static int deletePrints = 0;
     
 	public string BlockType { get; set; }
+
+	public void Delete() {
+		if (deletePrints++ < 10) {
+			Debug.Log ("Delete called on block" + thisBody);
+		}
+
+	}
 
     /**draw() 
      * Draws the physical representation of a Block in the world.
