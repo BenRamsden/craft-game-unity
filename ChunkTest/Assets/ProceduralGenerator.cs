@@ -99,14 +99,27 @@ public class ProceduralGenerator : MonoBehaviour
 			}
 		}
 
+	}
+
+	private List<Vector3> deleteList = new List<Vector3>();
+
+	public void garbageCollect(Vector3 offset) {
+
 		foreach (Vector3 otherChunk in chunks.Keys) {
 			float dist = Vector3.Distance (offset, otherChunk);
 
-			if (dist > chunkSize * MAP_SIZE) {
+			if (dist > chunkSize * MAP_SIZE * 1.5) {
 				chunks [otherChunk].Delete ();
-				//chunks.Remove (otherChunk);
+				deleteList.Add (otherChunk);
 			}
 		}
+
+		foreach (Vector3 otherChunk in deleteList) {
+			chunks.Remove (otherChunk);
+		}
+
+		deleteList.Clear ();
+
 	}
 
 	private Dictionary<Mineral.Type, Vector3[]> calculateMinerals(int y)
