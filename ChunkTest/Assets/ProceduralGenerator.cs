@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ProceduralGenerator : MonoBehaviour
 {
-	private const int MAP_SIZE = 1;
+	private const int MAP_SIZE = 2;
 
 	private const bool DEBUG_DISABLE_MINERAL = true;
 
@@ -50,6 +50,17 @@ public class ProceduralGenerator : MonoBehaviour
 		chunks [offset] = chunk;
 	}
 
+
+	private bool forceExists = false;
+
+	private bool chunkExists(Vector3 offset) {
+		bool exists = chunks.ContainsKey (offset);
+
+		Debug.Log ("Offset " + offset.ToString () + " " + (exists ? "exists" : "null"));
+
+		return exists;
+	}
+
 	/**
 	 * Generates a new random map around a point
 	 * @param Vector3 offset The offset position
@@ -61,9 +72,13 @@ public class ProceduralGenerator : MonoBehaviour
 		{
 			for (int z = -MAP_SIZE; z < MAP_SIZE; z++)
 			{
-				Chunk surface = new Chunk(new Vector3(offset.x + (this.chunkSize * x), offset.y, offset.z + (this.chunkSize * z)));
+				Vector3 surfaceVec = new Vector3 (offset.x + (this.chunkSize * x), offset.y, offset.z + (this.chunkSize * z));
 
-				storeChunk (surface);
+				if (chunkExists (surfaceVec) == false) {
+					Chunk surface = new Chunk(surfaceVec);
+
+					storeChunk (surface);
+				}
 
 				if (DEBUG_DISABLE_MINERAL) {
 					continue;
@@ -73,12 +88,19 @@ public class ProceduralGenerator : MonoBehaviour
 				{
 					Dictionary<Mineral.Type, Vector3[]> minerals = this.calculateMinerals ((int)offset.y - (this.chunkSize * y));
 
-					Chunk earth = new Chunk(new Vector3(offset.x + (this.chunkSize * x), offset.y - (this.chunkSize * y), offset.z + (this.chunkSize * z)), true, minerals);
-				
-					storeChunk (earth);
+					Vector3 earthVec = new Vector3 (offset.x + (this.chunkSize * x), offset.y - (this.chunkSize * y), offset.z + (this.chunkSize * z));
+
+					if (chunkExists (earthVec) == false) {
+						Chunk earth = new Chunk(earthVec, true, minerals);
+
+						storeChunk (earth);
+					}
+
 				}
 			}
 		}
+
+		forceExists = true;
 	}
 
 	private Dictionary<Mineral.Type, Vector3[]> calculateMinerals(int y)

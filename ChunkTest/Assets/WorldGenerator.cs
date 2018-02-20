@@ -19,7 +19,7 @@ public class WorldGenerator : MonoBehaviour
 
 		player = (GameObject)Instantiate (Resources.Load("PlayerTorso"), new Vector3 (origin.x + 10, origin.y + 18, origin.z + 10), Quaternion.identity);
 
-		generator.generateMap (origin);
+		//generator.generateMap (origin);
 	}
 	
 	// Update is called once per frame
@@ -27,10 +27,17 @@ public class WorldGenerator : MonoBehaviour
     {
 		Vector3 playerPos = player.transform.position;
 
-		float originX = playerPos.x - playerPos.x % CHUNK_SIZE;
-		float originY = playerPos.y - playerPos.y % CHUNK_SIZE;
-		float originZ = playerPos.z - playerPos.z % CHUNK_SIZE;
+		float originX = playerPos.x;
+		originX -= originX % CHUNK_SIZE;
 
+		float originY = playerPos.y - CHUNK_SIZE/2;
+		originY -= originY % CHUNK_SIZE;
 
+		float originZ = playerPos.z;
+		originZ -= originZ % CHUNK_SIZE;
+
+		Vector3 origin = new Vector3 (originX, originY, originZ);
+
+		generator.generateMap (origin);
 	}
 }
