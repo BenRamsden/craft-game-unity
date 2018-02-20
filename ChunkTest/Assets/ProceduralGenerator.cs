@@ -4,11 +4,13 @@ using UnityEngine;
 
 public class ProceduralGenerator : MonoBehaviour
 {
-	private const int MAP_SIZE = 2;
+	private const int MAP_SIZE = 1;
 
 	private int chunkSize;
 
 	private Vector3 startOrigin;
+
+	private static bool DEBUG_DISABLE_MINERAL = true;
 
 	/**
 	 * Initalises the procedual generator
@@ -39,6 +41,10 @@ public class ProceduralGenerator : MonoBehaviour
 			for (int z = -MAP_SIZE; z < MAP_SIZE; z++)
 			{
 				Chunk surface = new Chunk(new Vector3(offset.x + (this.chunkSize * x), offset.y, offset.z + (this.chunkSize * z)));
+
+				if (DEBUG_DISABLE_MINERAL) {
+					continue;
+				}
 
 				for (int y = 1; y < 5; y++)
 				{
