@@ -56,7 +56,9 @@ public class ProceduralGenerator : MonoBehaviour
 	private bool chunkExists(Vector3 offset) {
 		bool exists = chunks.ContainsKey (offset);
 
-		Debug.Log ("Offset " + offset.ToString () + " " + (exists ? "exists" : "null"));
+		if (exists == false) {
+			Debug.Log ("Offset " + offset.ToString () + " null");
+		}
 
 		return exists;
 	}
