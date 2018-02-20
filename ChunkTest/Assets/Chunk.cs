@@ -96,6 +96,34 @@ public class Chunk
 			}
 		}
 
+		//WATER_GEN
+		for (int x = 0; x < CHUNK_SIZE; x++)
+		{
+			for (int z = 0; z < CHUNK_SIZE; z++)
+			{
+				//DESCEND
+				for (int y = CHUNK_SIZE-1; y >= 0; y--)
+				{
+
+					if (blocks [x, y, z] != null) {
+						break;  //quit descending this y, as hit ground
+					}
+
+					if (y < 14) {
+						world_x = (int)offset.x + x;
+						world_y = (int)offset.y + y;
+						world_z = (int)offset.z + z;
+
+						tempBlock = new Block ();
+						tempBlock.BlockType = "WaterBlock";
+						tempBlock.setPosition (world_x, world_y, world_z);
+						tempBlock.setChunkPosition (x, y, z);
+						blocks [x, y, z] = tempBlock;
+					}
+				}
+			}
+		}
+
 		if (minerals != null)
 		{
 			Vector3[] mineralPosition;
@@ -128,6 +156,19 @@ public class Chunk
      * Renders the visible blocks based on the current state of the chunk.
      * Currently this means rendering any block that touches a null "air" Block.
      */
+	private bool nullOrWater(Block block) {
+		return block == null || block.BlockType == "WaterBlock";
+	}
+
+	private bool surroundedByNull(int x, int y, int z) {
+		return nullOrWater (blocks [x + 1, y, z]) ||
+		nullOrWater (blocks [x - 1, y, z]) ||
+		nullOrWater (blocks [x, y + 1, z]) ||
+		nullOrWater (blocks [x, y - 1, z]) ||
+		nullOrWater (blocks [x, y, z + 1]) ||
+		nullOrWater (blocks [x, y, z - 1]);
+	}
+
 	private void drawChunk()
 	{
 		Block blockToDraw;
@@ -155,9 +196,7 @@ public class Chunk
                             blockToDraw.draw();
                         }
                         //If statement to handle Blocks within a chunk
-                        else if(blocks[x + 1 , y, z] == null || blocks[x - 1, y, z] == null ||
-                                blocks[x, y + 1, z] == null  || blocks[x, y - 1, z] == null ||
-                                blocks[x, y, z + 1] == null  || blocks[x, y, z - 1] == null)
+						else if(surroundedByNull(x,y,z))
                         {
 //							if (blockToDraw.BlockType == "StoneBlock")
 //								continue;
