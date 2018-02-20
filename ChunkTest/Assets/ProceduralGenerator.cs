@@ -12,6 +12,9 @@ public class ProceduralGenerator : MonoBehaviour
 
 	private static bool DEBUG_DISABLE_MINERAL = true;
 
+	//Maps offset => chunk
+	private Dictionary<Vector3,Chunk> chunks = new Dictionary<Vector3,Chunk> ();
+
 	/**
 	 * Initalises the procedual generator
 	 * @param int size The Chunk size
@@ -29,6 +32,12 @@ public class ProceduralGenerator : MonoBehaviour
 		return startOrigin;
 	}
 
+	private void storeChunk(Chunk chunk) {
+		Vector3 offset = chunk.getOffset ();
+
+		chunks [offset] = chunk;
+	}
+
 	/**
 	 * Generates a new random map around a point
 	 * @param Vector3 offset The offset position
@@ -42,6 +51,8 @@ public class ProceduralGenerator : MonoBehaviour
 			{
 				Chunk surface = new Chunk(new Vector3(offset.x + (this.chunkSize * x), offset.y, offset.z + (this.chunkSize * z)));
 
+				storeChunk (surface);
+
 				if (DEBUG_DISABLE_MINERAL) {
 					continue;
 				}
@@ -51,6 +62,8 @@ public class ProceduralGenerator : MonoBehaviour
 					Dictionary<Mineral.Type, Vector3[]> minerals = this.calculateMinerals ((int)offset.y - (this.chunkSize * y));
 
 					Chunk earth = new Chunk(new Vector3(offset.x + (this.chunkSize * x), offset.y - (this.chunkSize * y), offset.z + (this.chunkSize * z)), true, minerals);
+				
+					storeChunk (earth);
 				}
 			}
 		}

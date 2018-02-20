@@ -152,6 +152,10 @@ public class Chunk
 		drawChunk();
 	}
 
+	public Vector3 getOffset() {
+		return this.offset;
+	}
+
     /**drawChunk()
      * Renders the visible blocks based on the current state of the chunk.
      * Currently this means rendering any block that touches a null "air" Block.
