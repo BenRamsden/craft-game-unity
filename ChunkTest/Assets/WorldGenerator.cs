@@ -27,5 +27,10 @@ public class WorldGenerator : MonoBehaviour
     {
 		Vector3 playerPos = player.transform.position;
 
+		float originX = playerPos.x - playerPos.x % CHUNK_SIZE;
+		float originY = playerPos.y - playerPos.y % CHUNK_SIZE;
+		float originZ = playerPos.z - playerPos.z % CHUNK_SIZE;
+
+
 	}
 }

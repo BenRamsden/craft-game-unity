@@ -32,7 +32,7 @@ public class ProceduralGenerator : MonoBehaviour
 		originX -= originX % size;
 
 		float originY = Random.Range (size * 2, size * 5);
-		originY -= originX % size;
+		originY -= originY % size;
 
 		float originZ = Random.Range (320, 960);
 		originX -= originZ % size;
