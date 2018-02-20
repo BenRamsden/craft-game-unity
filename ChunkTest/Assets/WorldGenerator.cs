@@ -19,7 +19,7 @@ public class WorldGenerator : MonoBehaviour
 
 		player = (GameObject)Instantiate (Resources.Load("PlayerTorso"), new Vector3 (origin.x + 10, origin.y + 18, origin.z + 10), Quaternion.identity);
 
-		//generator.generateMap (origin);
+		generator.generateMap (origin);
 
 		InvokeRepeating ("DeleteOldChunks", 0.0f, 5.0f);
 	}
@@ -44,12 +44,12 @@ public class WorldGenerator : MonoBehaviour
     {
 		Vector3 origin = getPlayerPosition ();
 
-		generator.generateMap (origin);
+		//generator.generateMap (origin);
 	}
 
 	void DeleteOldChunks() {
 		Vector3 origin = getPlayerPosition ();
 
-		generator.garbageCollect (origin);
+		//generator.garbageCollect (origin);
 	}
 }
