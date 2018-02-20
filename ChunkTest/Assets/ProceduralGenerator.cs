@@ -6,9 +6,15 @@ public class ProceduralGenerator : MonoBehaviour
 {
 	private const int MAP_SIZE = 2;
 
+	private const bool DEBUG_DISABLE_MINERAL = true;
+
 	private int chunkSize;
 
 	private Vector3 startOrigin;
+
+
+	//Maps offset => chunk
+	private Dictionary<Vector3,Chunk> chunks = new Dictionary<Vector3,Chunk> ();
 
 	/**
 	 * Initalises the procedual generator
@@ -20,11 +26,38 @@ public class ProceduralGenerator : MonoBehaviour
 	{
 		Random.InitState (seed);
 
-		startOrigin = new Vector3(Random.Range(320, 960), Random.Range(size * 2, size * 5), Random.Range (320, 960));
+		//Modulo aligns the block origin with 0,0,0 at increments of size
+
+		float originX = Random.Range (320, 960);
+		originX -= originX % size;
+
+		float originY = Random.Range (size * 2, size * 5);
+		originY -= originY % size;
+
+		float originZ = Random.Range (320, 960);
+		originX -= originZ % size;
+
+		startOrigin = new Vector3(originX, originY, originZ);
 
 		this.chunkSize = size;
 
 		return startOrigin;
+	}
+
+	private void storeChunk(Chunk chunk) {
+		Vector3 offset = chunk.getOffset ();
+
+		chunks [offset] = chunk;
+	}
+
+	private bool chunkExists(Vector3 offset) {
+		bool exists = chunks.ContainsKey (offset);
+
+		if (exists == false) {
+			//Debug.Log ("Offset " + offset.ToString () + " null");
+		}
+
+		return exists;
 	}
 
 	/**
@@ -38,16 +71,55 @@ public class ProceduralGenerator : MonoBehaviour
 		{
 			for (int z = -MAP_SIZE; z < MAP_SIZE; z++)
 			{
-				Chunk surface = new Chunk(new Vector3(offset.x + (this.chunkSize * x), offset.y, offset.z + (this.chunkSize * z)));
+				Vector3 surfaceVec = new Vector3 (offset.x + (this.chunkSize * x), offset.y, offset.z + (this.chunkSize * z));
+
+				if (chunkExists (surfaceVec) == false) {
+					Chunk surface = new Chunk(surfaceVec);
+
+					storeChunk (surface);
+				}
+
+				if (DEBUG_DISABLE_MINERAL) {
+					continue;
+				}
 
 				for (int y = 1; y < 5; y++)
 				{
 					Dictionary<Mineral.Type, Vector3[]> minerals = this.calculateMinerals ((int)offset.y - (this.chunkSize * y));
 
-					Chunk earth = new Chunk(new Vector3(offset.x + (this.chunkSize * x), offset.y - (this.chunkSize * y), offset.z + (this.chunkSize * z)), true, minerals);
+					Vector3 earthVec = new Vector3 (offset.x + (this.chunkSize * x), offset.y - (this.chunkSize * y), offset.z + (this.chunkSize * z));
+
+					if (chunkExists (earthVec) == false) {
+						Chunk earth = new Chunk(earthVec, true, minerals);
+
+						storeChunk (earth);
+					}
+
 				}
 			}
 		}
+
+	}
+
+	private List<Vector3> deleteList = new List<Vector3>();
+
+	public void garbageCollect(Vector3 offset) {
+
+		foreach (Vector3 otherChunk in chunks.Keys) {
+			float dist = Vector3.Distance (offset, otherChunk);
+
+			if (dist > chunkSize * MAP_SIZE * 1.5) {
+				chunks [otherChunk].Delete ();
+				deleteList.Add (otherChunk);
+			}
+		}
+
+		foreach (Vector3 otherChunk in deleteList) {
+			chunks.Remove (otherChunk);
+		}
+
+		deleteList.Clear ();
+
 	}
 
 	private Dictionary<Mineral.Type, Vector3[]> calculateMinerals(int y)

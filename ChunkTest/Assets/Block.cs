@@ -9,8 +9,16 @@ public class Block
 	int blockHealth, blockDamage;
     int worldX, worldY, worldZ;
     int chunkX, chunkY, chunkZ;
+	static int deletePrints = 0;
     
 	public string BlockType { get; set; }
+
+	public void Delete() {
+		if (thisBody != null) {
+			GameObject.Destroy (thisBody);
+			thisBody = null;
+		}
+	}
 
     /**draw() 
      * Draws the physical representation of a Block in the world.
