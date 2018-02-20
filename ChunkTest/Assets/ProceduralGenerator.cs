@@ -6,11 +6,12 @@ public class ProceduralGenerator : MonoBehaviour
 {
 	private const int MAP_SIZE = 1;
 
+	private const bool DEBUG_DISABLE_MINERAL = true;
+
 	private int chunkSize;
 
 	private Vector3 startOrigin;
 
-	private static bool DEBUG_DISABLE_MINERAL = true;
 
 	//Maps offset => chunk
 	private Dictionary<Vector3,Chunk> chunks = new Dictionary<Vector3,Chunk> ();
@@ -25,7 +26,18 @@ public class ProceduralGenerator : MonoBehaviour
 	{
 		Random.InitState (seed);
 
-		startOrigin = new Vector3(Random.Range(320, 960), Random.Range(size * 2, size * 5), Random.Range (320, 960));
+		//Modulo aligns the block origin with 0,0,0 at increments of size
+
+		float originX = Random.Range (320, 960);
+		originX -= originX % size;
+
+		float originY = Random.Range (size * 2, size * 5);
+		originY -= originX % size;
+
+		float originZ = Random.Range (320, 960);
+		originX -= originZ % size;
+
+		startOrigin = new Vector3(originX, originY, originZ);
 
 		this.chunkSize = size;
 

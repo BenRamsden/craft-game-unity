@@ -4,13 +4,20 @@ using UnityEngine;
 
 public class WorldGenerator : MonoBehaviour
 {
+	private const int CHUNK_SIZE = 16;
+
+	private GameObject player;
+
+	private ProceduralGenerator generator;
+
 	// Use this for initialization
 	void Start ()
     {
-		ProceduralGenerator generator = new ProceduralGenerator ();
-		Vector3 origin = generator.initalise (16, 0);
+		generator = new ProceduralGenerator ();
 
-		GameObject player = (GameObject)Instantiate (Resources.Load("PlayerTorso"), new Vector3 (origin.x + 10, origin.y + 18, origin.z + 10), Quaternion.identity);
+		Vector3 origin = generator.initalise (CHUNK_SIZE, 0);
+
+		player = (GameObject)Instantiate (Resources.Load("PlayerTorso"), new Vector3 (origin.x + 10, origin.y + 18, origin.z + 10), Quaternion.identity);
 
 		generator.generateMap (origin);
 	}
@@ -18,5 +25,7 @@ public class WorldGenerator : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
     {
+		Vector3 playerPos = player.transform.position;
+
 	}
 }
