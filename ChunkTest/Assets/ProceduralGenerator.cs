@@ -54,7 +54,7 @@ public class ProceduralGenerator : MonoBehaviour
 		bool exists = chunks.ContainsKey (offset);
 
 		if (exists == false) {
-			Debug.Log ("Offset " + offset.ToString () + " null");
+			//Debug.Log ("Offset " + offset.ToString () + " null");
 		}
 
 		return exists;
@@ -102,10 +102,9 @@ public class ProceduralGenerator : MonoBehaviour
 		foreach (Vector3 otherChunk in chunks.Keys) {
 			float dist = Vector3.Distance (offset, otherChunk);
 
-			if (dist > chunkSize * MAP_SIZE * 2) {
-				Chunk chunk = chunks [otherChunk];
-
-				chunk.Delete ();
+			if (dist > chunkSize * MAP_SIZE) {
+				chunks [otherChunk].Delete ();
+				//chunks.Remove (otherChunk);
 			}
 		}
 	}

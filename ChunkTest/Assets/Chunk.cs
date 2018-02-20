@@ -159,6 +159,7 @@ public class Chunk
 
 					if (blocks [x, y, z] != null) {
 						blocks [x, y, z].Delete ();
+						blocks [x, y, z] = null;
 					}
 
 				}

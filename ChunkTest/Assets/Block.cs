@@ -14,10 +14,10 @@ public class Block
 	public string BlockType { get; set; }
 
 	public void Delete() {
-		if (deletePrints++ < 10) {
-			Debug.Log ("Delete called on block" + thisBody);
+		if (thisBody != null) {
+			GameObject.Destroy (thisBody);
+			thisBody = null;
 		}
-
 	}
 
     /**draw() 
