@@ -77,6 +77,7 @@ public class ProceduralGenerator : MonoBehaviour
 					Chunk surface = new Chunk(surfaceVec);
 
 					storeChunk (surface);
+					return;
 				}
 
 				if (DEBUG_DISABLE_MINERAL) {
@@ -93,6 +94,7 @@ public class ProceduralGenerator : MonoBehaviour
 						Chunk earth = new Chunk(earthVec, true, minerals);
 
 						storeChunk (earth);
+						return;
 					}
 
 				}
@@ -101,7 +103,8 @@ public class ProceduralGenerator : MonoBehaviour
 
 	}
 
-	private List<Vector3> deleteList = new List<Vector3>();
+	Vector3 deleteChunk = Vector3.zero;
+	bool deleteChunkSet = false;
 
 	public void garbageCollect(Vector3 offset) {
 
@@ -110,15 +113,17 @@ public class ProceduralGenerator : MonoBehaviour
 
 			if (dist > chunkSize * MAP_SIZE * 1.5) {
 				chunks [otherChunk].Delete ();
-				deleteList.Add (otherChunk);
+
+				deleteChunk = otherChunk;
+				deleteChunkSet = true;
+				break;
 			}
 		}
 
-		foreach (Vector3 otherChunk in deleteList) {
-			chunks.Remove (otherChunk);
+		if (deleteChunkSet == true) {
+			chunks.Remove (deleteChunk);
+			deleteChunkSet = false;
 		}
-
-		deleteList.Clear ();
 
 	}
 
