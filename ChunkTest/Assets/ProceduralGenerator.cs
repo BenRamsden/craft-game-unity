@@ -50,9 +50,6 @@ public class ProceduralGenerator : MonoBehaviour
 		chunks [offset] = chunk;
 	}
 
-
-	private bool forceExists = false;
-
 	private bool chunkExists(Vector3 offset) {
 		bool exists = chunks.ContainsKey (offset);
 
@@ -102,7 +99,13 @@ public class ProceduralGenerator : MonoBehaviour
 			}
 		}
 
-		forceExists = true;
+		foreach (Vector3 otherBlock in chunks.Keys) {
+			float dist = Vector3.Distance (offset, otherBlock);
+
+			if (dist > chunkSize * MAP_SIZE * 2) {
+				Debug.Log ("Would delete chunk " + otherBlock);
+			}
+		}
 	}
 
 	private Dictionary<Mineral.Type, Vector3[]> calculateMinerals(int y)
