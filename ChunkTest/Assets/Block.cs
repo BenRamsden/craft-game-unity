@@ -5,7 +5,7 @@ using UnityEngine;
 public class Block {
     GameObject thisBody;
 
-	static int deletePrints = 0; 	//what is this? 
+	//static int deletePrints = 0; 	//what is this? 
 	BlockProperties bp;
 	Vector3 worldPosition;
 	Vector3 chunkPosition;
@@ -60,7 +60,7 @@ public class Block {
      */
     public int getChunkX()
     {
-		return bp.getChunkX();
+		return chunkPosition.x;
     }
 
     /**getChunkY()
@@ -68,6 +68,6 @@ public class Block {
      */
     public int getChunkZ()
     {
-		return bp.getChunkZ();
+		return chunkPosition.z;
     }
 }
