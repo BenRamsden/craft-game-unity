@@ -6,12 +6,16 @@ public class Block
 {
     GameObject thisBody;
 	bool isMineable, isPickupable, isBreakable, isTraversable;
-	int blockHealth, blockDamage;
+
     int worldX, worldY, worldZ;
     int chunkX, chunkY, chunkZ;
 	static int deletePrints = 0;
     
 	public string BlockType { get; set; }
+
+	public void damage(int inputDamage) {
+
+	}
 
 	public void Delete() {
 		if (thisBody != null) {
@@ -26,6 +30,10 @@ public class Block
     public void draw()
     {
         thisBody = GameObject.Instantiate(Resources.Load(BlockType), new Vector3(worldX, worldY, worldZ), Quaternion.identity) as GameObject;
+		//BlockPublicProperties blockScript = thisBody.AddComponent<BlockPublicProperties>() as BlockPublicProperties;
+		BlockProperties blockScript = thisBody.GetComponent<BlockProperties>();
+				//blockScript.blockInstance = this;
+	//	blockScript.blockInstance = 
     }
 
     /**setPosition(int,int,int)
