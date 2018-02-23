@@ -5,14 +5,28 @@ using UnityEngine;
 public class BlockProperties : MonoBehaviour {
 
 	int blockHealth = 100;
+	bool isMineable, isPickupable, isBreakable, isTraversable;
+	int chunkX, chunkY, chunkZ;
 
-	// Use this for initialization
-	void Start () {
-		
+
+
+
+
+	public void setChunkPosition(int posX, int posY, int posZ)
+	{
+		chunkX = posX;
+		chunkY = posY;
+		chunkZ = posZ;
 	}
-	
-	// Update is called once per frame
-	void Update () {
 		
+	public int getChunkX()
+	{
+		return chunkX;
 	}
+		
+	public int getChunkZ()
+	{
+		return chunkZ;
+	}
+
 }

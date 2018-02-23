@@ -11,6 +11,8 @@ public class Chunk
     private int highestPoint = 0;
 	private Vector3 offset;
 
+
+
 	public Chunk(Vector3 offset, bool isBelowSurface = false, Dictionary<Mineral.Type, Vector3[]> minerals = null){
 		this.offset = offset;
 
