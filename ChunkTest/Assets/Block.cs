@@ -13,8 +13,8 @@ public class Block {
 	public string BlockType { get; set; }
 
 	public void damageBlock(int inputDamage) {
-		if (false) {
-		}
+		bp.blockHealth -= inputDamage;
+		Debug.Log (bp.blockHealth);
 	}
 
 	public void Delete() {
@@ -58,7 +58,7 @@ public class Block {
     /**getChunkX()
      * @return chunkX - the x coordinate of where the Block is in its Chunk.
      */
-    public int getChunkX()
+    public float getChunkX()
     {
 		return chunkPosition.x;
     }
@@ -66,7 +66,7 @@ public class Block {
     /**getChunkY()
      * @return chunkZ - the z coordinate of where the Block is in its Chunk.
      */
-    public int getChunkZ()
+    public float getChunkZ()
     {
 		return chunkPosition.z;
     }

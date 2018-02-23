@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Chunk
 {
-	private const int CHUNK_SIZE = 16;
+	public static int CHUNK_SIZE = 16;
 
 	//blocks[,,] is a 3D array in the form [x, y, z]
 	private Block[,,] blocks = new Block[CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE];
@@ -172,6 +172,10 @@ public class Chunk
 
 	public Vector3 getOffset() {
 		return this.offset;
+	}
+
+	public Block getBlock(Vector3 position){
+		return blocks [(int)position.x, (int)position.y, (int)position.z];
 	}
 
     /**drawChunk()
