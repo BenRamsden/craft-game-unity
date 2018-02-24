@@ -2,16 +2,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Block
-{
+public class Block {
     GameObject thisBody;
-	bool isMineable, isPickupable, isBreakable, isTraversable;
-	int blockHealth, blockDamage;
-    int worldX, worldY, worldZ;
-    int chunkX, chunkY, chunkZ;
-	static int deletePrints = 0;
-    
+
+	//static int deletePrints = 0; 	//what is this? 
+	BlockProperties bp;
+	Vector3 worldPosition;
+	Vector3 chunkPosition;
+
 	public string BlockType { get; set; }
+
+	public void damageBlock(int inputDamage) {
+		bp.blockHealth -= inputDamage;
+		Debug.Log (bp.blockHealth);
+	}
 
 	public void Delete() {
 		if (thisBody != null) {
@@ -19,26 +23,26 @@ public class Block
 			thisBody = null;
 		}
 	}
-
+		
     /**draw() 
      * Draws the physical representation of a Block in the world.
      */
     public void draw()
     {
-        thisBody = GameObject.Instantiate(Resources.Load(BlockType), new Vector3(worldX, worldY, worldZ), Quaternion.identity) as GameObject;
+		thisBody = GameObject.Instantiate(Resources.Load(BlockType), worldPosition , Quaternion.identity) as GameObject;
+		bp = thisBody.GetComponent<BlockProperties> ();
+
     }
 
-    /**setPosition(int,int,int)
+	/**setPosition(int,int,int)
      * Sets the Block's knowledge of its position in the world.
      * @param row - the x coordinate of where the Block is in the world.
      * @param layer - the y coordinate of where the Block is in the world.
      * @param column - the z coordinate of where the Block isin the world.
      */
-    public void setPosition(int row, int layer, int column)
-    {
-        worldX = row;
-        worldY = layer;
-        worldZ = column;
+	public void setPosition(int row, int layer, int column)
+	{
+		worldPosition = new Vector3 (row, layer, column);
 	}
 
     /**setChunkPosition(int,int,int)
@@ -47,36 +51,23 @@ public class Block
      * @param layer - the y coordinate of where the Block is in its Chunk.
      * @param column - the z coordinate of where the Block is in its Chunk.
      */
-    public void setChunkPosition(int posX, int posY, int posZ)
-    {
-        chunkX = posX;
-        chunkY = posY;
-        chunkZ = posZ;
+    public void setChunkPosition(int posX, int posY, int posZ) {
+		chunkPosition = new Vector3 (posX, posY, posZ);
     }
 
     /**getChunkX()
      * @return chunkX - the x coordinate of where the Block is in its Chunk.
      */
-    public int getChunkX()
+    public float getChunkX()
     {
-        return chunkX;
+		return chunkPosition.x;
     }
 
     /**getChunkY()
      * @return chunkZ - the z coordinate of where the Block is in its Chunk.
      */
-    public int getChunkZ()
+    public float getChunkZ()
     {
-        return chunkZ;
+		return chunkPosition.z;
     }
-
-	// Use this for initialization
-	void Start ()
-    {
-	}
-	
-	// Update is called once per frame
-	void Update ()
-    {
-	}
 }

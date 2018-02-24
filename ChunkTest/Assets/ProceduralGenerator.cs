@@ -60,6 +60,10 @@ public class ProceduralGenerator : MonoBehaviour
 		return exists;
 	}
 
+	public Chunk getChunk(Vector3 position){
+		return chunks[position];
+	}
+
 	/**
 	 * Generates a new random map around a point
 	 * @param Vector3 offset The offset position

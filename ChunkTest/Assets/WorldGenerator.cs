@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class WorldGenerator : MonoBehaviour
 {
-	private const int CHUNK_SIZE = 16;
+	private static int CHUNK_SIZE = Chunk.CHUNK_SIZE;
 
 	private GameObject player;
 
@@ -37,6 +37,10 @@ public class WorldGenerator : MonoBehaviour
 		originZ -= originZ % CHUNK_SIZE;
 
 		return new Vector3 (originX, originY, originZ);
+	}
+
+	public ProceduralGenerator getPGenerator(){
+		return generator;
 	}
 	
 	// Update is called once per frame
