@@ -7,6 +7,10 @@ public class PlayerInteraction : MonoBehaviour {
 	bool isLeftMouseDown;
 	Block currentBlock;
 
+    /**FixedUpdate()
+     * Is called by the physics engine every physics tick.
+     * This function checks the object we are currently looking at and performs an interaction with it.
+     */
 	void FixedUpdate() {
         Vector3 worldPosition, posOfChunk, posOfBlock;
 		if (isLeftMouseDown) {
