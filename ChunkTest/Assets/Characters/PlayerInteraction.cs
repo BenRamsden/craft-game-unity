@@ -8,14 +8,13 @@ public class PlayerInteraction : MonoBehaviour {
 	RaycastHit hit;
 	bool isLeftMouseDown;
 	Block currentBlock;
+	private  Animator animator;
 
 	// Use this for initialization
 	void Start () {
 		rb = GetComponent<Rigidbody>();
-		//world = GameObject.Find("World");
+		animator = GetComponent<Animator> ();
 
-		//chunk = world.findChunk (currentPosition);
-		//Block = Chunk.findblock (currentposition);
 
 	}
 
@@ -44,9 +43,12 @@ public class PlayerInteraction : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		isLeftMouseDown = Input.GetMouseButtonDown(0);
-		if (isLeftMouseDown && currentBlock != null) {
-			currentBlock.damageBlock (10);
+		if (isLeftMouseDown) {
+			animator.ResetTrigger("Interact");
+			animator.SetTrigger("Interact");
+			if (currentBlock != null) {
+				currentBlock.damageBlock (10);
+			}
 		}
-
 	}
 }
