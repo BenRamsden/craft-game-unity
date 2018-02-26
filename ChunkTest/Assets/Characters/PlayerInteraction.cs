@@ -6,11 +6,16 @@ public class PlayerInteraction : MonoBehaviour {
 	RaycastHit hit;
 	bool isLeftMouseDown;
 	Block currentBlock;
+	private  Animator animator;
 
-    /**FixedUpdate()
-     * Is called by the physics engine every physics tick.
-     * This function checks the object we are currently looking at and performs an interaction with it.
-     */
+	// Use this for initialization
+	void Start () {
+		rb = GetComponent<Rigidbody>();
+		animator = GetComponent<Animator> ();
+
+
+	}
+
 	void FixedUpdate() {
         Vector3 worldPosition, posOfChunk, posOfBlock;
 		if (isLeftMouseDown) {
@@ -33,8 +38,12 @@ public class PlayerInteraction : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		isLeftMouseDown = Input.GetMouseButtonDown(0);
-        if (currentBlock != null) {
-            currentBlock.damageBlock(10);
-        }
+		if (isLeftMouseDown) {
+			animator.ResetTrigger("Interact");
+			animator.SetTrigger("Interact");
+			if (currentBlock != null) {
+				currentBlock.damageBlock (10);
+			}
+		}
 	}
 }
