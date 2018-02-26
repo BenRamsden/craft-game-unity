@@ -7,6 +7,7 @@ public class PlayerInteraction : MonoBehaviour {
 	bool isLeftMouseDown;
 	Block currentBlock;
 	private  Animator animator;
+	Rigidbody rb;
 
 	// Use this for initialization
 	void Start () {
