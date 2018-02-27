@@ -175,8 +175,17 @@ public class Chunk
 	}
 
 	public Block getBlock(Vector3 position){
-		return blocks [(int)position.x, (int)position.y, (int)position.z];
+        Block block = blocks[(int)position.x, (int)position.y, (int)position.z];
+        if (block != null)
+        {
+            return block;
+        }
+        return null;
 	}
+
+    public void removeBlock(Vector3 position) {
+        blocks[(int)position.x, (int)position.y, (int)position.z] = null;
+    }
 
     /**drawChunk()
      * Renders the visible blocks based on the current state of the chunk.

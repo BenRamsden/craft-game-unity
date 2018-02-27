@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class Block {
     GameObject thisBody;
-
-	//static int deletePrints = 0; 	//what is this? 
 	BlockProperties bp;
 	Vector3 worldPosition;
 	Vector3 chunkPosition;
@@ -16,6 +14,14 @@ public class Block {
 		bp.blockHealth -= inputDamage;
 		Debug.Log (bp.blockHealth);
 	}
+
+    public void dropSelf(){
+        Transform thisTransform = thisBody.transform;
+        thisTransform.localScale -= new Vector3(0.5f, 0.5f, 0.5f);
+        thisTransform.rotation = Random.rotation;
+        thisBody.AddComponent<Rigidbody>();
+        thisBody.GetComponent<Rigidbody>().AddForce(thisTransform.forward * 1.0f);
+    }
 
 	public void Delete() {
 		if (thisBody != null) {
@@ -29,9 +35,11 @@ public class Block {
      */
     public void draw()
     {
-		thisBody = GameObject.Instantiate(Resources.Load(BlockType), worldPosition , Quaternion.identity) as GameObject;
-		bp = thisBody.GetComponent<BlockProperties> ();
-
+        if (thisBody == null)
+        {
+            thisBody = GameObject.Instantiate(Resources.Load(BlockType), worldPosition, Quaternion.identity) as GameObject;
+            bp = thisBody.GetComponent<BlockProperties>();
+        }
     }
 
 	/**setPosition(int,int,int)
@@ -53,6 +61,10 @@ public class Block {
      */
     public void setChunkPosition(int posX, int posY, int posZ) {
 		chunkPosition = new Vector3 (posX, posY, posZ);
+    }
+
+    public BlockProperties getProperties() {
+        return bp;
     }
 
     /**getChunkX()
