@@ -49,44 +49,35 @@ public class PlayerInteraction : MonoBehaviour {
                     currentBlock.dropSelf();
                     currentChunk.removeBlock(posOfBlock);
 
-                    Block adjacentBlock = currentChunk.getBlock(new Vector3(posOfBlock.x - 1.0f, posOfBlock.y, posOfBlock.z));
-                    if (adjacentBlock != null) {
-                        adjacentBlock.draw();
-                    }
-                    adjacentBlock = currentChunk.getBlock(new Vector3(posOfBlock.x-1.0f,posOfBlock.y,posOfBlock.z));
-                    if (adjacentBlock != null)
-                    {
-                        adjacentBlock.draw();
-                    }
-                    if (adjacentBlock != null)
-                    {
-                        adjacentBlock.draw();
-                    }
-                    adjacentBlock = currentChunk.getBlock(new Vector3(posOfBlock.x+1.0f, posOfBlock.y, posOfBlock.z));
-                    if (adjacentBlock != null)
-                    {
-                        adjacentBlock.draw();
-                    }
-                    adjacentBlock = currentChunk.getBlock(new Vector3(posOfBlock.x, posOfBlock.y-1.0f, posOfBlock.z));
-                    if (adjacentBlock != null)
-                    {
-                        adjacentBlock.draw();
-                    }
-                    adjacentBlock = currentChunk.getBlock(new Vector3(posOfBlock.x, posOfBlock.y+1.0f, posOfBlock.z));
-                    if (adjacentBlock != null)
-                    {
-                        adjacentBlock.draw();
-                    }
-                    adjacentBlock = currentChunk.getBlock(new Vector3(posOfBlock.x, posOfBlock.y, posOfBlock.z-1.0f));
-                    if (adjacentBlock != null)
-                    {
-                        adjacentBlock.draw();
-                    }
-                    adjacentBlock = currentChunk.getBlock(new Vector3(posOfBlock.x, posOfBlock.y, posOfBlock.z+1.0f));
-                    if (adjacentBlock != null)
-                    {
-                        adjacentBlock.draw();
-                    }
+					Vector3[] vectors = Vector3[6];
+					vectors [0] = new Vector3 (posOfBlock.x - 1.0f, posOfBlock.y, posOfBlock.z);
+					vectors [1] = new Vector3 (posOfBlock.x + 1.0f, posOfBlock.y, posOfBlock.z);
+					vectors [2] = new Vector3 (posOfBlock.x, posOfBlock.y - 1.0f, posOfBlock.z);
+					vectors [3] = new Vector3 (posOfBlock.x, posOfBlock.y + 1.0f, posOfBlock.z);
+					vectors [4] = new Vector3 (posOfBlock.x, posOfBlock.y, posOfBlock.z - 1.0f);
+					vectors [5] = new Vector3 (posOfBlock.x, posOfBlock.y, posOfBlock.z + 1.0f);
+
+
+					Block adjacentBlock;
+					for(int i = 0; i < 6; i++){
+						if (adjacentBlock = currentChunk.getBlock (vectors [i]) != null) 
+						{
+							if (adjacentBlock != null) 
+							{
+								adjacentBlock.draw();
+							}
+						} 
+						else
+						{
+							posOfChunk = new Vector3(
+								(vectors[i].x<0&&vectors[i].x<15)? posOfChunk.x-16.0f:posOfChunk.x+16.0f,
+								(vectors[i].y<0&&vectors[i].y<15)? posOfChunk.y-16.0f:posOfChunk.y+16.0f,
+								(vectors[i].z<0&&vectors[i].z<15)? posOfChunk.z-16.0f:posOfChunk.z+16.0f);
+							currentChunk = GameObject.Find("World").GetComponent<WorldGenerator>().getPGenerator().getChunk(posOfChunk);
+
+						}
+
+					}
                 }
             }
 		}
