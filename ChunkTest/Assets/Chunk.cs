@@ -69,7 +69,7 @@ public class Chunk
 						}
 						else if (y <= 10)
 						{
-							tempBlock.BlockType = "SoilBlock";
+							tempBlock.BlockType = "DirtBlock";
 						}
 						else
 						{
@@ -222,19 +222,14 @@ public class Chunk
 						blockToDraw = blocks [x, y, z];
 
                         //If statement to handle Blocks at the edge of a chunk
-                        if (x == 0 || x == CHUNK_SIZE-1 ||
-                            y == 0 || y == CHUNK_SIZE-1 ||
-                            z == 0 || z == CHUNK_SIZE-1)
+                        if (x == 0 || x == CHUNK_SIZE - 1 ||
+                            y == 0 || y == CHUNK_SIZE - 1 ||
+                            z == 0 || z == CHUNK_SIZE - 1)
                         {
-//							if (blockToDraw.BlockType == "StoneBlock")
-//								continue;
                             blockToDraw.draw();
                         }
-                        //If statement to handle Blocks within a chunk
-						else if(surroundedByNull(x,y,z))
+                        else if (surroundedByNull(x, y, z))
                         {
-//							if (blockToDraw.BlockType == "StoneBlock")
-//								continue;
                             blockToDraw.draw();
                         }
 					}
