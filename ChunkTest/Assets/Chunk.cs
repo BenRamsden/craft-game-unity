@@ -9,12 +9,12 @@ public class Chunk
 	//blocks[,,] is a 3D array in the form [x, y, z]
 	private Block[,,] blocks = new Block[CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE];
     private int highestPoint = 0;
-	private Vector3 offset;
+	private Vector3 worldOffset;
 
 
 
-	public Chunk(Vector3 offset, bool isBelowSurface = false, Dictionary<Mineral.Type, Vector3[]> minerals = null){
-		this.offset = offset;
+	public Chunk(Vector3 worldOffset, bool isBelowSurface = false, Dictionary<Mineral.Type, Vector3[]> minerals = null){
+		this.worldOffset = worldOffset;
 
         /* --- START SECTION --- */
         /*This section intialises the chunk*/
@@ -32,8 +32,8 @@ public class Chunk
 				for (int z = 0; z < CHUNK_SIZE; z++)
                 {
                     //Calculate absolute position of block (world space)
-					world_x = (int)offset.x + x;
-					world_z = (int)offset.z + z;
+					world_x = (int)worldOffset.x + x;
+					world_z = (int)worldOffset.z + z;
 
 					//Generate a scaled X and Z for input into PerlinNoise function
 					perlinX = ((float)world_x) / CHUNK_SIZE;
@@ -46,7 +46,7 @@ public class Chunk
 						perlinY = 0;
 
 					world_y = y + (int)(perlinY * 5);
-					world_yNoOffset = (int)offset.y + world_y;
+					world_yNoOffset = (int)worldOffset.y + world_y;
 						
 					//Debug.Log ("world_x:" + world_x + " world_z:" + world_z + " = " + world_y);
 					if (world_y < 0 || world_y > CHUNK_SIZE-1)
@@ -80,18 +80,18 @@ public class Chunk
                     highestPoint = (world_y > highestPoint) ? world_y : highestPoint;
 
 					tempBlock.setPosition(world_x, world_yNoOffset, world_z);
-					tempBlock.setChunkPosition((int)offset.x, (int)offset.y, (int)offset.z);
+					tempBlock.setChunkPosition((int)worldOffset.x, (int)worldOffset.y, (int)worldOffset.z);
 					blocks [x, world_y, z] = tempBlock;
 
 					if (y <= 4 && !isBelowSurface)
 					{
-						for (int i = (int)offset.y; i < world_yNoOffset; i++)
+						for (int i = (int)worldOffset.y; i < world_yNoOffset; i++)
 						{
 							tempBlock = new Block();
 							tempBlock.BlockType = "StoneBlock";
 							tempBlock.setPosition(world_x, i, world_z);
-							tempBlock.setChunkPosition((int)offset.x, 0, (int)offset.z);
-							blocks[x, i - (int)offset.y, z] = tempBlock;
+							tempBlock.setChunkPosition((int)worldOffset.x, 0, (int)worldOffset.z);
+							blocks[x, i - (int)worldOffset.y, z] = tempBlock;
 						}
 					}
                 }
@@ -111,20 +111,22 @@ public class Chunk
 						break;  //quit descending this y, as hit ground
 					}
 
-					if (y < 13 && Random.Range(0,100) < 1.0f) {
-						world_x = (int)offset.x + x;
-						world_y = (int)offset.y + y;
-						world_z = (int)offset.z + z;
+					if (y < 14 && Random.Range(0,100) < 1.0f) {
+						world_x = (int)worldOffset.x + x;
+						world_y = (int)worldOffset.y + y;
+						world_z = (int)worldOffset.z + z;
 
 						tempBlock = new Block ();
 						tempBlock.BlockType = "WaterBlock";
 						tempBlock.setPosition (world_x, world_y, world_z);
 						tempBlock.setChunkPosition (x, y, z);
-						blocks [x, y, z] = tempBlock;
+                        blocks[x, y, z] = tempBlock;
 					}
 				}
 			}
 		}
+
+        
 
 		if (minerals != null)
 		{
@@ -171,7 +173,7 @@ public class Chunk
 	}
 
 	public Vector3 getOffset() {
-		return this.offset;
+		return this.worldOffset;
 	}
 
 	public Block getBlock(Vector3 position){
@@ -234,9 +236,55 @@ public class Chunk
 		}
 	}
 
+    bool isInBlocksBounds(int x, int y, int z)
+    {
+        return x >= 0 && x < CHUNK_SIZE && y >= 0 && y < CHUNK_SIZE && z >= 0 && z < CHUNK_SIZE;
+    }
+
     public void waterProcess()
     {
-        Debug.Log("Water Process");
+        //if (Random.Range(0, 20) > 1.0f)
+        //    return;
+
+        //WATER_GEN
+        for (int x = 0; x < CHUNK_SIZE; x++)
+        {
+            for (int z = 0; z < CHUNK_SIZE; z++)
+            {
+                //DESCEND
+                for (int y = CHUNK_SIZE - 1; y >= 0; y--)
+                {
+                    
+                    if(blocks[x,y,z] != null && blocks[x,y,z].BlockType == "WaterBlock")
+                    {
+                        for(int x2 = x-1; x2 <= x+1; x2++)
+                        {
+                            for(int z2 = z-1; z2 <= z+1; z2++)
+                            {
+                                for(int y2 = y-1; y2 <= y; y2++)
+                                {
+                                    if(isInBlocksBounds(x2,y2,z2) && blocks[x2,y2,z2] == null)
+                                    {
+                                        int world_x = (int)worldOffset.x + x2;
+                                        int world_y = (int)worldOffset.y + y2;
+                                        int world_z = (int)worldOffset.z + z2;
+
+                                        Block tempBlock = new Block();
+                                        tempBlock.BlockType = "WaterBlock";
+                                        tempBlock.setPosition(world_x, world_y, world_z);
+                                        tempBlock.setChunkPosition(x2, y2, z2);
+                                        blocks[x2, y2, z2] = tempBlock;
+
+                                        tempBlock.draw();
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
     }
 
     // Use this for initialization
