@@ -26,18 +26,7 @@ public class ProceduralGenerator : MonoBehaviour
 	{
 		Random.InitState (seed);
 
-		//Modulo aligns the block origin with 0,0,0 at increments of size
-
-		float originX = Random.Range (320, 960);
-		originX -= originX % size;
-
-		float originY = Random.Range (size * 2, size * 5);
-		originY -= originY % size;
-
-		float originZ = Random.Range (320, 960);
-		originX -= originZ % size;
-
-		startOrigin = new Vector3(originX, originY, originZ);
+		startOrigin = new Vector3(0, 0, 0);
 
 		this.chunkSize = size;
 
@@ -72,42 +61,41 @@ public class ProceduralGenerator : MonoBehaviour
 	 * Generates a new random map around a point
 	 * @param Vector3 offset The offset position
 	 */
-	public void generateMap(Vector3 playerPos)
+	public bool generateMap(Vector3 playerPos)
 	{
 		// Create the surface
 		for (int x = -MAP_SIZE; x < MAP_SIZE; x++)
 		{
 			for (int z = -MAP_SIZE; z < MAP_SIZE; z++)
 			{
+				//Generate surface
 				Vector3 surfaceVec = new Vector3 (playerPos.x + (this.chunkSize * x), playerPos.y, playerPos.z + (this.chunkSize * z));
 
 				if (chunkExists (surfaceVec) == false) {
 					Chunk surface = new Chunk(surfaceVec,this);
 
 					storeChunk (surface);
-					return;
+					return true;
 				}
 
-				if (DEBUG_DISABLE_MINERAL) {
-					continue;
-				}
+				for (int offsetY = 0; offsetY >= -1; offsetY--) {
+					//Generate mineral layer
+					Vector3 mineralVec = new Vector3 (surfaceVec.x, surfaceVec.y + (offsetY * Chunk.CHUNK_SIZE), surfaceVec.z);
 
-				for (int y = 1; y < 5; y++)
-				{
-					Dictionary<Mineral.Type, Vector3[]> minerals = this.calculateMinerals ((int)playerPos.y - (this.chunkSize * y));
+					Dictionary<Mineral.Type, Vector3[]> minerals = this.calculateMinerals ((int)mineralVec.y);
 
-					Vector3 earthVec = new Vector3 (playerPos.x + (this.chunkSize * x), playerPos.y - (this.chunkSize * y), playerPos.z + (this.chunkSize * z));
-
-					if (chunkExists (earthVec) == false) {
-						Chunk earth = new Chunk(earthVec, this, true, minerals);
+					if (chunkExists (mineralVec) == false) {
+						Chunk earth = new Chunk(mineralVec, this, true);
+						earth.GenMinerals (minerals);
 
 						storeChunk (earth);
-						return;
+						return true;
 					}
-
 				}
 			}
 		}
+
+		return false;
 
 	}
 
@@ -146,7 +134,7 @@ public class ProceduralGenerator : MonoBehaviour
 	private Dictionary<Mineral.Type, Vector3[]> calculateMinerals(int y)
 	{
 		Dictionary<Mineral.Type, Vector3[]> minerals = new Dictionary<Mineral.Type, Vector3[]> ();
-		Debug.Log (y);
+		//Debug.Log (y);
 		// Generate coal
 		if (y < Mineral.getSpawnLayer (Mineral.Type.Coal))
 		{

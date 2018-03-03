@@ -18,6 +18,10 @@ public class WorldGenerator : MonoBehaviour
 		Vector3 origin = generator.initalise (CHUNK_SIZE, 0);
 
 		player = (GameObject)Instantiate (Resources.Load("Steve/PlayerTorso"), new Vector3 (origin.x + 10, origin.y + 18, origin.z + 10), Quaternion.identity);
+
+		while (generator.generateMap (origin) == true) {
+			//Loading
+		}
 	}
 		
 	Vector3 getPlayerPosition() {

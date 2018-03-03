@@ -26,12 +26,16 @@ public class Chunk
         return tempBlock;
     }
 
-	public Chunk(Vector3 worldOffset, ProceduralGenerator generator, bool isBelowSurface = false, Dictionary<Mineral.Type, Vector3[]> minerals = null){
+	public Chunk(Vector3 worldOffset, ProceduralGenerator generator, bool isBelowSurface = false){
 		this.worldOffset = worldOffset;
 		this.generator = generator;
 
         /* --- START SECTION --- */
         /*This section intialises the chunk*/
+
+		if (isBelowSurface) {
+			return;
+		}
 
 		for (int x = 0; x < CHUNK_SIZE; x++)
         {
@@ -96,35 +100,21 @@ public class Chunk
 				}
 			}
 		}
-
-        
-
-		if (minerals != null)
-		{
-			Vector3[] mineralPosition;
-			if(minerals.ContainsKey(Mineral.Type.Coal))
-			{
-				mineralPosition= minerals [Mineral.Type.Coal];
-
-				for (int mineralIndex = 0; mineralIndex < mineralPosition.Length; mineralIndex++)
-				{
-					blocks [(int)mineralPosition [mineralIndex].x, (int)mineralPosition [mineralIndex].y, (int)mineralPosition [mineralIndex].z].BlockType = Mineral.getBlock(Mineral.Type.Coal);
-				}
-			}
-
-			if (minerals.ContainsKey (Mineral.Type.Iron))
-			{
-				mineralPosition = minerals [Mineral.Type.Iron];
-
-				for (int mineralIndex = 0; mineralIndex < mineralPosition.Length; mineralIndex++)
-				{
-					blocks [(int)mineralPosition [mineralIndex].x, (int)mineralPosition [mineralIndex].y, (int)mineralPosition [mineralIndex].z].BlockType = Mineral.getBlock (Mineral.Type.Iron);
-				}
-			}
-		}
-		
+			
 	    /* --- END SECTION --- */
 		drawChunk();
+	}
+
+	public void GenMinerals(Dictionary<Mineral.Type, Vector3[]> minerals) {
+		foreach (KeyValuePair<Mineral.Type,Vector3[]> pair in minerals) {
+			Vector3[] mineralPosition = pair.Value;
+
+			for (int mineralIndex = 0; mineralIndex < mineralPosition.Length; mineralIndex++)
+			{
+				Block block = CreateBlock (Mineral.getBlock (Mineral.Type.Coal), (int)mineralPosition [mineralIndex].x, (int)mineralPosition [mineralIndex].y, (int)mineralPosition [mineralIndex].z);
+				block.draw ();
+			}
+		}
 	}
 
 	public void Delete() {
