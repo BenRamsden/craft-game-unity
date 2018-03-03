@@ -20,5 +20,15 @@ public class HelperMethods
 
 		return new Vector3 (originX, originY, originZ);
 	}
+		
+	public static Vector3 vectorDifference(Vector3 vector1, Vector3 vector2) {
+		Vector3 diff = vector1 - vector2;
+
+		diff.x = Mathf.Abs (diff.x);
+		diff.y = Mathf.Abs (diff.y);
+		diff.z = Mathf.Abs (diff.z);
+
+		return diff;
+	}
 }
 
