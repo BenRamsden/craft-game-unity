@@ -113,7 +113,7 @@ public class Chunk
 						break;  //quit descending this y, as hit ground
 					}
 
-					if (y < 14 && Random.Range(0,100) < 1.0f) {
+					if (y < 14 && Random.Range(0,1000) < 1.0f) {
 						world_x = (int)worldOffset.x + x;
 						world_y = (int)worldOffset.y + y;
 						world_z = (int)worldOffset.z + z;
