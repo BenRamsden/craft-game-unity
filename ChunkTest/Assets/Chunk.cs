@@ -12,7 +12,19 @@ public class Chunk
 	private Vector3 worldOffset;
 	private ProceduralGenerator generator;
 
+    public Block CreateBlock(string blockType, int chunkX, int chunkY, int chunkZ)
+    {
+        int worldX = (int)worldOffset.x + chunkX;
+        int worldY = (int)worldOffset.y + chunkY;
+        int worldZ = (int)worldOffset.z + chunkZ;
 
+        Block tempBlock = new Block();
+        tempBlock.BlockType = blockType;
+        tempBlock.setPosition(worldX, worldY, worldZ);
+        tempBlock.setChunkPosition(chunkX, chunkY, chunkZ);
+        blocks[chunkX,chunkY,chunkZ] = tempBlock;
+        return tempBlock;
+    }
 
 	public Chunk(Vector3 worldOffset, ProceduralGenerator generator, bool isBelowSurface = false, Dictionary<Mineral.Type, Vector3[]> minerals = null){
 		this.worldOffset = worldOffset;
@@ -21,8 +33,7 @@ public class Chunk
         /* --- START SECTION --- */
         /*This section intialises the chunk*/
 
-        Block tempBlock;
-        int world_x, world_y, world_z;
+        int worldX, worldY, worldZ;
         float perlinX, perlinY, perlinZ;
 
 		int world_yNoOffset;
@@ -34,12 +45,12 @@ public class Chunk
 				for (int z = 0; z < CHUNK_SIZE; z++)
                 {
                     //Calculate absolute position of block (world space)
-					world_x = (int)worldOffset.x + x;
-					world_z = (int)worldOffset.z + z;
+					worldX = (int)worldOffset.x + x;
+					worldZ = (int)worldOffset.z + z;
 
 					//Generate a scaled X and Z for input into PerlinNoise function
-					perlinX = ((float)world_x) / CHUNK_SIZE;
-					perlinZ = ((float)world_z) / CHUNK_SIZE;
+					perlinX = ((float)worldX) / CHUNK_SIZE;
+					perlinZ = ((float)worldZ) / CHUNK_SIZE;
 
 					//Generate the PerlinNoise value, offset the block's height by this
 					perlinY = Mathf.PerlinNoise (perlinX, perlinZ);
@@ -47,53 +58,47 @@ public class Chunk
 					if (isBelowSurface)
 						perlinY = 0;
 
-					world_y = y + (int)(perlinY * 5);
-					world_yNoOffset = (int)worldOffset.y + world_y;
+					worldY = y + (int)(perlinY * 5);
+					world_yNoOffset = (int)worldOffset.y + worldY;
 						
 					//Debug.Log ("world_x:" + world_x + " world_z:" + world_z + " = " + world_y);
-					if (world_y < 0 || world_y > CHUNK_SIZE-1)
+					if (worldY < 0 || worldY > CHUNK_SIZE-1)
                     {
-						Debug.Log ("Cannot insert chunk into block at index " + world_y + " continuing");
+						Debug.Log ("Cannot insert chunk into block at index " + worldY + " continuing");
 						continue;
 					}
 
-					tempBlock = new Block ();
+                    string blockType = null;
 
 					if (isBelowSurface)
 					{
-						tempBlock.BlockType ="StoneBlock";
+                        blockType = "StoneBlock";
 					}
 					else
 					{
 						if (y <= 4)
 						{
-							tempBlock.BlockType = "StoneBlock";
+                            blockType = "StoneBlock";
 						}
 						else if (y <= 10)
 						{
-							tempBlock.BlockType = "SoilBlock";
+                            blockType = "SoilBlock";
 						}
 						else
 						{
-							tempBlock.BlockType = "GrassBlock";
+                            blockType = "GrassBlock";
 						}
 					}
 
-                    highestPoint = (world_y > highestPoint) ? world_y : highestPoint;
+                    highestPoint = (worldY > highestPoint) ? worldY : highestPoint;
 
-					tempBlock.setPosition(world_x, world_yNoOffset, world_z);
-					tempBlock.setChunkPosition((int)worldOffset.x, (int)worldOffset.y, (int)worldOffset.z);
-					blocks [x, world_y, z] = tempBlock;
+                    CreateBlock(blockType, x, worldY, z);
 
 					if (y <= 4 && !isBelowSurface)
 					{
 						for (int i = (int)worldOffset.y; i < world_yNoOffset; i++)
 						{
-							tempBlock = new Block();
-							tempBlock.BlockType = "StoneBlock";
-							tempBlock.setPosition(world_x, i, world_z);
-							tempBlock.setChunkPosition((int)worldOffset.x, 0, (int)worldOffset.z);
-							blocks[x, i - (int)worldOffset.y, z] = tempBlock;
+                            CreateBlock("StoneBlock", x, i - (int)worldOffset.y, z);
 						}
 					}
                 }
@@ -114,15 +119,7 @@ public class Chunk
 					}
 
 					if (y < 14 && Random.Range(0,1000) < 1.0f) {
-						world_x = (int)worldOffset.x + x;
-						world_y = (int)worldOffset.y + y;
-						world_z = (int)worldOffset.z + z;
-
-						tempBlock = new Block ();
-						tempBlock.BlockType = "WaterBlock";
-						tempBlock.setPosition (world_x, world_y, world_z);
-						tempBlock.setChunkPosition (x, y, z);
-                        blocks[x, y, z] = tempBlock;
+                        CreateBlock("WaterBlock", x, y, z);
 					}
 				}
 			}
@@ -245,9 +242,6 @@ public class Chunk
 
     public void waterProcess()
     {
-        //if (Random.Range(0, 20) > 1.0f)
-        //    return;
-
         //WATER_GEN
         for (int x = 0; x < CHUNK_SIZE; x++)
         {
@@ -272,13 +266,8 @@ public class Chunk
 									if (isInBlocksBounds (x2, y2, z2)) {
 										if(blocks[x2,y2,z2] == null)
 										{
-											Block tempBlock = new Block();
-											tempBlock.BlockType = "WaterBlock";
-											tempBlock.setPosition(world_x, world_y, world_z);
-											tempBlock.setChunkPosition(x2, y2, z2);
-											blocks[x2, y2, z2] = tempBlock;
-
-											tempBlock.draw();
+                                            Block block = CreateBlock("WaterBlock", x2, y2, z2);
+                                            block.draw();
 										}
 									} else {
 										Vector3 worldPos = new Vector3 (world_x,world_y,world_z);
@@ -303,13 +292,8 @@ public class Chunk
 										Block otherBlock = otherChunk.blocks [chunkX, chunkY, chunkZ];
 
 										if (otherBlock == null) {
-											Block tempBlock = new Block();
-											tempBlock.BlockType = "WaterBlock";
-											tempBlock.setPosition(world_x, world_y, world_z);
-											tempBlock.setChunkPosition(chunkX, chunkY, chunkZ);
-											otherChunk.blocks[chunkX, chunkY, chunkZ] = tempBlock;
-
-											tempBlock.draw();
+                                            Block block = otherChunk.CreateBlock("WaterBlock", chunkX, chunkY, chunkZ);
+                                            block.draw();
 										}
 										
 									}
