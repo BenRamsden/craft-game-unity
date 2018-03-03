@@ -61,6 +61,10 @@ public class ProceduralGenerator : MonoBehaviour
 	}
 
 	public Chunk getChunk(Vector3 position){
+		if(chunks.ContainsKey(position) == false) {
+			return null;
+		}
+
 		return chunks[position];
 	}
 
@@ -68,17 +72,17 @@ public class ProceduralGenerator : MonoBehaviour
 	 * Generates a new random map around a point
 	 * @param Vector3 offset The offset position
 	 */
-	public void generateMap(Vector3 offset)
+	public void generateMap(Vector3 playerPos)
 	{
 		// Create the surface
 		for (int x = -MAP_SIZE; x < MAP_SIZE; x++)
 		{
 			for (int z = -MAP_SIZE; z < MAP_SIZE; z++)
 			{
-				Vector3 surfaceVec = new Vector3 (offset.x + (this.chunkSize * x), offset.y, offset.z + (this.chunkSize * z));
+				Vector3 surfaceVec = new Vector3 (playerPos.x + (this.chunkSize * x), playerPos.y, playerPos.z + (this.chunkSize * z));
 
 				if (chunkExists (surfaceVec) == false) {
-					Chunk surface = new Chunk(surfaceVec);
+					Chunk surface = new Chunk(surfaceVec,this);
 
 					storeChunk (surface);
 					return;
@@ -90,12 +94,12 @@ public class ProceduralGenerator : MonoBehaviour
 
 				for (int y = 1; y < 5; y++)
 				{
-					Dictionary<Mineral.Type, Vector3[]> minerals = this.calculateMinerals ((int)offset.y - (this.chunkSize * y));
+					Dictionary<Mineral.Type, Vector3[]> minerals = this.calculateMinerals ((int)playerPos.y - (this.chunkSize * y));
 
-					Vector3 earthVec = new Vector3 (offset.x + (this.chunkSize * x), offset.y - (this.chunkSize * y), offset.z + (this.chunkSize * z));
+					Vector3 earthVec = new Vector3 (playerPos.x + (this.chunkSize * x), playerPos.y - (this.chunkSize * y), playerPos.z + (this.chunkSize * z));
 
 					if (chunkExists (earthVec) == false) {
-						Chunk earth = new Chunk(earthVec, true, minerals);
+						Chunk earth = new Chunk(earthVec, this, true, minerals);
 
 						storeChunk (earth);
 						return;
@@ -110,10 +114,10 @@ public class ProceduralGenerator : MonoBehaviour
 	Vector3 deleteChunk = Vector3.zero;
 	bool deleteChunkSet = false;
 
-	public void garbageCollect(Vector3 offset) {
+	public void garbageCollect(Vector3 playerPos) {
 
 		foreach (Vector3 otherChunk in chunks.Keys) {
-			float dist = Vector3.Distance (offset, otherChunk);
+			float dist = Vector3.Distance (playerPos, otherChunk);
 
 			if (dist > chunkSize * MAP_SIZE * 1.5) {
 				chunks [otherChunk].Delete ();
@@ -130,6 +134,14 @@ public class ProceduralGenerator : MonoBehaviour
 		}
 
 	}
+
+    public void waterProcess(Vector3 playerPos)
+    {
+        foreach (Vector3 otherChunk in chunks.Keys)
+        {
+            chunks[otherChunk].waterProcess();
+        }
+    }
 
 	private Dictionary<Mineral.Type, Vector3[]> calculateMinerals(int y)
 	{
