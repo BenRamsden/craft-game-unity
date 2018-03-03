@@ -61,6 +61,10 @@ public class ProceduralGenerator : MonoBehaviour
 	}
 
 	public Chunk getChunk(Vector3 position){
+		if(chunks.ContainsKey(position) == false) {
+			return null;
+		}
+
 		return chunks[position];
 	}
 
@@ -78,7 +82,7 @@ public class ProceduralGenerator : MonoBehaviour
 				Vector3 surfaceVec = new Vector3 (playerPos.x + (this.chunkSize * x), playerPos.y, playerPos.z + (this.chunkSize * z));
 
 				if (chunkExists (surfaceVec) == false) {
-					Chunk surface = new Chunk(surfaceVec);
+					Chunk surface = new Chunk(surfaceVec,this);
 
 					storeChunk (surface);
 					return;
@@ -95,7 +99,7 @@ public class ProceduralGenerator : MonoBehaviour
 					Vector3 earthVec = new Vector3 (playerPos.x + (this.chunkSize * x), playerPos.y - (this.chunkSize * y), playerPos.z + (this.chunkSize * z));
 
 					if (chunkExists (earthVec) == false) {
-						Chunk earth = new Chunk(earthVec, true, minerals);
+						Chunk earth = new Chunk(earthVec, this, true, minerals);
 
 						storeChunk (earth);
 						return;

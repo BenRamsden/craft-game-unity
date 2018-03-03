@@ -10,11 +10,13 @@ public class Chunk
 	private Block[,,] blocks = new Block[CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE];
     private int highestPoint = 0;
 	private Vector3 worldOffset;
+	private ProceduralGenerator generator;
 
 
 
-	public Chunk(Vector3 worldOffset, bool isBelowSurface = false, Dictionary<Mineral.Type, Vector3[]> minerals = null){
+	public Chunk(Vector3 worldOffset, ProceduralGenerator generator, bool isBelowSurface = false, Dictionary<Mineral.Type, Vector3[]> minerals = null){
 		this.worldOffset = worldOffset;
+		this.generator = generator;
 
         /* --- START SECTION --- */
         /*This section intialises the chunk*/
@@ -263,20 +265,56 @@ public class Chunk
                             {
                                 for(int y2 = y-1; y2 <= y; y2++)
                                 {
-                                    if(isInBlocksBounds(x2,y2,z2) && blocks[x2,y2,z2] == null)
-                                    {
-                                        int world_x = (int)worldOffset.x + x2;
-                                        int world_y = (int)worldOffset.y + y2;
-                                        int world_z = (int)worldOffset.z + z2;
+									int world_x = (int)worldOffset.x + x2;
+									int world_y = (int)worldOffset.y + y2;
+									int world_z = (int)worldOffset.z + z2;
 
-                                        Block tempBlock = new Block();
-                                        tempBlock.BlockType = "WaterBlock";
-                                        tempBlock.setPosition(world_x, world_y, world_z);
-                                        tempBlock.setChunkPosition(x2, y2, z2);
-                                        blocks[x2, y2, z2] = tempBlock;
+									if (isInBlocksBounds (x2, y2, z2)) {
+										if(blocks[x2,y2,z2] == null)
+										{
+											Block tempBlock = new Block();
+											tempBlock.BlockType = "WaterBlock";
+											tempBlock.setPosition(world_x, world_y, world_z);
+											tempBlock.setChunkPosition(x2, y2, z2);
+											blocks[x2, y2, z2] = tempBlock;
 
-                                        tempBlock.draw();
-                                    }
+											tempBlock.draw();
+										}
+									} else {
+										Vector3 worldPos = new Vector3 (world_x,world_y,world_z);
+
+										Vector3 chunkPosition = HelperMethods.worldPositionToChunkPosition (worldPos);
+		
+										Chunk otherChunk = generator.getChunk (chunkPosition);
+
+										if (otherChunk == null) {
+											continue;
+										}
+
+										Vector3 chunkIndex = HelperMethods.vectorDifference (worldPos, chunkPosition);
+										int chunkX = (int)chunkIndex.x;
+										int chunkY = (int)chunkIndex.y;
+										int chunkZ = (int)chunkIndex.z;
+
+										if (isInBlocksBounds (chunkX, chunkY, chunkZ) == false) {
+											continue;
+										}
+
+										Block otherBlock = otherChunk.blocks [chunkX, chunkY, chunkZ];
+
+										if (otherBlock == null) {
+											Block tempBlock = new Block();
+											tempBlock.BlockType = "WaterBlock";
+											tempBlock.setPosition(world_x, world_y, world_z);
+											tempBlock.setChunkPosition(chunkX, chunkY, chunkZ);
+											otherChunk.blocks[chunkX, chunkY, chunkZ] = tempBlock;
+
+											tempBlock.draw();
+										}
+										
+									}
+
+                                    
                                 }
                             }
                         }
