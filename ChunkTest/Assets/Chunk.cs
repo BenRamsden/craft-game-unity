@@ -111,7 +111,7 @@ public class Chunk
 						break;  //quit descending this y, as hit ground
 					}
 
-					if (y < 14) {
+					if (y < 13 && Random.Range(0,100) < 1.0f) {
 						world_x = (int)offset.x + x;
 						world_y = (int)offset.y + y;
 						world_z = (int)offset.z + z;
@@ -234,8 +234,13 @@ public class Chunk
 		}
 	}
 
-	// Use this for initialization
-	void Start()
+    public void waterProcess()
+    {
+        Debug.Log("Water Process");
+    }
+
+    // Use this for initialization
+    void Start()
 	{	
 	}
 

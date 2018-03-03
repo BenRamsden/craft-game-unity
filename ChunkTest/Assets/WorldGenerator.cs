@@ -46,10 +46,12 @@ public class WorldGenerator : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
     {
-		Vector3 origin = getPlayerPosition ();
+		Vector3 playerPos = getPlayerPosition ();
 
-		generator.generateMap (origin);
+		generator.generateMap(playerPos);
 
-		generator.garbageCollect (origin);
+		generator.garbageCollect(playerPos);
+
+        generator.waterProcess(playerPos);
 	}
 }
