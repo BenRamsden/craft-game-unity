@@ -33,11 +33,6 @@ public class Chunk
         /* --- START SECTION --- */
         /*This section intialises the chunk*/
 
-        int worldX, worldY, worldZ;
-        float perlinX, perlinY, perlinZ;
-
-		int world_yNoOffset;
-
 		for (int x = 0; x < CHUNK_SIZE; x++)
         {
 			for (int y = 0; y < CHUNK_SIZE - (!isBelowSurface ? 4 : 0); y++)
@@ -45,62 +40,39 @@ public class Chunk
 				for (int z = 0; z < CHUNK_SIZE; z++)
                 {
                     //Calculate absolute position of block (world space)
-					worldX = (int)worldOffset.x + x;
-					worldZ = (int)worldOffset.z + z;
+					int worldX = (int)worldOffset.x + x;
+					int worldZ = (int)worldOffset.z + z;
 
 					//Generate a scaled X and Z for input into PerlinNoise function
-					perlinX = ((float)worldX) / CHUNK_SIZE;
-					perlinZ = ((float)worldZ) / CHUNK_SIZE;
+					float perlinX = ((float)worldX) / CHUNK_SIZE;
+					float perlinZ = ((float)worldZ) / CHUNK_SIZE;
 
 					//Generate the PerlinNoise value, offset the block's height by this
-					perlinY = Mathf.PerlinNoise (perlinX, perlinZ);
-
-					if (isBelowSurface)
-						perlinY = 0;
-
-					worldY = y + (int)(perlinY * 5);
-					world_yNoOffset = (int)worldOffset.y + worldY;
-						
-					//Debug.Log ("world_x:" + world_x + " world_z:" + world_z + " = " + world_y);
-					if (worldY < 0 || worldY > CHUNK_SIZE-1)
-                    {
-						Debug.Log ("Cannot insert chunk into block at index " + worldY + " continuing");
+					int perlinY = (int) (y + Mathf.PerlinNoise (perlinX, perlinZ) * 5);
+					
+					if (perlinY < 0 || perlinY > CHUNK_SIZE-1) {
+						Debug.Log ("Cannot insert chunk into block at index " + perlinY + " continuing");
 						continue;
 					}
 
                     string blockType = null;
 
-					if (isBelowSurface)
+					if (y <= 4)
 					{
                         blockType = "StoneBlock";
 					}
+					else if (y <= 10)
+					{
+                        blockType = "SoilBlock";
+					}
 					else
 					{
-						if (y <= 4)
-						{
-                            blockType = "StoneBlock";
-						}
-						else if (y <= 10)
-						{
-                            blockType = "SoilBlock";
-						}
-						else
-						{
-                            blockType = "GrassBlock";
-						}
+                        blockType = "GrassBlock";
 					}
 
-                    highestPoint = (worldY > highestPoint) ? worldY : highestPoint;
+                    highestPoint = (perlinY > highestPoint) ? perlinY : highestPoint;
 
-                    CreateBlock(blockType, x, worldY, z);
-
-					if (y <= 4 && !isBelowSurface)
-					{
-						for (int i = (int)worldOffset.y; i < world_yNoOffset; i++)
-						{
-                            CreateBlock("StoneBlock", x, i - (int)worldOffset.y, z);
-						}
-					}
+                    CreateBlock(blockType, x, perlinY, z);
                 }
 			}
 		}
