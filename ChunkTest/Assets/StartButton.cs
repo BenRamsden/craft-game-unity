@@ -17,10 +17,7 @@ public class StartButton : MonoBehaviour {
 		WorldGenerator wg = world.GetComponent<WorldGenerator> ();
 		wg.InitPlayer ();
 
-		GameObject menuCamera = GameObject.Find ("MenuCamera");
-		Destroy (menuCamera);
-
-		GameObject canvas = GameObject.Find ("Canvas");
-		Destroy (canvas);
+		GameObject menu = GameObject.Find ("Menu");
+		Destroy (menu);
 	}
 }
