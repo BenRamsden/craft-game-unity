@@ -9,13 +9,16 @@ public class WorldGenerator : MonoBehaviour
 	private GameObject player;
 
 	private ProceduralGenerator generator;
+	private SeedGenerator seed;
 
 	// Use this for initialization
 	void Start ()
     {
 		generator = new ProceduralGenerator ();
 
-		Vector3 origin = generator.initalise (CHUNK_SIZE, 0);
+		seed = new SeedGenerator ("a totally random seed", 7);
+
+		Vector3 origin = generator.initalise (CHUNK_SIZE, seed);
 
 		player = (GameObject)Instantiate (Resources.Load("Steve/PlayerTorso"), new Vector3 (origin.x + 10, origin.y + 18, origin.z + 10), Quaternion.identity);
 

@@ -12,6 +12,8 @@ public class ProceduralGenerator : MonoBehaviour
 
 	private Vector3 startOrigin;
 
+	public SeedGenerator Seed;
+
 
 	//Maps offset => chunk
 	private Dictionary<Vector3,Chunk> chunks = new Dictionary<Vector3,Chunk> ();
@@ -19,12 +21,13 @@ public class ProceduralGenerator : MonoBehaviour
 	/**
 	 * Initalises the procedual generator
 	 * @param int size The Chunk size
-	 * @param int seed The seed value for the random generator
+	 * @param SeedGenerator seed The seed generator
 	 * @return Vector3 Returns the starting origin
 	 */
-	public Vector3 initalise(int size, int seed = 0)
+	public Vector3 initalise(int size, SeedGenerator seed)
 	{
-		Random.InitState (seed);
+		this.Seed = seed;
+		Random.InitState (seed.ChunkSeed);
 
 		float originX = Random.Range (320, 960);
 		originX -= originX % size;
@@ -89,6 +92,7 @@ public class ProceduralGenerator : MonoBehaviour
 					return true;
 				}
 
+				Random.InitState (Seed.MineralSeed);
 				for (int offsetY = 0; offsetY >= -1; offsetY--) {
 					//Generate mineral layer
 					Vector3 mineralVec = new Vector3 (surfaceVec.x, surfaceVec.y + (offsetY * Chunk.CHUNK_SIZE), surfaceVec.z);

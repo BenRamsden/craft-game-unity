@@ -94,7 +94,7 @@ public class Chunk
 						break;  //quit descending this y, as hit ground
 					}
 
-					if (y < 14 && Random.Range(0,1000) < 1.0f) {
+					if (y < 14 && Random.Range(0,1000) < 10) {
                         CreateBlock("WaterBlock", x, y, z);
 					}
 				}
