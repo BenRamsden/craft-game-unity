@@ -14,6 +14,14 @@ public class PlayerMove : MonoBehaviour {
 	public float mouseSensitivity = 1000.0f;
 	public float moveSpeed = 10.0F;
 
+	private AudioClip jumpSound;
+	private AudioClip grassWalkSound;
+	private AudioClip swimSound;
+	private AudioClip walkSound;
+	private AudioSource audioSource;
+
+	private bool isInWater = false;
+
 	public static float x_AxisRotateClamp = 80.0f;
 
 	// Use this for initialization
@@ -24,6 +32,11 @@ public class PlayerMove : MonoBehaviour {
 		rotY = rot.y;
 		rotX = rot.x;
 		jump = new Vector3 (0.0f, 5.0f, 0.0f);
+
+		jumpSound = (AudioClip)Resources.Load ("Sounds/jump");
+		grassWalkSound = (AudioClip)Resources.Load ("Sounds/walk_grass");
+		swimSound = (AudioClip)Resources.Load ("Sounds/swim");
+		audioSource = gameObject.AddComponent<AudioSource> ();
 	}
 
 	/** Moving player using unity physics */
@@ -67,6 +80,39 @@ public class PlayerMove : MonoBehaviour {
 			isGrounded = false;
 
 			animator.SetBool ("isJumping", true);
+
+			audioSource.PlayOneShot (jumpSound);
 		}
+
+		// If a key is pressed, play a sound
+		if (Input.anyKey && !audioSource.isPlaying)
+		{
+			if (isInWater)
+				audioSource.PlayOneShot (swimSound);
+			else
+				audioSource.PlayOneShot (walkSound);
+		}
+	}
+
+	void OnCollisionEnter(Collision collision)
+	{
+		// Get the walk sound from the collided block
+		walkSound = collision.gameObject.GetComponent<BlockProperties> ().PlayerWalkSound;
+	}
+
+	/**
+	 * Water blocks are triggers, check whether we are in water
+	 */
+
+	void OnTriggerStay(Collider trigger)
+	{
+		if (trigger.gameObject.name == "WaterBlock")
+			isInWater = true;
+	}
+
+	void OnTriggerExit(Collider trigger)
+	{
+		if (trigger.gameObject.name == "WaterBlock")
+			isInWater = false;
 	}
 }

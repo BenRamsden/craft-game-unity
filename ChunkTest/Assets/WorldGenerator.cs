@@ -4,48 +4,50 @@ using UnityEngine;
 
 public class WorldGenerator : MonoBehaviour
 {
-	private const int CHUNK_SIZE = 16;
+	private static int CHUNK_SIZE = Chunk.CHUNK_SIZE;
 
 	private GameObject player;
 
 	private ProceduralGenerator generator;
+	private SeedGenerator seed;
 
 	// Use this for initialization
 	void Start ()
     {
 		generator = new ProceduralGenerator ();
 
-		Vector3 origin = generator.initalise (CHUNK_SIZE, 0);
+		seed = new SeedGenerator ("a totally random seed", 7);
 
-		player = (GameObject)Instantiate (Resources.Load("PlayerTorso"), new Vector3 (origin.x + 10, origin.y + 18, origin.z + 10), Quaternion.identity);
+		Vector3 origin = generator.initalise (CHUNK_SIZE, seed);
 
-		//generator.generateMap (origin);
+		player = (GameObject)Instantiate (Resources.Load("Steve/PlayerTorso"), new Vector3 (origin.x + 10, origin.y + 18, origin.z + 10), Quaternion.identity);
 
-		//InvokeRepeating ("UpdateMap", 0.0f, 5.0f);
+		while (generator.generateMap (origin) == true) {
+			//Loading
+		}
 	}
 		
 	Vector3 getPlayerPosition() {
 		Vector3 playerPos = player.transform.position;
 
-		float originX = playerPos.x;
-		originX -= originX % CHUNK_SIZE;
+		playerPos.y -= CHUNK_SIZE / 2;
 
-		float originY = playerPos.y - CHUNK_SIZE/2;
-		originY -= originY % CHUNK_SIZE;
+		return HelperMethods.worldPositionToChunkPosition (playerPos);
+	}
 
-		float originZ = playerPos.z;
-		originZ -= originZ % CHUNK_SIZE;
-
-		return new Vector3 (originX, originY, originZ);
+	public ProceduralGenerator getPGenerator(){
+		return generator;
 	}
 	
 	// Update is called once per frame
 	void Update ()
     {
-		Vector3 origin = getPlayerPosition ();
+		Vector3 playerPos = getPlayerPosition ();
 
-		generator.generateMap (origin);
+		generator.generateMap(playerPos);
 
-		generator.garbageCollect (origin);
+		generator.garbageCollect(playerPos);
+
+        generator.waterProcess(playerPos);
 	}
 }

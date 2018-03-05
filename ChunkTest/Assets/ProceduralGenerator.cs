@@ -12,6 +12,8 @@ public class ProceduralGenerator : MonoBehaviour
 
 	private Vector3 startOrigin;
 
+	public SeedGenerator Seed;
+
 
 	//Maps offset => chunk
 	private Dictionary<Vector3,Chunk> chunks = new Dictionary<Vector3,Chunk> ();
@@ -19,19 +21,20 @@ public class ProceduralGenerator : MonoBehaviour
 	/**
 	 * Initalises the procedual generator
 	 * @param int size The Chunk size
-	 * @param int seed The seed value for the random generator
+	 * @param SeedGenerator seed The seed generator
 	 * @return Vector3 Returns the starting origin
 	 */
-	public Vector3 initalise(int size, int seed = 0)
+	public Vector3 initalise(int size, SeedGenerator seed)
 	{
-		Random.InitState (seed);
-
-		//Modulo aligns the block origin with 0,0,0 at increments of size
+		this.Seed = seed;
+		Random.InitState (seed.ChunkSeed);
 
 		float originX = Random.Range (320, 960);
 		originX -= originX % size;
 
-		float originY = Random.Range (size * 2, size * 5);
+		//TODO: Water update has trouble when this is set to 0
+		//Likely due to inter-chunk math failing on float boundaries
+		float originY = Random.Range (size * -1, size * 1);
 		originY -= originY % size;
 
 		float originZ = Random.Range (320, 960);
@@ -60,56 +63,64 @@ public class ProceduralGenerator : MonoBehaviour
 		return exists;
 	}
 
+	public Chunk getChunk(Vector3 position){
+		if(chunks.ContainsKey(position) == false) {
+			return null;
+		}
+
+		return chunks[position];
+	}
+
 	/**
 	 * Generates a new random map around a point
 	 * @param Vector3 offset The offset position
 	 */
-	public void generateMap(Vector3 offset)
+	public bool generateMap(Vector3 playerPos)
 	{
 		// Create the surface
 		for (int x = -MAP_SIZE; x < MAP_SIZE; x++)
 		{
 			for (int z = -MAP_SIZE; z < MAP_SIZE; z++)
 			{
-				Vector3 surfaceVec = new Vector3 (offset.x + (this.chunkSize * x), offset.y, offset.z + (this.chunkSize * z));
+				//Generate surface
+				Vector3 surfaceVec = new Vector3 (playerPos.x + (this.chunkSize * x), playerPos.y, playerPos.z + (this.chunkSize * z));
 
 				if (chunkExists (surfaceVec) == false) {
-					Chunk surface = new Chunk(surfaceVec);
+					Chunk surface = new Chunk(surfaceVec,this);
 
 					storeChunk (surface);
-					return;
+					return true;
 				}
 
-				if (DEBUG_DISABLE_MINERAL) {
-					continue;
-				}
+				Random.InitState (Seed.MineralSeed);
+				for (int offsetY = 0; offsetY >= -1; offsetY--) {
+					//Generate mineral layer
+					Vector3 mineralVec = new Vector3 (surfaceVec.x, surfaceVec.y + (offsetY * Chunk.CHUNK_SIZE), surfaceVec.z);
 
-				for (int y = 1; y < 5; y++)
-				{
-					Dictionary<Mineral.Type, Vector3[]> minerals = this.calculateMinerals ((int)offset.y - (this.chunkSize * y));
+					Dictionary<Mineral.Type, Vector3[]> minerals = this.calculateMinerals ((int)mineralVec.y);
 
-					Vector3 earthVec = new Vector3 (offset.x + (this.chunkSize * x), offset.y - (this.chunkSize * y), offset.z + (this.chunkSize * z));
-
-					if (chunkExists (earthVec) == false) {
-						Chunk earth = new Chunk(earthVec, true, minerals);
+					if (chunkExists (mineralVec) == false) {
+						Chunk earth = new Chunk(mineralVec, this, true);
+						earth.GenMinerals (minerals);
 
 						storeChunk (earth);
-						return;
+						return true;
 					}
-
 				}
 			}
 		}
+
+		return false;
 
 	}
 
 	Vector3 deleteChunk = Vector3.zero;
 	bool deleteChunkSet = false;
 
-	public void garbageCollect(Vector3 offset) {
+	public void garbageCollect(Vector3 playerPos) {
 
 		foreach (Vector3 otherChunk in chunks.Keys) {
-			float dist = Vector3.Distance (offset, otherChunk);
+			float dist = Vector3.Distance (playerPos, otherChunk);
 
 			if (dist > chunkSize * MAP_SIZE * 1.5) {
 				chunks [otherChunk].Delete ();
@@ -127,10 +138,18 @@ public class ProceduralGenerator : MonoBehaviour
 
 	}
 
+    public void waterProcess(Vector3 playerPos)
+    {
+        foreach (Vector3 otherChunk in chunks.Keys)
+        {
+            chunks[otherChunk].waterProcess();
+        }
+    }
+
 	private Dictionary<Mineral.Type, Vector3[]> calculateMinerals(int y)
 	{
 		Dictionary<Mineral.Type, Vector3[]> minerals = new Dictionary<Mineral.Type, Vector3[]> ();
-		Debug.Log (y);
+		//Debug.Log (y);
 		// Generate coal
 		if (y < Mineral.getSpawnLayer (Mineral.Type.Coal))
 		{
