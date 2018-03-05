@@ -30,6 +30,7 @@ public class Block {
     public void draw()
     {
 		thisBody = GameObject.Instantiate(Resources.Load(BlockType), worldPosition , Quaternion.identity) as GameObject;
+		thisBody.name = BlockType;
 		bp = thisBody.GetComponent<BlockProperties> ();
 
     }
