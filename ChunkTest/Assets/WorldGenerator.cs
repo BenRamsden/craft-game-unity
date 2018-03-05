@@ -14,6 +14,9 @@ public class WorldGenerator : MonoBehaviour
 
 	private Vector3 origin;
 
+	private GameObject canvas;
+	private GameObject camera;
+
 	// Use this for initialization
 	void Start ()
     {
@@ -23,6 +26,9 @@ public class WorldGenerator : MonoBehaviour
 
 		origin = generator.initalise (CHUNK_SIZE, seed);
 
+		canvas = (GameObject) Instantiate (Resources.Load ("Menu/Canvas"), new Vector3 (0,0,0), Quaternion.identity);
+
+		camera = (GameObject)Instantiate (Resources.Load ("Menu/Camera"), new Vector3 (0, 20, 25), Quaternion.LookRotation(new Vector3(0.0f,-0.3f,-1.0f)) );
 
 		while (generator.generateMap (origin) == true) {
 			//Loading
@@ -30,7 +36,10 @@ public class WorldGenerator : MonoBehaviour
 	}
 
 	public void InitPlayer() {
-		player = (GameObject)Instantiate (Resources.Load("Steve/PlayerTorso"), new Vector3 (origin.x + 10, origin.y + 18, origin.z + 10), Quaternion.identity);
+		Destroy (canvas);
+		Destroy (camera);
+
+		player = (GameObject)Instantiate (Resources.Load("Steve/PlayerTorso"), new Vector3 (origin.x, origin.y+20, origin.z), Quaternion.identity);
 	}
 		
 	Vector3 getPlayerPosition() {

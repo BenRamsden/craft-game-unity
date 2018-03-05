@@ -11,13 +11,8 @@ public class StartButton : MonoBehaviour {
 	}
 	
 	void TaskOnClick () {
-		Debug.Log ("You clicked the button");
-
 		GameObject world = GameObject.Find ("World");
 		WorldGenerator wg = world.GetComponent<WorldGenerator> ();
 		wg.InitPlayer ();
-
-		GameObject menu = GameObject.Find ("Menu");
-		Destroy (menu);
 	}
 }
