@@ -40,7 +40,7 @@ public class ProceduralGenerator : MonoBehaviour
 		float originZ = Random.Range (320, 960);
 		originX -= originZ % size;
 
-		startOrigin = new Vector3(originX, originY, originZ);
+		startOrigin = new Vector3(0, 0, 0);
 
 		this.chunkSize = size;
 
