@@ -9,7 +9,10 @@ public class WorldGenerator : MonoBehaviour
 	private GameObject player;
 
 	private ProceduralGenerator generator;
+
 	private SeedGenerator seed;
+
+	private Vector3 origin;
 
 	// Use this for initialization
 	void Start ()
@@ -18,16 +21,23 @@ public class WorldGenerator : MonoBehaviour
 
 		seed = new SeedGenerator ("a totally random seed", 7);
 
-		Vector3 origin = generator.initalise (CHUNK_SIZE, seed);
+		origin = generator.initalise (CHUNK_SIZE, seed);
 
-		player = (GameObject)Instantiate (Resources.Load("Steve/PlayerTorso"), new Vector3 (origin.x + 10, origin.y + 18, origin.z + 10), Quaternion.identity);
 
 		while (generator.generateMap (origin) == true) {
 			//Loading
 		}
 	}
+
+	public void InitPlayer() {
+		player = (GameObject)Instantiate (Resources.Load("Steve/PlayerTorso"), new Vector3 (origin.x + 10, origin.y + 18, origin.z + 10), Quaternion.identity);
+	}
 		
 	Vector3 getPlayerPosition() {
+		if (player == null) {
+			return origin;
+		}
+
 		Vector3 playerPos = player.transform.position;
 
 		playerPos.y -= CHUNK_SIZE / 2;
