@@ -37,8 +37,9 @@ public class Block {
     {
         if (thisBody == null)
         {
-            thisBody = GameObject.Instantiate(Resources.Load(BlockType), worldPosition, Quaternion.identity) as GameObject;
-            bp = thisBody.GetComponent<BlockProperties>();
+		thisBody = GameObject.Instantiate(Resources.Load(BlockType), worldPosition , Quaternion.identity) as GameObject;
+		thisBody.name = BlockType;
+		bp = thisBody.GetComponent<BlockProperties> ();
         }
     }
 
