@@ -67,7 +67,7 @@ public class Chunk
 					}
 					else if (y <= 10)
 					{
-                        blockType = "SoilBlock";
+                        blockType = "DirtBlock";
 					}
 					else
 					{
