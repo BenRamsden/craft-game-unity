@@ -4,9 +4,7 @@ using UnityEngine;
 
 public class ProceduralGenerator : MonoBehaviour
 {
-	private const int MAP_SIZE = 2;
-
-	private const bool DEBUG_DISABLE_MINERAL = true;
+	private const int MAP_SIZE = 5;
 
 	private int chunkSize;
 

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Chunk
 {
-	public static int CHUNK_SIZE = 16;
+	public static int CHUNK_SIZE = 8;
 
 	//blocks[,,] is a 3D array in the form [x, y, z]
 	private Block[,,] blocks = new Block[CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE];
@@ -45,14 +45,19 @@ public class Chunk
                 {
                     //Calculate absolute position of block (world space)
 					int worldX = (int)worldOffset.x + x;
+					int worldY = (int)worldOffset.y + y;
 					int worldZ = (int)worldOffset.z + z;
+
+					if (worldY > CHUNK_SIZE-1) {
+						continue;
+					}
 
 					//Generate a scaled X and Z for input into PerlinNoise function
 					float perlinX = ((float)worldX) / CHUNK_SIZE;
 					float perlinZ = ((float)worldZ) / CHUNK_SIZE;
 
 					//Generate the PerlinNoise value, offset the block's height by this
-					int perlinY = (int) (y + Mathf.PerlinNoise (perlinX, perlinZ) * 5);
+					int perlinY = (int) (y + Mathf.PerlinNoise (perlinX/3, perlinZ/3) * CHUNK_SIZE);
 					
 					if (perlinY < 0 || perlinY > CHUNK_SIZE-1) {
 						Debug.Log ("Cannot insert chunk into block at index " + perlinY + " continuing");
@@ -61,17 +66,13 @@ public class Chunk
 
                     string blockType = null;
 
-					if (y <= 4)
+					if (y <= 2)
 					{
                         blockType = "StoneBlock";
 					}
-					else if (y <= 10)
-					{
-                        blockType = "DirtBlock";
-					}
 					else
 					{
-						blockType = "DirtBlock";
+						blockType = "FastGrass";
 					}
 
                     highestPoint = (perlinY > highestPoint) ? perlinY : highestPoint;
@@ -89,12 +90,17 @@ public class Chunk
 				//DESCEND
 				for (int y = CHUNK_SIZE-1; y >= 0; y--)
 				{
+					int worldY = (int)worldOffset.y + y;
+
+					if (worldY > CHUNK_SIZE-1) {
+						continue;
+					}
 
 					if (blocks [x, y, z] != null) {
 						break;  //quit descending this y, as hit ground
 					}
 
-					if (y < 14 && Random.Range(0,1000) < 10) {
+					if (y < 6 && Random.Range(0,1000) < 10) {
                         CreateBlock("WaterBlock", x, y, z);
 					}
 				}
