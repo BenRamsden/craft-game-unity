@@ -209,61 +209,58 @@ public class Chunk
                     
                     if(blocks[x,y,z] != null && blocks[x,y,z].BlockType == "WaterBlock")
                     {
-                        for(int x2 = x-1; x2 <= x+1; x2++)
-                        {
-                            for(int z2 = z-1; z2 <= z+1; z2++)
-                            {
-                                for(int y2 = y-1; y2 <= y; y2++)
-                                {
-									int world_x = (int)worldOffset.x + x2;
-									int world_y = (int)worldOffset.y + y2;
-									int world_z = (int)worldOffset.z + z2;
-
-									if (isInBlocksBounds (x2, y2, z2)) {
-										if(blocks[x2,y2,z2] == null)
-										{
-                                            Block block = CreateBlock("WaterBlock", x2, y2, z2);
-                                            block.draw();
-										}
-									} else {
-										Vector3 worldPos = new Vector3 (world_x,world_y,world_z);
-
-										Vector3 chunkPosition = HelperMethods.worldPositionToChunkPosition (worldPos);
-		
-										Chunk otherChunk = generator.getChunk (chunkPosition);
-
-										if (otherChunk == null) {
-											continue;
-										}
-
-										Vector3 chunkIndex = HelperMethods.vectorDifference (worldPos, chunkPosition);
-										int chunkX = (int)chunkIndex.x;
-										int chunkY = (int)chunkIndex.y;
-										int chunkZ = (int)chunkIndex.z;
-
-										if (isInBlocksBounds (chunkX, chunkY, chunkZ) == false) {
-											continue;
-										}
-
-										Block otherBlock = otherChunk.blocks [chunkX, chunkY, chunkZ];
-
-										if (otherBlock == null) {
-                                            Block block = otherChunk.CreateBlock("WaterBlock", chunkX, chunkY, chunkZ);
-                                            block.draw();
-										}
-										
-									}
-
-                                    
-                                }
-                            }
-                        }
+						waterProcessBlock (x + 1, y, z); //right
+						waterProcessBlock (x - 1, y, z); //left
+						waterProcessBlock (x, y, z + 1); //front
+						waterProcessBlock (x, y, z - 1); //back
+						waterProcessBlock (x, y - 1, z); //bottom
                     }
 
                 }
             }
         }
     }
+
+	void waterProcessBlock(int x2, int y2, int z2) {
+		if (isInBlocksBounds (x2, y2, z2)) {
+			if(blocks[x2,y2,z2] == null)
+			{
+				Block block = CreateBlock("WaterBlock", x2, y2, z2);
+				block.draw();
+			}
+		} else {
+			int world_x = (int)worldOffset.x + x2;
+			int world_y = (int)worldOffset.y + y2;
+			int world_z = (int)worldOffset.z + z2;
+
+			Vector3 worldPos = new Vector3 (world_x,world_y,world_z);
+
+			Vector3 chunkPosition = HelperMethods.worldPositionToChunkPosition (worldPos);
+
+			Chunk otherChunk = generator.getChunk (chunkPosition);
+
+			if (otherChunk == null) {
+				return;
+			}
+
+			Vector3 chunkIndex = HelperMethods.vectorDifference (worldPos, chunkPosition);
+			int chunkX = (int)chunkIndex.x;
+			int chunkY = (int)chunkIndex.y;
+			int chunkZ = (int)chunkIndex.z;
+
+			if (isInBlocksBounds (chunkX, chunkY, chunkZ) == false) {
+				return;
+			}
+
+			Block otherBlock = otherChunk.blocks [chunkX, chunkY, chunkZ];
+
+			if (otherBlock == null) {
+				Block block = otherChunk.CreateBlock("WaterBlock", chunkX, chunkY, chunkZ);
+				block.draw();
+			}
+
+		}
+	}
 
     // Use this for initialization
     void Start()
