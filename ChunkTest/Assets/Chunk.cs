@@ -53,7 +53,7 @@ public class Chunk
 					float perlinZ = ((float)worldZ) / CHUNK_SIZE;
 
 					//Generate the PerlinNoise value, offset the block's height by this
-					int perlinY = (int) (3 * Mathf.PerlinNoise (perlinX/3, perlinZ/3) * CHUNK_SIZE);
+					int perlinY = (int) (2 * Mathf.PerlinNoise (perlinX/5, perlinZ/5) * CHUNK_SIZE);
 					perlinY += y;
 					perlinY -= (int)worldOffset.y;
 					
