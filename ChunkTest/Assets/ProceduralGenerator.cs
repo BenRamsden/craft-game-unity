@@ -92,6 +92,8 @@ public class ProceduralGenerator : MonoBehaviour
 					return true;
 				}
 
+				continue;
+
 				Random.InitState (Seed.MineralSeed);
 				for (int offsetY = 0; offsetY >= -1; offsetY--) {
 					//Generate mineral layer

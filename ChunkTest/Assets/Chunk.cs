@@ -71,7 +71,7 @@ public class Chunk
 					}
 					else
 					{
-                        blockType = "GrassBlock";
+						blockType = "DirtBlock";
 					}
 
                     highestPoint = (perlinY > highestPoint) ? perlinY : highestPoint;
@@ -171,31 +171,21 @@ public class Chunk
 	{
 		Block blockToDraw;
 
-		//Iterate through each layer from the highest point downwards (y-axis)
-		for (int y = highestPoint; y >= 0; y--)
-		{
-			//Iterate through each row (x-axis)
-			for (int x = 0; x < CHUNK_SIZE; x++)
-			{
-				//Iterate through each column (z-axis)
-				for (int z = 0; z < CHUNK_SIZE; z++)
-				{
-					if (blocks [x, y, z] != null)
-					{
-						blockToDraw = blocks [x, y, z];
-
-                        //If statement to handle Blocks at the edge of a chunk
-                        if (x == 0 || x == CHUNK_SIZE - 1 ||
-                            y == 0 || y == CHUNK_SIZE - 1 ||
-                            z == 0 || z == CHUNK_SIZE - 1)
-                        {
-                            blockToDraw.draw();
-                        }
-                        else if (surroundedByNull(x, y, z))
-                        {
-                            blockToDraw.draw();
-                        }
+		for (int x = 0; x < CHUNK_SIZE; x++) {
+			for (int z = 0; z < CHUNK_SIZE; z++) {
+				for (int y = CHUNK_SIZE - 1; y > 0; y--) {
+					if (blocks [x, y, z] == null) {
+						continue;
 					}
+
+					blockToDraw = blocks [x, y, z];
+					blockToDraw.draw ();
+
+					if (blockToDraw.BlockType == "WaterBlock") {
+						continue;
+					}
+
+					break;
 				}
 			}
 		}
