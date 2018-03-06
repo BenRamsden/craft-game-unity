@@ -144,12 +144,19 @@ public class Chunk
 	}
 
 	public Block getBlock(Vector3 position){
-        Block block = blocks[(int)position.x, (int)position.y, (int)position.z];
-        if (block != null)
-        {
-            return block;
-        }
-        return null;
+		int x = (int)position.x;
+		int y = (int)position.y;
+		int z = (int)position.z;
+
+		if (!isInBlocksBounds (x, y, z)) {
+			return null;
+		}
+			        
+		if (blocks [x, y, z] == null) {
+			return null;
+		}
+
+		return blocks[x,y,z];
 	}
 
     public void removeBlock(Vector3 position) {

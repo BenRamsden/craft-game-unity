@@ -11,39 +11,39 @@ public class PlayerInteraction : MonoBehaviour {
     Vector3 worldPosition, posOfChunk, posOfBlock;
     Chunk currentChunk;
     GameObject currentObject, previousObject;
+	GameObject camera;
 
     // Use this for initialization
     void Start () {
 		rb = GetComponent<Rigidbody>();
 		animator = GetComponent<Animator> ();
+		camera = GameObject.Find ("Main Camera");
 	}
 
 	void FixedUpdate() {
-        if (Physics.Raycast(transform.position, transform.forward, out hit, 100))
+		if (camera == null) {
+			return;
+		}
+
+		if (Physics.Raycast(transform.position, camera.transform.forward, out hit, 100))
         {
             currentObject = hit.collider.gameObject;
-            if (currentObject != null) {
-                //hovering
-            }
-
-            if (currentObject.CompareTag("GrassBlock"))
-            {
-                worldPosition = currentObject.GetComponent<Transform>().position;
-                posOfBlock = new Vector3(worldPosition.x % 16.0f, worldPosition.y % 16.0f, worldPosition.z % 16.0f);
-                posOfChunk = worldPosition - (posOfBlock);
-
-                currentChunk = GameObject.Find("World").GetComponent<WorldGenerator>().getPGenerator().getChunk(posOfChunk);
-                currentBlock = currentChunk.getBlock(posOfBlock);
-            }
-            else
-            {
-                currentBlock = null;
-            }
         }
     }
 
 	// Update is called once per frame
 	void Update () {
+		if (currentObject == null) {
+			return;
+		}
+
+		worldPosition = currentObject.GetComponent<Transform>().position;
+		posOfChunk = HelperMethods.worldPositionToChunkPosition (worldPosition);
+		posOfBlock = HelperMethods.vectorDifference (worldPosition, posOfChunk);
+
+		currentChunk = GameObject.Find("World").GetComponent<WorldGenerator>().getPGenerator().getChunk(posOfChunk);
+		currentBlock = currentChunk.getBlock(posOfBlock);
+
 		isLeftMouseDown = Input.GetMouseButtonDown(0);
         if (isLeftMouseDown)
         {
@@ -51,7 +51,7 @@ public class PlayerInteraction : MonoBehaviour {
             animator.SetTrigger("Interact");
             if (currentBlock != null)
             {
-                currentBlock.damageBlock(10);
+                currentBlock.damageBlock(100);
                 if (currentBlock.getProperties().blockHealth <= 0)
                 {
                     currentBlock.dropSelf();
