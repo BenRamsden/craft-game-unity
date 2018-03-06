@@ -101,7 +101,11 @@ public class Chunk
 					}
 
 					if (y < 6 && Random.Range(0,1000) < 10) {
-                        CreateBlock("WaterBlock", x, y, z);
+
+						if (isInBlocksBounds (x, y - 1, z) && blocks [x, y - 1, z] != null) {
+							CreateBlock("WaterBlock", x, y, z);
+						}
+
 					}
 				}
 			}
