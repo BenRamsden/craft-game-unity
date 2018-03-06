@@ -8,7 +8,7 @@ public class PlayerMove : MonoBehaviour {
 	private  Animator animator;
 	public bool isGrounded;
 
-	public readonly Vector3 jump = new Vector3(0.0f, 20.0f, 0.0f);
+	public readonly Vector3 jump = new Vector3(0.0f, 5.0f, 0.0f);
 
 	private float mouseX, mouseY, rotY,rotYHead, rotX, moveX, moveZ = 0.0f;
 	public float mouseSensitivity = 1000.0f;
