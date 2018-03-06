@@ -4,9 +4,7 @@ using UnityEngine;
 
 public class ProceduralGenerator : MonoBehaviour
 {
-	private const int MAP_SIZE = 2;
-
-	private const bool DEBUG_DISABLE_MINERAL = true;
+	private const int MAP_SIZE = 5;
 
 	private int chunkSize;
 
@@ -91,6 +89,8 @@ public class ProceduralGenerator : MonoBehaviour
 					storeChunk (surface);
 					return true;
 				}
+
+				continue;
 
 				Random.InitState (Seed.MineralSeed);
 				for (int offsetY = 0; offsetY >= -1; offsetY--) {

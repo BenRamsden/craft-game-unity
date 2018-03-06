@@ -30,7 +30,7 @@ public class WorldGenerator : MonoBehaviour
 		if (ENABLE_MENU) {
 			canvas = (GameObject)Instantiate (Resources.Load ("Menu/Canvas"), new Vector3 (0, 0, 0), Quaternion.identity);
 
-			camera = (GameObject)Instantiate (Resources.Load ("Menu/Camera"), new Vector3 (0, 20, 25), Quaternion.LookRotation (new Vector3 (0.0f, -0.3f, -1.0f)));
+			camera = (GameObject)Instantiate (Resources.Load ("Menu/Camera"), new Vector3 (0, 20, 60), Quaternion.LookRotation (new Vector3 (0.0f, -0.3f, -1.0f)));
 		} else {
 			InitPlayer ();
 		}
