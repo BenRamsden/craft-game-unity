@@ -39,7 +39,7 @@ public class Chunk
 
 		for (int x = 0; x < CHUNK_SIZE; x++)
         {
-			for (int y = 0; y < CHUNK_SIZE - (!isBelowSurface ? 4 : 0); y++)
+			for (int y = 0; y < CHUNK_SIZE; y++)
             {
 				for (int z = 0; z < CHUNK_SIZE; z++)
                 {
@@ -48,30 +48,25 @@ public class Chunk
 					int worldY = (int)worldOffset.y + y;
 					int worldZ = (int)worldOffset.z + z;
 
-					if (worldY > CHUNK_SIZE-1) {
-						continue;
-					}
-
 					//Generate a scaled X and Z for input into PerlinNoise function
 					float perlinX = ((float)worldX) / CHUNK_SIZE;
 					float perlinZ = ((float)worldZ) / CHUNK_SIZE;
 
 					//Generate the PerlinNoise value, offset the block's height by this
-					int perlinY = (int) (y + Mathf.PerlinNoise (perlinX/3, perlinZ/3) * CHUNK_SIZE);
+					int perlinY = (int) (Mathf.PerlinNoise (perlinX/3, perlinZ/3) * CHUNK_SIZE);
+					perlinY += y;
+					perlinY -= (int)worldOffset.y;
 					
 					if (perlinY < 0 || perlinY > CHUNK_SIZE-1) {
-						Debug.Log ("Cannot insert chunk into block at index " + perlinY + " continuing");
+						//Debug.Log ("Cannot insert chunk into block at index " + perlinY + " continuing");
 						continue;
 					}
 
                     string blockType = null;
 
-					if (y <= 2)
-					{
+					if (worldY <= 12){
                         blockType = "StoneBlock";
-					}
-					else
-					{
+					} else {
 						blockType = "FastGrass";
 					}
 
@@ -92,7 +87,7 @@ public class Chunk
 				{
 					int worldY = (int)worldOffset.y + y;
 
-					if (worldY > CHUNK_SIZE-1) {
+					if (worldY < 0) {
 						continue;
 					}
 
@@ -100,7 +95,7 @@ public class Chunk
 						break;  //quit descending this y, as hit ground
 					}
 
-					if (y < 6 && Random.Range(0,1000) < 10) {
+					if (worldY < 10 && Random.Range(0,1000) < 10) {
 
 						if (isInBlocksBounds (x, y - 1, z) && blocks [x, y - 1, z] != null) {
 							CreateBlock("WaterBlock", x, y, z);
@@ -183,14 +178,14 @@ public class Chunk
 		nullOrWater (blocks [x, y, z + 1]) ||
 		nullOrWater (blocks [x, y, z - 1]);
 	}
-
+		
 	private void drawChunk()
 	{
 		Block blockToDraw;
 
 		for (int x = 0; x < CHUNK_SIZE; x++) {
 			for (int z = 0; z < CHUNK_SIZE; z++) {
-				for (int y = CHUNK_SIZE - 1; y > 0; y--) {
+				for (int y = CHUNK_SIZE - 1; y >= 0; y--) {
 					if (blocks [x, y, z] == null) {
 						continue;
 					}
@@ -206,6 +201,34 @@ public class Chunk
 				}
 			}
 		}
+
+		/*
+		for (int x = 0; x < CHUNK_SIZE; x++) {
+			for (int z = 0; z < CHUNK_SIZE; z++) {
+				for (int y = 0; y < CHUNK_SIZE; y++) {
+					if (blocks [x, y, z] == null) {
+						continue;
+					}
+
+					blockToDraw = blocks [x, y, z];
+
+					if (x == 0 || x == CHUNK_SIZE - 1 ||
+					   y == 0 || y == CHUNK_SIZE - 1 ||
+					   z == 0 || z == CHUNK_SIZE - 1) {
+						blockToDraw.draw ();
+						continue;
+					}
+
+					if (surroundedByNull (x,y,z)) {
+						blockToDraw.draw ();
+						continue;
+					}
+
+				}
+			}
+		}
+		*/
+
 	}
 
     bool isInBlocksBounds(int x, int y, int z)
