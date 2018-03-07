@@ -64,15 +64,19 @@ public class WorldGenerator : MonoBehaviour
 	public ProceduralGenerator getPGenerator(){
 		return generator;
 	}
-	
+
+	void FixedUpdate() {
+		Vector3 centerChunk = getCenterChunkPos ();
+
+		generator.garbageCollect(centerChunk);
+	}
+
 	// Update is called once per frame
 	void Update ()
     {
 		Vector3 centerChunk = getCenterChunkPos ();
 
 		generator.generateMap(centerChunk);
-
-		generator.garbageCollect(centerChunk);
 
         generator.waterProcess(centerChunk);
 	}

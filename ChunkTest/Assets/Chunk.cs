@@ -53,7 +53,7 @@ public class Chunk
 					float perlinZ = ((float)worldZ) / CHUNK_SIZE;
 
 					//Generate the PerlinNoise value, offset the block's height by this
-					int perlinY = (int) (2 * Mathf.PerlinNoise (perlinX/5, perlinZ/5) * CHUNK_SIZE);
+					int perlinY = (int) (Mathf.PerlinNoise (perlinX/3, perlinZ/3) * CHUNK_SIZE);
 					perlinY += y;
 					perlinY -= (int)worldOffset.y;
 					
@@ -64,7 +64,7 @@ public class Chunk
 
                     string blockType = null;
 
-					if (worldY <= 0){
+					if (worldY <= 12){
                         blockType = "StoneBlock";
 					} else {
 						blockType = "FastGrass";
@@ -95,7 +95,7 @@ public class Chunk
 						break;  //quit descending this y, as hit ground
 					}
 
-					if (worldY < 12 && Random.Range(0,1000) < 10) {
+					if (worldY < 10 && Random.Range(0,1000) < 10) {
 
 						if (isInBlocksBounds (x, y - 1, z) && blocks [x, y - 1, z] != null) {
 							CreateBlock("WaterBlock", x, y, z);
@@ -178,7 +178,7 @@ public class Chunk
 		nullOrWater (blocks [x, y, z + 1]) ||
 		nullOrWater (blocks [x, y, z - 1]);
 	}
-
+		
 	private void drawChunk()
 	{
 		Block blockToDraw;
@@ -201,6 +201,34 @@ public class Chunk
 				}
 			}
 		}
+
+		/*
+		for (int x = 0; x < CHUNK_SIZE; x++) {
+			for (int z = 0; z < CHUNK_SIZE; z++) {
+				for (int y = 0; y < CHUNK_SIZE; y++) {
+					if (blocks [x, y, z] == null) {
+						continue;
+					}
+
+					blockToDraw = blocks [x, y, z];
+
+					if (x == 0 || x == CHUNK_SIZE - 1 ||
+					   y == 0 || y == CHUNK_SIZE - 1 ||
+					   z == 0 || z == CHUNK_SIZE - 1) {
+						blockToDraw.draw ();
+						continue;
+					}
+
+					if (surroundedByNull (x,y,z)) {
+						blockToDraw.draw ();
+						continue;
+					}
+
+				}
+			}
+		}
+		*/
+
 	}
 
     bool isInBlocksBounds(int x, int y, int z)
