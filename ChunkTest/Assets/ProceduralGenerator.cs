@@ -32,13 +32,12 @@ public class ProceduralGenerator : MonoBehaviour
 
 		//TODO: Water update has trouble when this is set to 0
 		//Likely due to inter-chunk math failing on float boundaries
-		float originY = Random.Range (size * -1, size * 1);
-		originY -= originY % size;
+		float originY = 0.0f;
 
 		float originZ = Random.Range (320, 960);
 		originX -= originZ % size;
 
-		startOrigin = new Vector3(0, 0, 0);
+		startOrigin = new Vector3(originX, originY, originZ);
 
 		this.chunkSize = size;
 

@@ -49,14 +49,16 @@ public class WorldGenerator : MonoBehaviour
 		player = (GameObject)Instantiate (Resources.Load("Steve/PlayerTorso"), new Vector3 (origin.x, origin.y+20, origin.z), Quaternion.identity);
 	}
 		
-	Vector3 getPlayerPosition() {
-		if (player == null) {
-			return origin;
+	Vector3 getCenterChunkPos() {
+		Vector3 centerChunk;
+
+		if (player != null) {
+			centerChunk = player.transform.position;
+		} else {
+			centerChunk = origin;
 		}
 
-		Vector3 playerPos = player.transform.position;
-
-		return HelperMethods.worldPositionToChunkPosition (playerPos);
+		return HelperMethods.worldPositionToChunkPosition (centerChunk);
 	}
 
 	public ProceduralGenerator getPGenerator(){
@@ -66,12 +68,12 @@ public class WorldGenerator : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
     {
-		Vector3 playerPos = getPlayerPosition ();
+		Vector3 centerChunk = getCenterChunkPos ();
 
-		generator.generateMap(playerPos);
+		generator.generateMap(centerChunk);
 
-		generator.garbageCollect(playerPos);
+		generator.garbageCollect(centerChunk);
 
-        generator.waterProcess(playerPos);
+        generator.waterProcess(centerChunk);
 	}
 }
