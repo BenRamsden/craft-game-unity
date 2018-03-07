@@ -87,7 +87,7 @@ public class Chunk
 				{
 					int worldY = (int)worldOffset.y + y;
 
-					if (worldY > CHUNK_SIZE-1) {
+					if (worldY < 0) {
 						continue;
 					}
 
@@ -95,10 +95,10 @@ public class Chunk
 						break;  //quit descending this y, as hit ground
 					}
 
-					if (y < 6 && Random.Range(0,1000) < 10) {
+					if (worldY < 12 && Random.Range(0,1000) < 10) {
 
 						if (isInBlocksBounds (x, y - 1, z) && blocks [x, y - 1, z] != null) {
-							//CreateBlock("WaterBlock", x, y, z);
+							CreateBlock("WaterBlock", x, y, z);
 						}
 
 					}
@@ -197,7 +197,7 @@ public class Chunk
 						continue;
 					}
 
-					//break;
+					break;
 				}
 			}
 		}

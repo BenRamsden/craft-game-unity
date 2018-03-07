@@ -89,7 +89,7 @@ public class ProceduralGenerator : MonoBehaviour
 
 		// Create the surface
 		for (int x = -MAP_SIZE; x <= MAP_SIZE; x++){
-			for (int y = -MAP_SIZE; y <= MAP_SIZE; y++) {
+			for (int y = -1; y <= 1; y++) {
 				for (int z = -MAP_SIZE; z <= MAP_SIZE; z++){
 
 					chunkPos.Set(target.x + (chunkSize * x), target.y + (chunkSize * y), target.z + (chunkSize * z));
