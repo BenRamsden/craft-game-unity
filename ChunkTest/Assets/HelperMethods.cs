@@ -4,19 +4,18 @@ using UnityEngine;
 
 public class HelperMethods
 {
+	public static float div = (float) Chunk.CHUNK_SIZE;
+
 	public HelperMethods ()
 	{
 	}
 
 	public static Vector3 worldPositionToChunkPosition(Vector3 worldPosition) {
-		float originX = worldPosition.x;
-		originX -= originX % Chunk.CHUNK_SIZE;
+		float originX = Mathf.Floor(worldPosition.x / div) * div;
 
-		float originY = worldPosition.y;
-		originY -= originY % Chunk.CHUNK_SIZE;
+		float originY = Mathf.Floor(worldPosition.y / div) * div;
 
-		float originZ = worldPosition.z;
-		originZ -= originZ % Chunk.CHUNK_SIZE;
+		float originZ = Mathf.Floor(worldPosition.z / div) * div;
 
 		return new Vector3 (originX, originY, originZ);
 	}

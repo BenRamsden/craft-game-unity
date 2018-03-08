@@ -4,9 +4,7 @@ using UnityEngine;
 
 public class ProceduralGenerator : MonoBehaviour
 {
-	private const int MAP_SIZE = 2;
-
-	private const bool DEBUG_DISABLE_MINERAL = true;
+	private const int MAP_SIZE = 5;
 
 	private int chunkSize;
 
@@ -34,8 +32,7 @@ public class ProceduralGenerator : MonoBehaviour
 
 		//TODO: Water update has trouble when this is set to 0
 		//Likely due to inter-chunk math failing on float boundaries
-		float originY = Random.Range (size * -1, size * 1);
-		originY -= originY % size;
+		float originY = 0.0f;
 
 		float originZ = Random.Range (320, 960);
 		originX -= originZ % size;
@@ -71,47 +68,87 @@ public class ProceduralGenerator : MonoBehaviour
 		return chunks[position];
 	}
 
+
+	private class ChunkPosition
+	{
+		public Vector3 position { get; set; }
+		public float distance  { get; set; }
+
+		public ChunkPosition(Vector3 position, float distance) {
+			this.position = position;
+			this.distance = distance;
+		}
+
+	}
+
+
+	ChunkPosition closestNullChunk(Vector3 target) {
+		ChunkPosition cp = null;
+		Vector3 chunkPos = new Vector3 (0, 0, 0);
+
+		// Create the surface
+		for (int x = -MAP_SIZE; x <= MAP_SIZE; x++){
+			for (int y = -1; y <= 1; y++) {
+				for (int z = -MAP_SIZE; z <= MAP_SIZE; z++){
+
+					chunkPos.Set(target.x + (chunkSize * x), target.y + (chunkSize * y), target.z + (chunkSize * z));
+
+					if (chunkExists (chunkPos) == false) {
+						//Chunk is null at this position, compare its distance to the current closest chunk
+
+						float dist = Vector3.Distance (target, chunkPos);
+
+						if (cp == null) {
+							cp = new ChunkPosition (chunkPos, dist);
+						} else if (dist < cp.distance) {
+							cp.distance = dist;
+							cp.position = chunkPos;
+						}
+
+					}
+
+				}
+			}
+		}
+
+		return cp;
+	}
+
 	/**
 	 * Generates a new random map around a point
 	 * @param Vector3 offset The offset position
 	 */
 	public bool generateMap(Vector3 playerPos)
 	{
-		// Create the surface
-		for (int x = -MAP_SIZE; x < MAP_SIZE; x++)
-		{
-			for (int z = -MAP_SIZE; z < MAP_SIZE; z++)
-			{
-				//Generate surface
-				Vector3 surfaceVec = new Vector3 (playerPos.x + (this.chunkSize * x), playerPos.y, playerPos.z + (this.chunkSize * z));
+		ChunkPosition cp = closestNullChunk (playerPos);
 
-				if (chunkExists (surfaceVec) == false) {
-					Chunk surface = new Chunk(surfaceVec,this);
+		if (cp == null) {
+			return false;
+		}
 
-					storeChunk (surface);
-					return true;
-				}
+		Chunk chunk = new Chunk (cp.position, this);
+		storeChunk (chunk);
+		return true;
 
-				Random.InitState (Seed.MineralSeed);
-				for (int offsetY = 0; offsetY >= -1; offsetY--) {
-					//Generate mineral layer
-					Vector3 mineralVec = new Vector3 (surfaceVec.x, surfaceVec.y + (offsetY * Chunk.CHUNK_SIZE), surfaceVec.z);
+		/**
 
-					Dictionary<Mineral.Type, Vector3[]> minerals = this.calculateMinerals ((int)mineralVec.y);
+		Random.InitState (Seed.MineralSeed);
+		for (int offsetY = 0; offsetY >= -1; offsetY--) {
+			//Generate mineral layer
+			Vector3 mineralVec = new Vector3 (chunkPos.x, chunkPos.y + (offsetY * Chunk.CHUNK_SIZE), chunkPos.z);
 
-					if (chunkExists (mineralVec) == false) {
-						Chunk earth = new Chunk(mineralVec, this, true);
-						earth.GenMinerals (minerals);
+			Dictionary<Mineral.Type, Vector3[]> minerals = this.calculateMinerals ((int)mineralVec.y);
 
-						storeChunk (earth);
-						return true;
-					}
-				}
+			if (chunkExists (mineralVec) == false) {
+				Chunk earth = new Chunk(mineralVec, this, true);
+				earth.GenMinerals (minerals);
+
+				storeChunk (earth);
+				return true;
 			}
 		}
 
-		return false;
-
+		*/
 	}
 
 	Vector3 deleteChunk = Vector3.zero;
@@ -122,7 +159,7 @@ public class ProceduralGenerator : MonoBehaviour
 		foreach (Vector3 otherChunk in chunks.Keys) {
 			float dist = Vector3.Distance (playerPos, otherChunk);
 
-			if (dist > chunkSize * MAP_SIZE * 1.5) {
+			if (dist > chunkSize * MAP_SIZE * 2) {
 				chunks [otherChunk].Delete ();
 
 				deleteChunk = otherChunk;

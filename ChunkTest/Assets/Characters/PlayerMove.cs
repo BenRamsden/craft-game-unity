@@ -8,9 +8,9 @@ public class PlayerMove : MonoBehaviour {
 	private  Animator animator;
 	public bool isGrounded;
 
-	public Vector3 jump;
+	public readonly Vector3 jump = new Vector3(0.0f, 5.0f, 0.0f);
 
-	private float mouseX, mouseY, rotY, rotX, moveX, moveZ = 0.0f;
+	private float mouseX, mouseY, rotY,rotYHead, rotX, moveX, moveZ = 0.0f;
 	public float mouseSensitivity = 1000.0f;
 	public float moveSpeed = 10.0F;
 
@@ -23,15 +23,15 @@ public class PlayerMove : MonoBehaviour {
 	private bool isInWater = false;
 
 	public static float x_AxisRotateClamp = 80.0f;
+    public static float y_AxisRotateClamp = 10.0f;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
 		rb = GetComponent<Rigidbody> ();
 		animator = GetComponent<Animator> ();
 		Vector3 rot = transform.localRotation.eulerAngles;
 		rotY = rot.y;
 		rotX = rot.x;
-		jump = new Vector3 (0.0f, 5.0f, 0.0f);
 
 		jumpSound = (AudioClip)Resources.Load ("Sounds/jump");
 		grassWalkSound = (AudioClip)Resources.Load ("Sounds/walk_grass");
@@ -64,18 +64,33 @@ public class PlayerMove : MonoBehaviour {
 		animator.SetBool ("isJumping", false);
 	}
 
-	/** Rotating player with mouse*/
 
 	void Update () {
-		mouseX = Input.GetAxis("Mouse X");
-		mouseY = -Input.GetAxis("Mouse Y"); // "-" because it is inverted up and down 
-		rotY += mouseX * mouseSensitivity * Time.deltaTime;
-		//rotX += mouseY * mouseSensitivity * Time.deltaTime;
+        // Rotating player with mouse
+        mouseX = Input.GetAxis("Mouse X");
+		mouseY = -Input.GetAxis("Mouse Y"); // "-" because otherwise it is inverted up and down 
+        rotYHead += mouseX * mouseSensitivity * Time.deltaTime;
+        rotX += mouseY * mouseSensitivity * Time.deltaTime;
 		//stop the player being able to look up/down too much
 		rotX = Mathf.Clamp(rotX, -x_AxisRotateClamp, x_AxisRotateClamp);
-		rb.transform.rotation= Quaternion.Euler(rotX, rotY, 0.0f);
+        //rotYHead = Mathf.Clamp(rotY, -y_AxisRotateClamp, y_AxisRotateClamp);
 
-		if(Input.GetKeyDown(KeyCode.Space) && isGrounded){
+        //set up rotations for the torso and head. allow head to look up and down but not torso.
+        Quaternion rotationHead = Quaternion.Euler(rotX, rotYHead, 0.0f);
+        transform.GetChild(0).rotation = rotationHead;
+
+        float diff = rotYHead - rotY;
+    
+        if(diff > y_AxisRotateClamp || diff < y_AxisRotateClamp)
+        {
+            rotY += diff / 3;
+        }
+
+        Quaternion rotationTorso = Quaternion.Euler(0.0f, rotY, 0.0f);
+        transform.rotation = rotationTorso;
+
+        //player jumping code
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded){
 			rb.AddForce(jump, ForceMode.Impulse);
 			isGrounded = false;
 
