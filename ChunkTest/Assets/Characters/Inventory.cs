@@ -5,7 +5,8 @@ using UnityEngine.UI;
 
 public class Inventory : MonoBehaviour {
     private Stack<Block> blocks = new Stack<Block>();
-    public Text BlockAmountText;
+	public Text blockAmountText;
+
     public void addBlock(Block block){
         blocks.Push(block);
     }
@@ -13,7 +14,12 @@ public class Inventory : MonoBehaviour {
         return blocks.Pop();
     }
 
+	public void Start(){
+		blockAmountText = GameObject.Find("blockAmountText").GetComponent<Text>();
+	}
+
     public void setUI() {
-        BlockAmountText.text = "Blocks: " + blocks.Count;
+		Debug.Log (blocks.Count.ToString());
+		blockAmountText.text = "Blocks: " + blocks.Count.ToString();
     }
 }
