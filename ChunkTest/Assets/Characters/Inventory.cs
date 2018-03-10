@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class Inventory : MonoBehaviour {
     private Stack<Block> blocks = new Stack<Block>();
 	public Text blockAmountText;
+	public Image item1;
 
     public void addBlock(Block block){
         blocks.Push(block);
@@ -15,11 +16,13 @@ public class Inventory : MonoBehaviour {
     }
 
 	public void Start(){
-		blockAmountText = GameObject.Find("blockAmountText").GetComponent<Text>();
+		item1 = GameObject.Find ("item1").GetComponent<Image>();
+		blockAmountText = GameObject.Find ("item1").GetComponentInChildren<Text>();
 	}
 
     public void setUI() {
 		Debug.Log (blocks.Count.ToString());
-		blockAmountText.text = "Blocks: " + blocks.Count.ToString();
+		blockAmountText.text = blocks.Count.ToString();
+		item1.material = (Material)Resources.Load("Menu/grassBlockMat");
     }
 }
