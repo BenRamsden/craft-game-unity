@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using UnityEngine;
 
 public class PlayerInteraction : MonoBehaviour {
@@ -10,14 +9,17 @@ public class PlayerInteraction : MonoBehaviour {
 	Rigidbody rb;
     Vector3 worldPosition, posOfChunk, posOfBlock;
     Chunk currentChunk;
-    GameObject currentObject, previousObject;
-	GameObject camera;
+    GameObject currentObject;
+	Camera camera;
+	LineRenderer targetLine;
+	Vector3 rayOrigin;
 
     // Use this for initialization
     void Start () {
 		rb = GetComponent<Rigidbody>();
 		animator = GetComponent<Animator> ();
-		camera = GameObject.Find ("Main Camera");
+		camera = GetComponentInChildren<Camera>();
+		targetLine = GetComponent<LineRenderer>();
 	}
 
 	void FixedUpdate() {
@@ -25,10 +27,15 @@ public class PlayerInteraction : MonoBehaviour {
 			return;
 		}
 
-		if (Physics.Raycast(transform.position, camera.transform.forward, out hit, 100))
-        {
-            currentObject = hit.collider.gameObject;
-        }
+		rayOrigin = camera.ViewportToWorldPoint (new Vector3(.5f,.5f,0));
+		//targetLine.SetPosition (0, rayOrigin);
+		if (Physics.Raycast (rayOrigin, camera.transform.forward, out hit, 100)) {
+			//targetLine.SetPosition (1, hit.point);
+			currentObject = hit.collider.gameObject;
+		} 
+		//else {
+			//targetLine.SetPosition (1, rayOrigin + (camera.transform.forward * 100));
+		//}
     }
 
 	// Update is called once per frame
@@ -65,63 +72,30 @@ public class PlayerInteraction : MonoBehaviour {
 					vectors [4] = new Vector3 (posOfBlock.x, posOfBlock.y, posOfBlock.z - 1.0f);
 					vectors [5] = new Vector3 (posOfBlock.x, posOfBlock.y, posOfBlock.z + 1.0f);
 
-
 					Block adjacentBlock;
 					for(int i = 0; i < 6; i++){
-                        Debug.Log("Vector.x = " + vectors[i].x + ", Vector.y = " + vectors[i].y + ", Vector.z = " + vectors[i].z);
-
                         if (currentChunk.getBlock(vectors [i]) != null){
                             adjacentBlock = currentChunk.getBlock(vectors[i]);
                             if (adjacentBlock != null){
 								adjacentBlock.draw();
 							}
-						}else{
-                            if (vectors[i].x < 0){
-                                posOfChunk = new Vector3(posOfChunk.x - 16.0f, posOfChunk.y, posOfChunk.z);
-                                vectors[i].x += 16;
-                            }else if(vectors[i].x > 15){
-                                posOfChunk = new Vector3(posOfChunk.x + 16.0f, posOfChunk.y, posOfChunk.z);
-                                vectors[i].x -= 16;
-                            }
-
-                            if (vectors[i].y < 0){
-                                posOfChunk = new Vector3(posOfChunk.x, posOfChunk.y - 16.0f, posOfChunk.z);
-                                vectors[i].y += 16;
-                            }else if (vectors[i].y > 15){
-                                posOfChunk = new Vector3(posOfChunk.x, posOfChunk.y + 16.0f, posOfChunk.z);
-                                vectors[i].y -= 16;
-                            }
-
-                            if (vectors[i].z < 0){
-                                posOfChunk = new Vector3(posOfChunk.x, posOfChunk.y, posOfChunk.z - 16.0f);
-                                vectors[i].z += 16;
-                            }else if (vectors[i].z > 15){
-                                posOfChunk = new Vector3(posOfChunk.x, posOfChunk.y, posOfChunk.z + 16.0f);
-                                vectors[i].z -= 16;
-                            }
-							currentChunk = GameObject.Find("World").GetComponent<WorldGenerator>().getPGenerator().getChunk(posOfChunk);
-                            adjacentBlock = currentChunk.getBlock(vectors[i]);
-
-                            if (currentChunk.getBlock(vectors[i]) != null){
-                                adjacentBlock = currentChunk.getBlock(vectors[i]);
-                                if (adjacentBlock != null)
-                                {
-                                    adjacentBlock.draw();
-                                }
-                            }
-                        }
+						}
 					}
                 }
             }
         }
 	}
 
-    private void onTriggerEnter(Collider other)
-    {
-        Block newBlock = new Block();
-        newBlock.BlockType = other.tag;
-        GetComponent<Inventory>().addBlock(newBlock);
-        GetComponent<Inventory>().setUI();
-        Destroy(other.gameObject);
-    }
+	void OnCollisionEnter(Collision col){
+		if (col.gameObject.GetComponent<Rigidbody>() != null) {
+			Block newBlock = new Block();
+			newBlock.BlockType = col.gameObject.tag;
+			if (GetComponent<Inventory> ().addBlock (newBlock)) {
+				GetComponent<Inventory>().setUI();
+				Destroy(col.gameObject);
+			} else {
+				Debug.Log ("Hit Capacity for these items.");
+			}
+		}
+	}
 }

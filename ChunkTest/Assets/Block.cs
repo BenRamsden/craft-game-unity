@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Block {
+public class Block{
     GameObject thisBody;
 	BlockProperties bp;
 	Vector3 worldPosition;
