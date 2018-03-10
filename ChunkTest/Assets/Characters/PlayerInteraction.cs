@@ -90,9 +90,12 @@ public class PlayerInteraction : MonoBehaviour {
 		if (col.gameObject.GetComponent<Rigidbody>() != null) {
 			Block newBlock = new Block();
 			newBlock.BlockType = col.gameObject.tag;
-			GetComponent<Inventory>().addBlock(newBlock);
-			GetComponent<Inventory>().setUI();
-			Destroy(col.gameObject);
+			if (GetComponent<Inventory> ().addBlock (newBlock)) {
+				GetComponent<Inventory>().setUI();
+				Destroy(col.gameObject);
+			} else {
+				Debug.Log ("Hit Capacity for these items.");
+			}
 		}
 	}
 }
