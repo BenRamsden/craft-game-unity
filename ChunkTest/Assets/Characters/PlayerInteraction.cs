@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class PlayerInteraction : MonoBehaviour {
 	RaycastHit hit;
-	bool isLeftMouseDown;
+	bool isLeftMouseDown, isRightMouseClicked;
 	Block currentBlock;
 	private  Animator animator;
 	Rigidbody rb;
@@ -13,7 +13,7 @@ public class PlayerInteraction : MonoBehaviour {
 	Camera camera;
 	LineRenderer targetLine;
 	Vector3 rayOrigin;
-	int timer = 30;
+	int timer = 10;
 
     // Use this for initialization
     void Start () {
@@ -45,12 +45,24 @@ public class PlayerInteraction : MonoBehaviour {
 			return;
 		}
 		isLeftMouseDown = Input.GetMouseButton(0);
+		isRightMouseClicked = Input.GetMouseButtonDown(1);
+
+		worldPosition = currentObject.GetComponent<Transform>().position;
+		posOfChunk = HelperMethods.worldPositionToChunkPosition (worldPosition);
+		posOfBlock = HelperMethods.vectorDifference (worldPosition, posOfChunk);
+
+		currentChunk = GameObject.Find("World").GetComponent<WorldGenerator>().getPGenerator().getChunk(posOfChunk);
+		currentBlock = currentChunk.getBlock(posOfBlock);
 
 		if (isLeftMouseDown && timer < 1){
 			interactWithBlock();
-			timer = 30;
+			timer = 10;
 		}
 		timer = (timer < 1)? 0: --timer;
+
+		if(isRightMouseClicked){
+			placeBlock();
+		}
 	}
 
 	void OnCollisionEnter(Collision col){
@@ -68,13 +80,6 @@ public class PlayerInteraction : MonoBehaviour {
 
 
 	private void interactWithBlock(){
-		worldPosition = currentObject.GetComponent<Transform>().position;
-		posOfChunk = HelperMethods.worldPositionToChunkPosition (worldPosition);
-		posOfBlock = HelperMethods.vectorDifference (worldPosition, posOfChunk);
-
-		currentChunk = GameObject.Find("World").GetComponent<WorldGenerator>().getPGenerator().getChunk(posOfChunk);
-		currentBlock = currentChunk.getBlock(posOfBlock);
-
 		animator.ResetTrigger("Interact");
 		animator.SetTrigger("Interact");
 		if (currentBlock != null)
@@ -103,6 +108,17 @@ public class PlayerInteraction : MonoBehaviour {
 					}
 				}
 			}
+		}
+	}
+
+	private void placeBlock(){
+		animator.ResetTrigger("Interact");
+		animator.SetTrigger("Interact");
+		if(currentBlock != null){
+			GetComponent<Inventory>().removeBlock ("FastGrass");
+			Block tempBlock = currentChunk.CreateBlock("FastGrass", (int)posOfBlock.x, (int)posOfBlock.y+1, (int)posOfBlock.z);
+			tempBlock.draw();
+			GetComponent<Inventory>().setUI();
 		}
 	}
 

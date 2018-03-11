@@ -17,21 +17,22 @@ public class Inventory : MonoBehaviour {
 	public Image[] items = new Image[6];
 
     public bool addBlock(Block block){
-		int itemBarIndex = checkForEntry(block.BlockType);
+		int itemBarIndex = checkForEntry(block.BlockType, true);
 		if (itemBarIndex != -1) {
-			itemBar [itemBarIndex].Add (block);
+			itemBar [itemBarIndex].Add(block);
 			return true;
 		}
 		return false;
     }
 
-	public Block getBlock(string typeString){
-		int itemBarIndex = checkForEntry(typeString);
+	public bool removeBlock(string typeString){
+		int itemBarIndex = checkForEntry(typeString, false);
 		Debug.Log (itemBarIndex.ToString());
 		if (itemBarIndex != -1) {
-			return (Block) itemBar[itemBarIndex][itemBar[itemBarIndex].Count - 1];
+			(itemBar [itemBarIndex]).RemoveAt((itemBar [itemBarIndex].Count) - 1);
+			return true;
 		}
-		return null;
+		return false;
     }
 
 	public void Start(){
@@ -39,6 +40,12 @@ public class Inventory : MonoBehaviour {
 			items[i] = GameObject.Find(string.Concat("item",(i+1).ToString())).GetComponent<Image>();
 			amountText[i] = GameObject.Find (string.Concat("item",(i+1).ToString())).GetComponentInChildren<Text>();
 		}
+	}
+	public void Delete() {
+		for (int i = 0; i < 6; i++) {
+			itemBar [i].Clear ();
+		}
+		itemBar = null;
 	}
 
     public void setUI() {
@@ -50,19 +57,25 @@ public class Inventory : MonoBehaviour {
 		}
     }
 
-	private int checkForEntry(string typeString){
+	private int checkForEntry(string typeString, bool isAddBlock){
 		int listNumber = -1;
-		for(int i = 0; i < 6; i++){
-			//This is the case if the Array is empty	
-			if((itemBar [i]).Count < 1){
-				listNumber = i;
-			}else if((itemBar [i]) [0].GetType() == typeof(Block)){
-				if (((Block)(itemBar [i]) [0]).BlockType == typeString) {
-					if ((itemBar [i]).Count < 64) {
-						listNumber = i;
-						break;
+		for(int i = 0; i < 6; ++i){
+			if (itemBar [i].Count > 0) {
+				if ((itemBar [i]) [0].GetType () == typeof(Block)) {
+					if (((Block)(itemBar [i]) [0]).BlockType == typeString) {
+						if(!isAddBlock){
+							listNumber = i;
+							break;
+						}
+						if ((itemBar [i]).Count < 64) {
+							listNumber = i;
+							break;
+						}
 					}
 				}
+			} else {
+				//This is the case if the Array is empty
+				listNumber = i;	
 			}
 		}
 		return listNumber;
