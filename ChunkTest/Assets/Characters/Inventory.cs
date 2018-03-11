@@ -42,16 +42,18 @@ public class Inventory : MonoBehaviour {
 	}
 
     public void setUI() {
+		string materialName;
 		for(int i = 0; i < 6; i++){
+			materialName = (itemBar[i].Count > 0)? ((Block)(itemBar [i]) [0]).BlockType: "DefaultItem";
 			amountText[i].text = itemBar[i].Count.ToString();
-			items[i].material = (Material)Resources.Load("Menu/grassBlockMat");
+			items[i].material = (Material)Resources.Load(string.Concat("Menu/",materialName));
 		}
     }
 
 	private int checkForEntry(string typeString){
 		int listNumber = -1;
 		for(int i = 0; i < 6; i++){
-			//This is the case if the Array is empty
+			//This is the case if the Array is empty	
 			if((itemBar [i]).Count < 1){
 				listNumber = i;
 			}else if((itemBar [i]) [0].GetType() == typeof(Block)){

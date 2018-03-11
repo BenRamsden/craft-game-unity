@@ -13,6 +13,7 @@ public class PlayerInteraction : MonoBehaviour {
 	Camera camera;
 	LineRenderer targetLine;
 	Vector3 rayOrigin;
+	int timer = 30;
 
     // Use this for initialization
     void Start () {
@@ -43,47 +44,13 @@ public class PlayerInteraction : MonoBehaviour {
 		if (currentObject == null) {
 			return;
 		}
+		isLeftMouseDown = Input.GetMouseButton(0);
 
-		worldPosition = currentObject.GetComponent<Transform>().position;
-		posOfChunk = HelperMethods.worldPositionToChunkPosition (worldPosition);
-		posOfBlock = HelperMethods.vectorDifference (worldPosition, posOfChunk);
-
-		currentChunk = GameObject.Find("World").GetComponent<WorldGenerator>().getPGenerator().getChunk(posOfChunk);
-		currentBlock = currentChunk.getBlock(posOfBlock);
-
-		isLeftMouseDown = Input.GetMouseButtonDown(0);
-        if (isLeftMouseDown)
-        {
-            animator.ResetTrigger("Interact");
-            animator.SetTrigger("Interact");
-            if (currentBlock != null)
-            {
-                currentBlock.damageBlock(100);
-                if (currentBlock.getProperties().blockHealth <= 0)
-                {
-                    currentBlock.dropSelf();
-                    currentChunk.removeBlock(posOfBlock);
-
-					Vector3[] vectors = new Vector3[6];
-					vectors [0] = new Vector3 (posOfBlock.x - 1.0f, posOfBlock.y, posOfBlock.z);
-					vectors [1] = new Vector3 (posOfBlock.x + 1.0f, posOfBlock.y, posOfBlock.z);
-					vectors [2] = new Vector3 (posOfBlock.x, posOfBlock.y - 1.0f, posOfBlock.z);
-					vectors [3] = new Vector3 (posOfBlock.x, posOfBlock.y + 1.0f, posOfBlock.z);
-					vectors [4] = new Vector3 (posOfBlock.x, posOfBlock.y, posOfBlock.z - 1.0f);
-					vectors [5] = new Vector3 (posOfBlock.x, posOfBlock.y, posOfBlock.z + 1.0f);
-
-					Block adjacentBlock;
-					for(int i = 0; i < 6; i++){
-                        if (currentChunk.getBlock(vectors [i]) != null){
-                            adjacentBlock = currentChunk.getBlock(vectors[i]);
-                            if (adjacentBlock != null){
-								adjacentBlock.draw();
-							}
-						}
-					}
-                }
-            }
-        }
+		if (isLeftMouseDown && timer < 1){
+			interactWithBlock();
+			timer = 30;
+		}
+		timer = (timer < 1)? 0: --timer;
 	}
 
 	void OnCollisionEnter(Collision col){
@@ -94,8 +61,49 @@ public class PlayerInteraction : MonoBehaviour {
 				GetComponent<Inventory>().setUI();
 				Destroy(col.gameObject);
 			} else {
-				Debug.Log ("Hit Capacity for these items.");
+				Debug.Log ("Inventory is full.");
 			}
 		}
 	}
+
+
+	private void interactWithBlock(){
+		worldPosition = currentObject.GetComponent<Transform>().position;
+		posOfChunk = HelperMethods.worldPositionToChunkPosition (worldPosition);
+		posOfBlock = HelperMethods.vectorDifference (worldPosition, posOfChunk);
+
+		currentChunk = GameObject.Find("World").GetComponent<WorldGenerator>().getPGenerator().getChunk(posOfChunk);
+		currentBlock = currentChunk.getBlock(posOfBlock);
+
+		animator.ResetTrigger("Interact");
+		animator.SetTrigger("Interact");
+		if (currentBlock != null)
+		{
+			currentBlock.damageBlock(100);
+			if (currentBlock.getProperties().blockHealth <= 0)
+			{
+				currentBlock.dropSelf();
+				currentChunk.removeBlock(posOfBlock);
+
+				Vector3[] vectors = new Vector3[6];
+				vectors [0] = new Vector3 (posOfBlock.x - 1.0f, posOfBlock.y, posOfBlock.z);
+				vectors [1] = new Vector3 (posOfBlock.x + 1.0f, posOfBlock.y, posOfBlock.z);
+				vectors [2] = new Vector3 (posOfBlock.x, posOfBlock.y - 1.0f, posOfBlock.z);
+				vectors [3] = new Vector3 (posOfBlock.x, posOfBlock.y + 1.0f, posOfBlock.z);
+				vectors [4] = new Vector3 (posOfBlock.x, posOfBlock.y, posOfBlock.z - 1.0f);
+				vectors [5] = new Vector3 (posOfBlock.x, posOfBlock.y, posOfBlock.z + 1.0f);
+
+				Block adjacentBlock;
+				for(int i = 0; i < 6; i++){
+					if (currentChunk.getBlock(vectors [i]) != null){
+						adjacentBlock = currentChunk.getBlock(vectors[i]);
+						if (adjacentBlock != null){
+							adjacentBlock.draw();
+						}
+					}
+				}
+			}
+		}
+	}
+
 }
