@@ -12,12 +12,12 @@ public class Inventory : MonoBehaviour {
 		new List<Block>(64),
 		new List<Block>(64)
 	};
-
+	private int activeList = 5;
 	public Text[] amountText = new Text[6];
 	public Image[] items = new Image[6];
 
     public bool addBlock(Block block){
-		int itemBarIndex = checkForEntry(block.BlockType, true);
+		int itemBarIndex = checkForEntry(block.BlockType);
 		if (itemBarIndex != -1) {
 			itemBar [itemBarIndex].Add(block);
 			return true;
@@ -25,14 +25,14 @@ public class Inventory : MonoBehaviour {
 		return false;
     }
 
-	public bool removeBlock(string typeString){
-		int itemBarIndex = checkForEntry(typeString, false);
-		Debug.Log (itemBarIndex.ToString());
-		if (itemBarIndex != -1) {
-			(itemBar [itemBarIndex]).RemoveAt((itemBar [itemBarIndex].Count) - 1);
-			return true;
+	public string removeBlock(){
+		int activeCount = itemBar [activeList].Count;
+		if (activeCount > 0) {
+			string tempName = itemBar [activeList] [0].BlockType;
+			(itemBar [activeList]).RemoveAt(activeCount - 1);
+			return tempName;
 		}
-		return false;
+		return null;
     }
 
 	public void Start(){
@@ -40,6 +40,7 @@ public class Inventory : MonoBehaviour {
 			items[i] = GameObject.Find(string.Concat("item",(i+1).ToString())).GetComponent<Image>();
 			amountText[i] = GameObject.Find (string.Concat("item",(i+1).ToString())).GetComponentInChildren<Text>();
 		}
+		setUI ();
 	}
 	public void Delete() {
 		for (int i = 0; i < 6; i++) {
@@ -54,19 +55,21 @@ public class Inventory : MonoBehaviour {
 			materialName = (itemBar[i].Count > 0)? ((Block)(itemBar [i]) [0]).BlockType: "DefaultItem";
 			amountText[i].text = itemBar[i].Count.ToString();
 			items[i].material = (Material)Resources.Load(string.Concat("Menu/",materialName));
+			items[i].GetComponent<RectTransform> ().localScale = new Vector3(1,1,1);
 		}
+		items [activeList].GetComponent<RectTransform> ().localScale = new Vector3(1.15f,1.15f,1.15f);
     }
 
-	private int checkForEntry(string typeString, bool isAddBlock){
+	public void setActiveList(int activeList){
+		this.activeList = activeList;
+	}
+
+	private int checkForEntry(string typeString){
 		int listNumber = -1;
 		for(int i = 0; i < 6; ++i){
 			if (itemBar [i].Count > 0) {
 				if ((itemBar [i]) [0].GetType () == typeof(Block)) {
 					if (((Block)(itemBar [i]) [0]).BlockType == typeString) {
-						if(!isAddBlock){
-							listNumber = i;
-							break;
-						}
 						if ((itemBar [i]).Count < 64) {
 							listNumber = i;
 							break;
