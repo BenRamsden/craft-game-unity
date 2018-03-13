@@ -10,7 +10,7 @@ public class BotMove : MonoBehaviour {
 
 	public readonly Vector3 jump = new Vector3(0.0f, 5.0f, 0.0f);
 
-	private float mouseX, mouseY, rotY,rotYHead, rotX, moveX, moveZ = 0.0f;
+	private float rotY,rotYHead, rotX, moveX, moveZ = 0.0f;
 	public float mouseSensitivity = 1000.0f;
 	public float moveSpeed = 10.0F;
 
@@ -43,6 +43,19 @@ public class BotMove : MonoBehaviour {
 	void FixedUpdate () {
 		moveX = Random.Range(-1,1);// Input.GetAxis ("Horizontal");
 		moveZ = Random.Range(-1,1);// Input.GetAxis ("Vertical");
+
+		movePlayer (moveX, moveZ);
+	}
+
+	void Update () {
+        // Rotating player with mouse
+		float mouseX = Random.Range(-1,1);// Input.GetAxis("Mouse X");
+		float mouseY = Random.Range(-1,1);// -Input.GetAxis("Mouse Y"); // "-" because otherwise it is inverted up and down 
+        
+		moveCamera (mouseX, mouseY);
+	}
+
+	void movePlayer(float moveX, float moveZ) {
 		//float move
 		Vector3 movement = new Vector3 (moveX, 0.0f, moveZ);
 
@@ -57,62 +70,38 @@ public class BotMove : MonoBehaviour {
 		}
 	}
 
-
-	void OnCollisionStay()
-	{
-		isGrounded = true;
-		animator.SetBool ("isJumping", false);
-	}
-
-
-	void Update () {
-        // Rotating player with mouse
-		mouseX = Random.Range(-1,1);// Input.GetAxis("Mouse X");
-		mouseY = Random.Range(-1,1);// -Input.GetAxis("Mouse Y"); // "-" because otherwise it is inverted up and down 
-        rotYHead += mouseX * mouseSensitivity * Time.deltaTime;
-        rotX += mouseY * mouseSensitivity * Time.deltaTime;
+	void moveCamera(float mouseX, float mouseY) {
+		rotYHead += mouseX * mouseSensitivity * Time.deltaTime;
+		rotX += mouseY * mouseSensitivity * Time.deltaTime;
 		//stop the player being able to look up/down too much
 		rotX = Mathf.Clamp(rotX, -x_AxisRotateClamp, x_AxisRotateClamp);
-        //rotYHead = Mathf.Clamp(rotY, -y_AxisRotateClamp, y_AxisRotateClamp);
+		//rotYHead = Mathf.Clamp(rotY, -y_AxisRotateClamp, y_AxisRotateClamp);
 
-        //set up rotations for the torso and head. allow head to look up and down but not torso.
-        Quaternion rotationHead = Quaternion.Euler(rotX, rotYHead, 0.0f);
-        transform.GetChild(0).rotation = rotationHead;
+		//set up rotations for the torso and head. allow head to look up and down but not torso.
+		Quaternion rotationHead = Quaternion.Euler(rotX, rotYHead, 0.0f);
+		transform.GetChild(0).rotation = rotationHead;
 
-        float diff = rotYHead - rotY;
-    
-        if(diff > y_AxisRotateClamp || diff < y_AxisRotateClamp)
-        {
-            rotY += diff / 3;
-        }
+		float diff = rotYHead - rotY;
 
-        Quaternion rotationTorso = Quaternion.Euler(0.0f, rotY, 0.0f);
-        transform.rotation = rotationTorso;
-
-        //player jumping code
-        /*if (Input.GetKeyDown(KeyCode.Space) && isGrounded){
-			rb.AddForce(jump, ForceMode.Impulse);
-			isGrounded = false;
-
-			animator.SetBool ("isJumping", true);
-
-			audioSource.PlayOneShot (jumpSound);
-		}*/
-
-		// If a key is pressed, play a sound
-		/*if (Input.anyKey && !audioSource.isPlaying)
+		if(diff > y_AxisRotateClamp || diff < y_AxisRotateClamp)
 		{
-			if (isInWater)
-				audioSource.PlayOneShot (swimSound);
-			else
-				audioSource.PlayOneShot (walkSound);
-		}*/
+			rotY += diff / 3;
+		}
+
+		Quaternion rotationTorso = Quaternion.Euler(0.0f, rotY, 0.0f);
+		transform.rotation = rotationTorso;
 	}
 
 	void OnCollisionEnter(Collision collision)
 	{
 		// Get the walk sound from the collided block
 		walkSound = collision.gameObject.GetComponent<BlockProperties> ().PlayerWalkSound;
+	}
+		
+	void OnCollisionStay()
+	{
+		isGrounded = true;
+		animator.SetBool ("isJumping", false);
 	}
 
 	/**
