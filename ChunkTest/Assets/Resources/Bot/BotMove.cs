@@ -41,37 +41,62 @@ public class BotMove : MonoBehaviour {
 		audioSource = gameObject.AddComponent<AudioSource> ();
 	}
 
+	GameObject cube = null;
+
 	/** Moving player using unity physics */
 	void FixedUpdate () {
+		Vector3 forward = transform.forward;
+
 		Vector3 botPos = this.gameObject.transform.position;
-		botPos.y -= 2;
+		botPos.y -= 1.2f;
+		botPos += forward * 3.0f;
+
+		if (cube == null) {
+			cube = GameObject.CreatePrimitive (PrimitiveType.Cube);
+			cube.transform.localScale = new Vector3 (0.1f, 0.1f, 0.1f);
+
+			Physics.IgnoreCollision (cube.GetComponent<Collider> (), GetComponent<Collider> ());
+		}
+			
+		cube.transform.position = botPos;
+
 		Vector3 chunkPos = HelperMethods.worldPositionToChunkPosition (botPos);
 		Vector3 blockPos = HelperMethods.vectorDifference (chunkPos,botPos);
 
 		Chunk chunk = pg.getChunk (chunkPos);
 
-		if (chunk == null)
-			return;
+		if (chunk != null) {
+			Block block = chunk.getBlock (blockPos);
 
-		Block block = chunk.getBlock (blockPos);
+			if (block != null) {
+				Debug.Log ("Block = " + block.BlockType);
+				jumpPlayer ();
+			}
+		}
 
-		if (block == null)
-			return;
-
-		Debug.Log ("Block = " + block.BlockType);
-
-		float moveX = Random.Range(-1,1);// Input.GetAxis ("Horizontal");
-		float moveZ = Random.Range(-1,1);// Input.GetAxis ("Vertical");
+		float moveX = 0;// Input.GetAxis ("Horizontal");
+		float moveZ = 0.2f;// Input.GetAxis ("Vertical");
 
 		movePlayer (moveX, moveZ);
 	}
 
 	void Update () {
         // Rotating player with mouse
-		float mouseX = Random.Range(-1,1);// Input.GetAxis("Mouse X");
-		float mouseY = Random.Range(-1,1);// -Input.GetAxis("Mouse Y"); // "-" because otherwise it is inverted up and down 
+		float mouseX = 0;// Input.GetAxis("Mouse X");
+		float mouseY = 0;// -Input.GetAxis("Mouse Y"); // "-" because otherwise it is inverted up and down 
         
 		moveCamera (mouseX, mouseY);
+	}
+
+	void jumpPlayer() {
+		if (isGrounded){
+			rb.AddForce(jump, ForceMode.Impulse);
+			isGrounded = false;
+
+			animator.SetBool ("isJumping", true);
+
+			audioSource.PlayOneShot (jumpSound);
+		}
 	}
 
 	void movePlayer(float moveX, float moveZ) {
