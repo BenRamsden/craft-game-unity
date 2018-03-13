@@ -41,37 +41,14 @@ public class BotMove : MonoBehaviour {
 		audioSource = gameObject.AddComponent<AudioSource> ();
 	}
 
-	GameObject cube = null;
+	static Vector3 leftCollider = new Vector3 (-1.5f, -1.2f, 0.0f);
+	static Vector3 frontCollider = new Vector3(0.0f,-1.2f,0.0f);
+	static Vector3 rightCollider = new Vector3 (1.5f, -1.2f, 0.0f);
 
-	/** Moving player using unity physics */
+	/* Moving player using unity physics */
 	void FixedUpdate () {
-		Vector3 forward = transform.forward;
-
-		Vector3 botPos = this.gameObject.transform.position;
-		botPos.y -= 1.2f;
-		botPos += forward * 3.0f;
-
-		if (cube == null) {
-			cube = GameObject.CreatePrimitive (PrimitiveType.Cube);
-			cube.transform.localScale = new Vector3 (0.1f, 0.1f, 0.1f);
-
-			Physics.IgnoreCollision (cube.GetComponent<Collider> (), GetComponent<Collider> ());
-		}
-			
-		cube.transform.position = botPos;
-
-		Vector3 chunkPos = HelperMethods.worldPositionToChunkPosition (botPos);
-		Vector3 blockPos = HelperMethods.vectorDifference (chunkPos,botPos);
-
-		Chunk chunk = pg.getChunk (chunkPos);
-
-		if (chunk != null) {
-			Block block = chunk.getBlock (blockPos);
-
-			if (block != null) {
-				Debug.Log ("Block = " + block.BlockType);
-				jumpPlayer ();
-			}
+		if (avoidCollision (frontCollider)) {
+			jumpPlayer ();
 		}
 
 		float moveX = 0;// Input.GetAxis ("Horizontal");
@@ -86,6 +63,41 @@ public class BotMove : MonoBehaviour {
 		float mouseY = 0;// -Input.GetAxis("Mouse Y"); // "-" because otherwise it is inverted up and down 
         
 		moveCamera (mouseX, mouseY);
+	}
+
+	bool avoidCollision(Vector3 collider) {
+		Vector3 forward = transform.forward;
+
+		Vector3 botPos = this.gameObject.transform.position;
+		botPos += collider;
+		botPos += forward * 3.0f;
+
+		/*if (cube == null) {
+			cube = GameObject.CreatePrimitive (PrimitiveType.Cube);
+			cube.transform.localScale = new Vector3 (0.1f, 0.1f, 0.1f);
+
+			Physics.IgnoreCollision (cube.GetComponent<Collider> (), GetComponent<Collider> ());
+		}
+			
+		cube.transform.position = botPos;*/
+
+		Vector3 chunkPos = HelperMethods.worldPositionToChunkPosition (botPos);
+		Vector3 blockPos = HelperMethods.vectorDifference (chunkPos,botPos);
+
+		Chunk chunk = pg.getChunk (chunkPos);
+
+		if (chunk == null)
+			return false;
+
+		Block block = chunk.getBlock (blockPos);
+
+		if (block == null)
+			return false;
+
+		if (block.BlockType == "WaterBlock")
+			return false;
+
+		return true;
 	}
 
 	void jumpPlayer() {
@@ -120,6 +132,12 @@ public class BotMove : MonoBehaviour {
 		//stop the player being able to look up/down too much
 		rotX = Mathf.Clamp(rotX, -x_AxisRotateClamp, x_AxisRotateClamp);
 		//rotYHead = Mathf.Clamp(rotY, -y_AxisRotateClamp, y_AxisRotateClamp);
+
+		if (avoidCollision (leftCollider)) {
+			rotYHead += 45;
+		} else if (avoidCollision (rightCollider)) {
+			rotYHead -= 45;
+		}
 
 		//set up rotations for the torso and head. allow head to look up and down but not torso.
 		Quaternion rotationHead = Quaternion.Euler(rotX, rotYHead, 0.0f);
