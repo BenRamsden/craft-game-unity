@@ -43,6 +43,23 @@ public class BotMove : MonoBehaviour {
 
 	/** Moving player using unity physics */
 	void FixedUpdate () {
+		Vector3 botPos = this.gameObject.transform.position;
+		botPos.y -= 2;
+		Vector3 chunkPos = HelperMethods.worldPositionToChunkPosition (botPos);
+		Vector3 blockPos = HelperMethods.vectorDifference (chunkPos,botPos);
+
+		Chunk chunk = pg.getChunk (chunkPos);
+
+		if (chunk == null)
+			return;
+
+		Block block = chunk.getBlock (blockPos);
+
+		if (block == null)
+			return;
+
+		Debug.Log ("Block = " + block.BlockType);
+
 		float moveX = Random.Range(-1,1);// Input.GetAxis ("Horizontal");
 		float moveZ = Random.Range(-1,1);// Input.GetAxis ("Vertical");
 
