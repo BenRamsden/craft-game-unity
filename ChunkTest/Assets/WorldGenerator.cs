@@ -8,6 +8,7 @@ public class WorldGenerator : MonoBehaviour
 	private static bool ENABLE_MENU = true;
 
 	private GameObject player;
+	private GameObject bot;
 
 	private ProceduralGenerator generator;
 
@@ -47,6 +48,10 @@ public class WorldGenerator : MonoBehaviour
 		}
 			
 		player = (GameObject)Instantiate (Resources.Load("Steve/PlayerTorso"), new Vector3 (origin.x, origin.y+20, origin.z), Quaternion.identity);
+
+		bot = (GameObject)Instantiate (Resources.Load("Bot/BotTorso"), new Vector3 (origin.x, origin.y+20, origin.z+20), Quaternion.identity);
+		BotMove botMove = bot.GetComponent<BotMove> ();
+		botMove.pg = generator;
 	}
 		
 	Vector3 getCenterChunkPos() {
