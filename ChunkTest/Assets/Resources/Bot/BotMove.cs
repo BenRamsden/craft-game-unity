@@ -4,13 +4,15 @@ using UnityEngine;
 
 public class BotMove : MonoBehaviour {
 
+	public ProceduralGenerator pg;
+
 	public Rigidbody rb;
 	private  Animator animator;
 	public bool isGrounded;
 
 	public readonly Vector3 jump = new Vector3(0.0f, 5.0f, 0.0f);
 
-	private float rotY,rotYHead, rotX, moveX, moveZ = 0.0f;
+	private float rotY,rotYHead, rotX = 0.0f;
 	public float mouseSensitivity = 1000.0f;
 	public float moveSpeed = 10.0F;
 
@@ -41,8 +43,8 @@ public class BotMove : MonoBehaviour {
 
 	/** Moving player using unity physics */
 	void FixedUpdate () {
-		moveX = Random.Range(-1,1);// Input.GetAxis ("Horizontal");
-		moveZ = Random.Range(-1,1);// Input.GetAxis ("Vertical");
+		float moveX = Random.Range(-1,1);// Input.GetAxis ("Horizontal");
+		float moveZ = Random.Range(-1,1);// Input.GetAxis ("Vertical");
 
 		movePlayer (moveX, moveZ);
 	}
