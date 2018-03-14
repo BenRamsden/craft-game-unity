@@ -54,6 +54,10 @@ public class Block{
 		worldPosition = new Vector3 (row, layer, column);
 	}
 
+	public Vector3 getPosition() {
+		return worldPosition;
+	}
+
     /**setChunkPosition(int,int,int)
      * Sets the Block's knowledge of its position in its Chunk.
      * @param row - the x coordinate of where the Block is in its Chunk.

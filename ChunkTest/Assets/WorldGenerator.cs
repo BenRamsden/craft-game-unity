@@ -48,6 +48,8 @@ public class WorldGenerator : MonoBehaviour
 		}
 			
 		player = (GameObject)Instantiate (Resources.Load("Steve/PlayerTorso"), new Vector3 (origin.x, origin.y+20, origin.z), Quaternion.identity);
+		PlayerInteraction playerInteraction = player.GetComponent<PlayerInteraction> ();
+		playerInteraction.pg = generator;
 
 		bot = (GameObject)Instantiate (Resources.Load("Bot/BotTorso"), new Vector3 (origin.x, origin.y+20, origin.z+20), Quaternion.identity);
 		BotMove botMove = bot.GetComponent<BotMove> ();
