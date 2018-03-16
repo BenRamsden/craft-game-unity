@@ -82,7 +82,7 @@ public class PlayerInteraction : MonoBehaviour {
 	void OnCollisionEnter(Collision col){
 		if (col.gameObject.GetComponent<Rigidbody>() != null) {
 			Block newBlock = new Block();
-			newBlock.BlockType = col.gameObject.tag;
+			newBlock.resourceString = col.gameObject.tag;
 			if (inventory.addBlock (newBlock)) {
 				inventory.setUI();
 				Destroy(col.gameObject);

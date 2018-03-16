@@ -19,7 +19,7 @@ public class Chunk
         int worldZ = (int)worldOffset.z + chunkZ;
 
         Block tempBlock = new Block();
-        tempBlock.BlockType = blockType;
+		tempBlock.resourceString = blockType;
         tempBlock.setPosition(worldX, worldY, worldZ);
         tempBlock.setChunkPosition(chunkX, chunkY, chunkZ);
         blocks[chunkX,chunkY,chunkZ] = tempBlock;
@@ -53,7 +53,7 @@ public class Chunk
 					float perlinZ = ((float)worldZ) / CHUNK_SIZE;
 
 					//Generate the PerlinNoise value, offset the block's height by this
-					int perlinY = (int) (Mathf.PerlinNoise (perlinX/3, perlinZ/3) * CHUNK_SIZE);
+					int perlinY = (int) (Mathf.PerlinNoise (perlinX/3, perlinZ/3) * CHUNK_SIZE * 3);
 					perlinY += y;
 					perlinY -= (int)worldOffset.y;
 					
@@ -167,7 +167,7 @@ public class Chunk
      * Currently this means rendering any block that touches a null "air" Block.
      */
 	private bool nullOrWater(Block block) {
-		return block == null || block.BlockType == "WaterBlock";
+		return block == null || block.resourceString == "WaterBlock";
 	}
 
 	private bool surroundedByNull(int x, int y, int z) {
@@ -193,7 +193,7 @@ public class Chunk
 					blockToDraw = blocks [x, y, z];
 					blockToDraw.draw ();
 
-					if (blockToDraw.BlockType == "WaterBlock") {
+					if (blockToDraw.resourceString == "WaterBlock") {
 						continue;
 					}
 
@@ -247,7 +247,7 @@ public class Chunk
                 for (int y = CHUNK_SIZE - 1; y >= 0; y--)
                 {
                     
-                    if(blocks[x,y,z] != null && blocks[x,y,z].BlockType == "WaterBlock")
+                    if(blocks[x,y,z] != null && blocks[x,y,z].resourceString == "WaterBlock")
                     {
 						waterProcessBlock (x + 1, y, z); //right
 						waterProcessBlock (x - 1, y, z); //left
