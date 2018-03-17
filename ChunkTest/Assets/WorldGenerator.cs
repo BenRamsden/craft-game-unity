@@ -72,19 +72,22 @@ public class WorldGenerator : MonoBehaviour
 		return generator;
 	}
 
-	void FixedUpdate() {
-		Vector3 centerChunk = getCenterChunkPos ();
-
-		generator.garbageCollect(centerChunk);
-	}
-
 	// Update is called once per frame
 	void Update ()
     {
 		Vector3 centerChunk = getCenterChunkPos ();
 
-		generator.generateMap(centerChunk);
+		while (generator.garbageCollect (centerChunk)) {
+			
+		}
 
-        generator.waterProcess(centerChunk);
+		int generated = 0;
+		while (generator.generateMap (centerChunk)) {
+			if (generated++ == 3) {
+				break;
+			}
+		}
+
+        //generator.waterProcess(centerChunk);
 	}
 }

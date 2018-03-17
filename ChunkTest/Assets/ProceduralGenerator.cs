@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ProceduralGenerator : MonoBehaviour
 {
-	private const int MAP_SIZE = 5;
+	private const int MAP_SIZE = 10;
 
 	private int chunkSize;
 
@@ -88,7 +88,7 @@ public class ProceduralGenerator : MonoBehaviour
 
 		// Create the surface
 		for (int x = -MAP_SIZE; x <= MAP_SIZE; x++){
-			for (int y = -1; y <= 1; y++) {
+			for (int y = -2; y <= 1; y++) {
 				for (int z = -MAP_SIZE; z <= MAP_SIZE; z++){
 
 					chunkPos.Set(target.x + (chunkSize * x), target.y + (chunkSize * y), target.z + (chunkSize * z));
@@ -154,7 +154,7 @@ public class ProceduralGenerator : MonoBehaviour
 	Vector3 deleteChunk = Vector3.zero;
 	bool deleteChunkSet = false;
 
-	public void garbageCollect(Vector3 playerPos) {
+	public bool garbageCollect(Vector3 playerPos) {
 
 		foreach (Vector3 otherChunk in chunks.Keys) {
 			float dist = Vector3.Distance (playerPos, otherChunk);
@@ -171,7 +171,10 @@ public class ProceduralGenerator : MonoBehaviour
 		if (deleteChunkSet == true) {
 			chunks.Remove (deleteChunk);
 			deleteChunkSet = false;
+			return true;
 		}
+
+		return false;
 
 	}
 
@@ -179,7 +182,8 @@ public class ProceduralGenerator : MonoBehaviour
     {
         foreach (Vector3 otherChunk in chunks.Keys)
         {
-            chunks[otherChunk].waterProcess();
+			Chunk chunk = chunks [otherChunk];
+			chunk.waterProcess ();
         }
     }
 

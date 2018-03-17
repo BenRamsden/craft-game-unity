@@ -94,7 +94,7 @@ public class BotMove : MonoBehaviour {
 		if (block == null)
 			return false;
 
-		if (block.BlockType == "WaterBlock")
+		if (block.resourceString == "WaterBlock")
 			return false;
 
 		return true;
