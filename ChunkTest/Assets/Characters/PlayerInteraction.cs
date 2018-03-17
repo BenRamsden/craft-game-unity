@@ -74,7 +74,7 @@ public class PlayerInteraction : MonoBehaviour {
 			}else if(Input.GetKey (KeyCode.Keypad6) || Input.GetKey (KeyCode.Alpha6)){
 				currentActiveItem = 6;
 			}
-			inventory.setActiveList (currentActiveItem - 1);
+			inventory.setSelectedSlot(currentActiveItem - 1);
 			inventory.setUI();
 		}
 	}
@@ -83,7 +83,7 @@ public class PlayerInteraction : MonoBehaviour {
 		if (col.gameObject.GetComponent<Rigidbody>() != null) {
 			Block newBlock = new Block();
 			newBlock.resourceString = col.gameObject.tag;
-			if (inventory.addBlock (newBlock)) {
+			if (inventory.addItem(newBlock)) {
 				inventory.setUI();
 				Destroy(col.gameObject);
 			} else {
@@ -138,7 +138,7 @@ public class PlayerInteraction : MonoBehaviour {
 		animator.SetTrigger("Interact");
 		if(currentBlock != null){
 			String blockType;
-			if ((blockType = inventory.removeBlock()) != null){
+			if ((blockType = inventory.removeItem()) != null){
 				Block tempBlock = currentChunk.CreateBlock(blockType, (int)posOfBlock.x, (int)posOfBlock.y+1, (int)posOfBlock.z);
 				tempBlock.draw();
 				inventory.setUI();

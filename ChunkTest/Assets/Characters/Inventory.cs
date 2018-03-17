@@ -4,41 +4,42 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class Inventory : MonoBehaviour {
+	private Container mainBag;
+	private Container activeBar;
+	private Container craftingMatrix;
 
-	private List<Item>[] inventoryList = {
-		new List<Item>(64), new List<Item>(64), new List<Item>(64), new List<Item>(64),
-		new List<Item>(64), new List<Item>(64), new List<Item>(64), new List<Item>(64),
-		new List<Item>(64), new List<Item>(64), new List<Item>(64), new List<Item>(64),
-		new List<Item>(64), new List<Item>(64), new List<Item>(64), new List<Item>(64),
-		new List<Item>(64), new List<Item>(64), new List<Item>(64), new List<Item>(64)
-	};
-
-	private ItemBar itemBar;
-
-
+	private int selectedSlot = 5;
 
 	public void Start(){
-
+		activeBar = new Container(6, "activeBar");
+		//mainBag = new Container(20);
+		//craftingMatrix = new Container(9);
 	}
 
 	public void Delete(){
-		foreach(List<Item> list in inventoryList){
-			list.Clear();
-		}
-		itemBar.Delete();
+		
 	}
 
-	public void addBlock(Block block){
-		if (!itemBar.isFull()) {
-			itemBar.addBlock(block);
+	public bool addItem(Item item){
+		if (!activeBar.isFull()) {
+			return activeBar.addItem(item);
 		} else {
-			//addblocktoinventory
+			//AddBlockToMainBag
 		}
+		return false;
 	}
 
-	public string removeBlock(){
-		return itemBar.removeBlock();
+	public string removeItem(){
+		return activeBar.removeItem(selectedSlot);
 	}
 
+	public void setSelectedSlot(int selectedSlot){
+		this.selectedSlot = selectedSlot;
+	}
 
+	public void setUI(){
+		activeBar.setUI();
+		//mainBag.setUI();
+		//craftingMatrix.setUI();
+	}
 }
