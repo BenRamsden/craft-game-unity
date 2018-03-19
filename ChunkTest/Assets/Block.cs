@@ -2,13 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Block{
-    GameObject thisBody;
-	BlockProperties bp;
-	Vector3 worldPosition;
+public class Block : Item{
+	private BlockProperties bp;
 	Vector3 chunkPosition;
-
-	public string BlockType { get; set; }
 
 	public void damageBlock(int inputDamage) {
 		bp.blockHealth -= inputDamage;
@@ -17,30 +13,21 @@ public class Block{
 
     public void dropSelf(){
         Transform thisTransform = thisBody.transform;
-        thisTransform.localScale -= new Vector3(0.5f, 0.5f, 0.5f);
+        thisTransform.localScale -= new Vector3(0.75f, 0.75f, 0.75f);
         thisTransform.rotation = Random.rotation;
         thisBody.AddComponent<Rigidbody>();
         thisBody.GetComponent<Rigidbody>().AddForce(thisTransform.forward * 1.0f);
     }
-
-	public void Delete() {
-		if (thisBody != null) {
-			GameObject.Destroy (thisBody);
-			thisBody = null;
-		}
-	}
 		
     /**draw() 
      * Draws the physical representation of a Block in the world.
      */
     public void draw()
     {
-        if (thisBody == null)
-        {
-		thisBody = GameObject.Instantiate(Resources.Load(BlockType), worldPosition , Quaternion.identity) as GameObject;
-		thisBody.name = BlockType;
-		bp = thisBody.GetComponent<BlockProperties> ();
-        }
+		base.draw();
+		if (thisBody != null) {
+			bp = thisBody.GetComponent<BlockProperties> ();
+		}
     }
 
 	/**setPosition(int,int,int)
@@ -52,6 +39,10 @@ public class Block{
 	public void setPosition(int row, int layer, int column)
 	{
 		worldPosition = new Vector3 (row, layer, column);
+	}
+
+	public Vector3 getPosition() {
+		return worldPosition;
 	}
 
     /**setChunkPosition(int,int,int)

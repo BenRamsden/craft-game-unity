@@ -81,10 +81,7 @@ public class PlayerMove : MonoBehaviour {
 
         float diff = rotYHead - rotY;
     
-        if(diff > y_AxisRotateClamp || diff < y_AxisRotateClamp)
-        {
-            rotY += diff / 3;
-        }
+		rotY += diff / 3;
 
         Quaternion rotationTorso = Quaternion.Euler(0.0f, rotY, 0.0f);
         transform.rotation = rotationTorso;
@@ -94,9 +91,28 @@ public class PlayerMove : MonoBehaviour {
 			rb.AddForce(jump, ForceMode.Impulse);
 			isGrounded = false;
 
-			animator.SetBool ("isJumping", true);
+            animator.SetBool("isJumping", true);
 
-			audioSource.PlayOneShot (jumpSound);
+            if (Random.Range(0, 2) != 0)
+            {
+                animator.SetBool("alternateJumpLeg", false);
+            }
+            else
+            {
+                animator.SetBool("alternateJumpLeg", true);
+            }
+
+            if (Random.Range(0, 2) != 0)
+            {
+                animator.SetBool("alternateJumpArm", false);
+            }
+            else
+            {
+                animator.SetBool("alternateJumpArm", true);
+            }
+
+
+            audioSource.PlayOneShot (jumpSound);
 		}
 
 		// If a key is pressed, play a sound

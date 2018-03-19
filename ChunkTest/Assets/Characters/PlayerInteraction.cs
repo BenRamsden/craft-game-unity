@@ -2,6 +2,8 @@
 using UnityEngine;
 
 public class PlayerInteraction : MonoBehaviour {
+	public ProceduralGenerator pg;
+
 	RaycastHit hit;
 	bool isLeftMouseDown, isRightMouseClicked;
 	Block currentBlock;
@@ -21,6 +23,8 @@ public class PlayerInteraction : MonoBehaviour {
 		animator = GetComponent<Animator> ();
 		camera = GetComponentInChildren<Camera>();
 		inventory = GetComponent<Inventory>();
+
+		Cursor.lockState = CursorLockMode.Locked;
 	}
 
 	void FixedUpdate() {
@@ -72,7 +76,7 @@ public class PlayerInteraction : MonoBehaviour {
 			}else if(Input.GetKey (KeyCode.Keypad6) || Input.GetKey (KeyCode.Alpha6)){
 				currentActiveItem = 6;
 			}
-			inventory.setActiveList (currentActiveItem - 1);
+			inventory.setSelectedSlot(currentActiveItem - 1);
 			inventory.setUI();
 		}
 	}
@@ -80,8 +84,8 @@ public class PlayerInteraction : MonoBehaviour {
 	void OnCollisionEnter(Collision col){
 		if (col.gameObject.GetComponent<Rigidbody>() != null) {
 			Block newBlock = new Block();
-			newBlock.BlockType = col.gameObject.tag;
-			if (inventory.addBlock (newBlock)) {
+			newBlock.resourceString = col.gameObject.tag;
+			if (inventory.addItem(newBlock)) {
 				inventory.setUI();
 				Destroy(col.gameObject);
 			} else {
@@ -99,28 +103,36 @@ public class PlayerInteraction : MonoBehaviour {
 			currentBlock.damageBlock(100);
 			if (currentBlock.getProperties().blockHealth <= 0)
 			{
+				Vector3 deletedPos = currentBlock.getPosition ();
 				currentBlock.dropSelf();
 				currentChunk.removeBlock(posOfBlock);
 
-				Vector3[] vectors = new Vector3[6];
-				vectors [0] = new Vector3 (posOfBlock.x - 1.0f, posOfBlock.y, posOfBlock.z);
-				vectors [1] = new Vector3 (posOfBlock.x + 1.0f, posOfBlock.y, posOfBlock.z);
-				vectors [2] = new Vector3 (posOfBlock.x, posOfBlock.y - 1.0f, posOfBlock.z);
-				vectors [3] = new Vector3 (posOfBlock.x, posOfBlock.y + 1.0f, posOfBlock.z);
-				vectors [4] = new Vector3 (posOfBlock.x, posOfBlock.y, posOfBlock.z - 1.0f);
-				vectors [5] = new Vector3 (posOfBlock.x, posOfBlock.y, posOfBlock.z + 1.0f);
-
-				Block adjacentBlock;
-				for(int i = 0; i < 6; i++){
-					if (currentChunk.getBlock(vectors [i]) != null){
-						adjacentBlock = currentChunk.getBlock(vectors[i]);
-						if (adjacentBlock != null){
-							adjacentBlock.draw();
-						}
-					}
-				}
+				drawAdjacentBlock (deletedPos.x-1, deletedPos.y, deletedPos.z);
+				drawAdjacentBlock (deletedPos.x+1, deletedPos.y, deletedPos.z);
+				drawAdjacentBlock (deletedPos.x, deletedPos.y-1, deletedPos.z);
+				drawAdjacentBlock (deletedPos.x, deletedPos.y+1, deletedPos.z);
+				drawAdjacentBlock (deletedPos.x, deletedPos.y, deletedPos.z-1);
+				drawAdjacentBlock (deletedPos.x, deletedPos.y, deletedPos.z+1);
 			}
 		}
+	}
+
+	private void drawAdjacentBlock(float x, float y, float z) {
+		Vector3 deletedPos = new Vector3 (x, y, z);
+		Vector3 chunkPos = HelperMethods.worldPositionToChunkPosition (deletedPos);
+		Vector3 blockPos = HelperMethods.vectorDifference (chunkPos,deletedPos);
+
+		Chunk chunk = pg.getChunk (chunkPos);
+
+		if (chunk == null)
+			return;
+					
+		Block block = chunk.getBlock (blockPos);
+
+		if (block == null)
+			return;
+
+		block.draw ();
 	}
 
 	private void placeBlock(){
@@ -128,7 +140,7 @@ public class PlayerInteraction : MonoBehaviour {
 		animator.SetTrigger("Interact");
 		if(currentBlock != null){
 			String blockType;
-			if ((blockType = inventory.removeBlock()) != null){
+			if ((blockType = inventory.removeItem()) != null){
 				Block tempBlock = currentChunk.CreateBlock(blockType, (int)posOfBlock.x, (int)posOfBlock.y+1, (int)posOfBlock.z);
 				tempBlock.draw();
 				inventory.setUI();

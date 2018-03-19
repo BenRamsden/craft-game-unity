@@ -8,6 +8,7 @@ public class WorldGenerator : MonoBehaviour
 	private static bool ENABLE_MENU = true;
 
 	private GameObject player;
+	private GameObject bot;
 
 	private ProceduralGenerator generator;
 
@@ -47,6 +48,12 @@ public class WorldGenerator : MonoBehaviour
 		}
 			
 		player = (GameObject)Instantiate (Resources.Load("Steve/PlayerTorso"), new Vector3 (origin.x, origin.y+20, origin.z), Quaternion.identity);
+		PlayerInteraction playerInteraction = player.GetComponent<PlayerInteraction> ();
+		playerInteraction.pg = generator;
+
+		bot = (GameObject)Instantiate (Resources.Load("Bot/BotTorso"), new Vector3 (origin.x, origin.y+20, origin.z+20), Quaternion.identity);
+		BotMove botMove = bot.GetComponent<BotMove> ();
+		botMove.pg = generator;
 	}
 		
 	Vector3 getCenterChunkPos() {
@@ -65,19 +72,22 @@ public class WorldGenerator : MonoBehaviour
 		return generator;
 	}
 
-	void FixedUpdate() {
-		Vector3 centerChunk = getCenterChunkPos ();
-
-		generator.garbageCollect(centerChunk);
-	}
-
 	// Update is called once per frame
 	void Update ()
     {
 		Vector3 centerChunk = getCenterChunkPos ();
 
-		generator.generateMap(centerChunk);
+		while (generator.garbageCollect (centerChunk)) {
+			
+		}
 
-        generator.waterProcess(centerChunk);
+		int generated = 0;
+		while (generator.generateMap (centerChunk)) {
+			if (generated++ == 3) {
+				break;
+			}
+		}
+
+        //generator.waterProcess(centerChunk);
 	}
 }
