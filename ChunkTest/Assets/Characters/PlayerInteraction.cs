@@ -100,7 +100,7 @@ public class PlayerInteraction : MonoBehaviour {
 		animator.SetTrigger("Interact");
 		if (currentBlock != null)
 		{
-			currentBlock.damageBlock(10);
+			currentBlock.damageBlock(100);
 			if (currentBlock.getProperties().blockHealth <= 0)
 			{
 				Vector3 deletedPos = currentBlock.getPosition ();
