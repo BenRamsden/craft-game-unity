@@ -81,10 +81,7 @@ public class PlayerMove : MonoBehaviour {
 
         float diff = rotYHead - rotY;
     
-        if(diff > y_AxisRotateClamp || diff < y_AxisRotateClamp)
-        {
-            rotY += diff / 3;
-        }
+		rotY += diff / 3;
 
         Quaternion rotationTorso = Quaternion.Euler(0.0f, rotY, 0.0f);
         transform.rotation = rotationTorso;

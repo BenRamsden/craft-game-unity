@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Block : Item{
-	BlockProperties bp;
+	private BlockProperties bp;
 	Vector3 chunkPosition;
 
 	public void damageBlock(int inputDamage) {
@@ -13,7 +13,7 @@ public class Block : Item{
 
     public void dropSelf(){
         Transform thisTransform = thisBody.transform;
-        thisTransform.localScale -= new Vector3(0.5f, 0.5f, 0.5f);
+        thisTransform.localScale -= new Vector3(0.75f, 0.75f, 0.75f);
         thisTransform.rotation = Random.rotation;
         thisBody.AddComponent<Rigidbody>();
         thisBody.GetComponent<Rigidbody>().AddForce(thisTransform.forward * 1.0f);
