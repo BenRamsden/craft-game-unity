@@ -23,6 +23,8 @@ public class PlayerInteraction : MonoBehaviour {
 		animator = GetComponent<Animator> ();
 		camera = GetComponentInChildren<Camera>();
 		inventory = GetComponent<Inventory>();
+
+		Cursor.lockState = CursorLockMode.Locked;
 	}
 
 	void FixedUpdate() {
