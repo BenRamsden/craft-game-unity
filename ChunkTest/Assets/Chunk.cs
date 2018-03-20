@@ -53,7 +53,7 @@ public class Chunk
 					float perlinZ = ((float)worldZ) / CHUNK_SIZE;
 
 					float perlinTerrain = Mathf.PerlinNoise (perlinX / 10, perlinZ / 10) * 2; //perlin between 0.0 and 1.0
-					perlinTerrain = Mathf.Pow (perlinTerrain, 2);
+					perlinTerrain = Mathf.Pow (perlinTerrain, 3);
 
 					int perlinY = (int) (Mathf.PerlinNoise (perlinX/3, perlinZ/3) * CHUNK_SIZE * perlinTerrain);
 					perlinY += y;
@@ -80,6 +80,7 @@ public class Chunk
 		}
 
 		//WATER_GEN
+		/*
 		for (int x = 0; x < CHUNK_SIZE; x++)
 		{
 			for (int z = 0; z < CHUNK_SIZE; z++)
@@ -99,6 +100,7 @@ public class Chunk
 				}
 			}
 		}
+		*/
 			
 	    /* --- END SECTION --- */
 		drawChunk();
