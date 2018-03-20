@@ -38,7 +38,8 @@ public class Inventory : MonoBehaviour {
 	}
 
 	public void setUI(){
-		activeBar.setUI();
+		if(activeBar != null)
+			activeBar.setUI();
 		//mainBag.setUI();
 		//craftingMatrix.setUI();
 	}
