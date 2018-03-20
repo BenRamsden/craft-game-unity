@@ -52,11 +52,13 @@ public class Chunk
 					float perlinX = ((float)worldX) / CHUNK_SIZE;
 					float perlinZ = ((float)worldZ) / CHUNK_SIZE;
 
-					//Generate the PerlinNoise value, offset the block's height by this
-					int perlinY = (int) (Mathf.PerlinNoise (perlinX/3, perlinZ/3) * CHUNK_SIZE);
+					float perlinTerrain = Mathf.PerlinNoise (perlinX / 10, perlinZ / 10) * 2; //perlin between 0.0 and 1.0
+					perlinTerrain = Mathf.Pow (perlinTerrain, 2);
+
+					int perlinY = (int) (Mathf.PerlinNoise (perlinX/3, perlinZ/3) * CHUNK_SIZE * perlinTerrain);
 					perlinY += y;
 					perlinY -= (int)worldOffset.y;
-					
+
 					if (perlinY < 0 || perlinY > CHUNK_SIZE-1) {
 						//Debug.Log ("Cannot insert chunk into block at index " + perlinY + " continuing");
 						continue;
@@ -87,20 +89,12 @@ public class Chunk
 				{
 					int worldY = (int)worldOffset.y + y;
 
-					if (worldY < 0) {
-						continue;
-					}
-
 					if (blocks [x, y, z] != null) {
 						break;  //quit descending this y, as hit ground
 					}
 
-					if (worldY < 10 && Random.Range(0,1000) < 10) {
-
-						if (isInBlocksBounds (x, y - 1, z) && blocks [x, y - 1, z] != null) {
-							CreateBlock("WaterBlock", x, y, z);
-						}
-
+					if (worldY > 7 && worldY < 9) {
+						CreateBlock ("WaterBlock", x, y, z);
 					}
 				}
 			}
