@@ -69,22 +69,15 @@ public class PlayerMove : MonoBehaviour {
         // Rotating player with mouse
         mouseX = Input.GetAxis("Mouse X");
 		mouseY = -Input.GetAxis("Mouse Y"); // "-" because otherwise it is inverted up and down 
-        rotYHead += mouseX * mouseSensitivity * Time.deltaTime;
+        rotY += mouseX * mouseSensitivity * Time.deltaTime;
         rotX += mouseY * mouseSensitivity * Time.deltaTime;
-		//stop the player being able to look up/down too much
-		rotX = Mathf.Clamp(rotX, -x_AxisRotateClamp, x_AxisRotateClamp);
-        //rotYHead = Mathf.Clamp(rotY, -y_AxisRotateClamp, y_AxisRotateClamp);
 
         //set up rotations for the torso and head. allow head to look up and down but not torso.
-        Quaternion rotationHead = Quaternion.Euler(rotX, rotYHead, 0.0f);
+        Quaternion rotationHead = Quaternion.Euler(rotX, rotY, 0.0f);
+		Quaternion rotationTorso = Quaternion.Euler(0.0f, rotY, 0.0f);
+
+		transform.rotation = rotationTorso;
         transform.GetChild(0).rotation = rotationHead;
-
-        float diff = rotYHead - rotY;
-    
-		rotY += diff / 3;
-
-        Quaternion rotationTorso = Quaternion.Euler(0.0f, rotY, 0.0f);
-        transform.rotation = rotationTorso;
 
         //player jumping code
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded){
