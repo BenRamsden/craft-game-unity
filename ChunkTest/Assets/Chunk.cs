@@ -52,7 +52,7 @@ public class Chunk
 					float perlinX = ((float)worldX) / CHUNK_SIZE;
 					float perlinZ = ((float)worldZ) / CHUNK_SIZE;
 
-					float perlinTerrainType = Mathf.PerlinNoise (perlinX / 100, perlinZ / 100);
+					float perlinTerrainType = Mathf.PerlinNoise (perlinX / 30, perlinZ / 30);
 
 					float perlinTerrain = Mathf.PerlinNoise (perlinX / 10, perlinZ / 10) * 2; //perlin between 0.0 and 1.0
 					perlinTerrain = Mathf.Pow (perlinTerrain, 3);
