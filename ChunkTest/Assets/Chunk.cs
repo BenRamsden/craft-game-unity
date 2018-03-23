@@ -26,6 +26,32 @@ public class Chunk
         return tempBlock;
     }
 
+	public Block CreateBlockInOtherChunk(string blockType, int chunkX, int chunkY, int chunkZ) {
+		if (isInBlocksBounds (chunkX, chunkY, chunkZ)) {
+			return CreateBlock (blockType, chunkX, chunkY, chunkZ);
+		}
+
+		Vector3 worldPosition = new Vector3 (worldOffset.x + chunkX, worldOffset.y + chunkY, worldOffset.z + chunkZ);
+		Vector3 chunkPosition = HelperMethods.worldPositionToChunkPosition (worldPosition);
+		Vector3 blockPosition = HelperMethods.vectorDifference (worldPosition, chunkPosition);
+
+		Chunk chunk = generator.getChunk (chunkPosition);
+
+		if (chunk == null) {
+			Debug.Log ("Cant create block, chunk doesnt exist "+chunkPosition);
+			return null;
+		}
+
+		Block block = chunk.getBlock (blockPosition);
+
+		if (block != null) {
+			Debug.Log ("Cant create block, block already there");
+			return null;
+		}
+
+		return chunk.CreateBlock ("LeafBlock", (int)blockPosition.x, (int)blockPosition.y, (int)blockPosition.z);
+	}
+
 	public Chunk(Vector3 worldOffset, ProceduralGenerator generator, bool isBelowSurface = false){
 		this.worldOffset = worldOffset;
 		this.generator = generator;
@@ -94,6 +120,32 @@ public class Chunk
 
                     CreateBlock(blockType, x, perlinY, z);
                 }
+			}
+		}
+
+		//TREE_GEN
+		for (int x = 0; x < CHUNK_SIZE; x++)
+		{
+			for (int z = 0; z < CHUNK_SIZE; z++)
+			{
+				//DESCEND
+				for (int y = CHUNK_SIZE-1; y >= 0; y--)
+				{
+					int worldY = (int)worldOffset.y + y;
+
+					if (blocks [x, y, z] != null) {
+
+						if (Random.Range (0, 100) < 0.2f) {
+							CreateBlockInOtherChunk ("LogBlock", x, y+1, z);
+							CreateBlockInOtherChunk ("LogBlock", x, y+2, z);
+							CreateBlockInOtherChunk ("LogBlock", x, y+3, z);
+							CreateBlockInOtherChunk ("LeafBlock", x, y+4, z);
+						}
+
+						break;
+
+					}
+				}
 			}
 		}
 
