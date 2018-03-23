@@ -135,7 +135,7 @@ public class Chunk
 
 					if (blocks [x, y, z] != null) {
 
-						if (Random.Range (0, 100) < 0.2f) {
+						if (Random.Range (0, 1000) < 1.0f) {
 							CreateBlockInOtherChunk ("LogBlock", x, y+1, z);
 							CreateBlockInOtherChunk ("LogBlock", x, y+2, z);
 							CreateBlockInOtherChunk ("LogBlock", x, y+3, z);
