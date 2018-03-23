@@ -38,14 +38,14 @@ public class Chunk
 		Chunk chunk = generator.getChunk (chunkPosition);
 
 		if (chunk == null) {
-			Debug.Log ("Cant create block, chunk doesnt exist "+chunkPosition);
+			//Debug.Log ("Cant create block, chunk doesnt exist "+chunkPosition);
 			return null;
 		}
 
 		Block block = chunk.getBlock (blockPosition);
 
 		if (block != null) {
-			Debug.Log ("Cant create block, block already there");
+			//Debug.Log ("Cant create block, block already there");
 			return null;
 		}
 
@@ -232,6 +232,7 @@ public class Chunk
      * Renders the visible blocks based on the current state of the chunk.
      * Currently this means rendering any block that touches a null "air" Block.
      */
+	/*
 	private bool nullOrWater(Block block) {
 		return block == null || block.resourceString == "WaterBlock";
 	}
@@ -244,6 +245,34 @@ public class Chunk
 		nullOrWater (blocks [x, y, z + 1]) ||
 		nullOrWater (blocks [x, y, z - 1]);
 	}
+	*/
+
+	private bool nullOrWater2(int x, int y, int z) {
+		if (isInBlocksBounds (x, y, z) == false) {
+			return false;
+		}
+
+		Block block = blocks [x, y, z];
+
+		if (block == null) {
+			return true;
+		}
+
+		if (block.resourceString == "WaterBlock") {
+			return true;
+		}
+
+		return false;
+	}
+
+	private bool horizontalNull(int x, int y, int z) {
+		bool leftNull = nullOrWater2 (x - 1, y, z);
+		bool rightNull = nullOrWater2 (x + 1, y, z);
+		bool backNull = nullOrWater2 (x, y, z - 1);
+		bool frontNull = nullOrWater2 (x, y, z + 1);
+
+		return leftNull || rightNull || backNull || frontNull;
+	}
 		
 	private void drawChunk()
 	{
@@ -251,19 +280,23 @@ public class Chunk
 
 		for (int x = 0; x < CHUNK_SIZE; x++) {
 			for (int z = 0; z < CHUNK_SIZE; z++) {
+				bool inGround = false;
+
 				for (int y = CHUNK_SIZE - 1; y >= 0; y--) {
 					if (blocks [x, y, z] == null) {
 						continue;
 					}
 
 					blockToDraw = blocks [x, y, z];
-					blockToDraw.draw ();
 
-					//if (blockToDraw.resourceString == "WaterBlock") {
-					//	continue;
-					//}
-
-					break;
+					if (inGround == false) {
+						blockToDraw.draw ();
+						inGround = true;
+					} else if (horizontalNull (x, y, z)) {
+						blockToDraw.draw ();
+					} else {
+						break;
+					}
 				}
 			}
 		}
