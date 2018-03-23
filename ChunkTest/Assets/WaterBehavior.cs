@@ -23,6 +23,7 @@ public class WaterBehavior : MonoBehaviour {
 	void Update()
 	{
 		// Calculate index
+		/*
 		int index = (int)(Time.timeSinceLevelLoad * _fps) % (_uvTieX * _uvTieY);
 		if(index != _lastIndex)
 		{
@@ -39,5 +40,6 @@ public class WaterBehavior : MonoBehaviour {
 
 			_lastIndex = index;
 		}
+		*/
 	}
 }

@@ -70,8 +70,10 @@ public class Chunk
 
 					if (perlinTerrainType < 0.3f) {
 						blockType = "FastGrass";
-					} else {
+					} else if (perlinTerrainType < 0.4f) {
 						blockType = "FastDirt";
+					} else {
+						blockType = "WaterBlock";
 					}
 						
                     highestPoint = (perlinY > highestPoint) ? perlinY : highestPoint;
