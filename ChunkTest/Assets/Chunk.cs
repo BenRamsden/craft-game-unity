@@ -26,6 +26,32 @@ public class Chunk
         return tempBlock;
     }
 
+	public Block CreateBlockInOtherChunk(string blockType, int chunkX, int chunkY, int chunkZ) {
+		if (isInBlocksBounds (chunkX, chunkY, chunkZ)) {
+			return CreateBlock (blockType, chunkX, chunkY, chunkZ);
+		}
+
+		Vector3 worldPosition = new Vector3 (worldOffset.x + chunkX, worldOffset.y + chunkY, worldOffset.z + chunkZ);
+		Vector3 chunkPosition = HelperMethods.worldPositionToChunkPosition (worldPosition);
+		Vector3 blockPosition = HelperMethods.vectorDifference (worldPosition, chunkPosition);
+
+		Chunk chunk = generator.getChunk (chunkPosition);
+
+		if (chunk == null) {
+			//Debug.Log ("Cant create block, chunk doesnt exist "+chunkPosition);
+			return null;
+		}
+
+		Block block = chunk.getBlock (blockPosition);
+
+		if (block != null) {
+			//Debug.Log ("Cant create block, block already there");
+			return null;
+		}
+
+		return chunk.CreateBlock ("LeafBlock", (int)blockPosition.x, (int)blockPosition.y, (int)blockPosition.z);
+	}
+
 	public Chunk(Vector3 worldOffset, ProceduralGenerator generator, bool isBelowSurface = false){
 		this.worldOffset = worldOffset;
 		this.generator = generator;
@@ -52,10 +78,36 @@ public class Chunk
 					float perlinX = ((float)worldX) / CHUNK_SIZE;
 					float perlinZ = ((float)worldZ) / CHUNK_SIZE;
 
+					float perlinTerrainType = Mathf.PerlinNoise (perlinX / 30, perlinZ / 30);
+
 					float perlinTerrain = Mathf.PerlinNoise (perlinX / 10, perlinZ / 10) * 2; //perlin between 0.0 and 1.0
 					perlinTerrain = Mathf.Pow (perlinTerrain, 3);
 
 					int perlinY = (int) (Mathf.PerlinNoise (perlinX/3, perlinZ/3) * CHUNK_SIZE * perlinTerrain);
+
+                    string blockType = null;
+
+					const float WATER_TYPE = 0.25f;
+
+					if (perlinTerrainType < WATER_TYPE) {
+						//int seaDescent = (int) (perlinTerrainType * 3.0f);
+						perlinY *= 0;	
+
+						blockType = "WaterBlock";
+					} else if (perlinTerrainType < 0.4f) {
+						float islandEdge = perlinTerrainType - WATER_TYPE;
+						const float tweenDistance = 0.02f;
+						const float tweenScale = 1.0f / tweenDistance;
+
+						if (islandEdge < tweenDistance) {
+							perlinY = (int) (perlinY * islandEdge * tweenScale);
+						}
+
+						blockType = "FastGrass";
+					} else {
+						blockType = "FastDirt";
+					}
+
 					perlinY += y;
 					perlinY -= (int)worldOffset.y;
 
@@ -63,19 +115,37 @@ public class Chunk
 						//Debug.Log ("Cannot insert chunk into block at index " + perlinY + " continuing");
 						continue;
 					}
-
-                    string blockType = null;
-
-					if (worldY <= 12){
-                        blockType = "StoneBlock";
-					} else {
-						blockType = "FastGrass";
-					}
-
+						
                     highestPoint = (perlinY > highestPoint) ? perlinY : highestPoint;
 
                     CreateBlock(blockType, x, perlinY, z);
                 }
+			}
+		}
+
+		//TREE_GEN
+		for (int x = 0; x < CHUNK_SIZE; x++)
+		{
+			for (int z = 0; z < CHUNK_SIZE; z++)
+			{
+				//DESCEND
+				for (int y = CHUNK_SIZE-1; y >= 0; y--)
+				{
+					int worldY = (int)worldOffset.y + y;
+
+					if (blocks [x, y, z] != null) {
+
+						if (Random.Range (0, 1000) < 1.0f) {
+							CreateBlockInOtherChunk ("LogBlock", x, y+1, z);
+							CreateBlockInOtherChunk ("LogBlock", x, y+2, z);
+							CreateBlockInOtherChunk ("LogBlock", x, y+3, z);
+							CreateBlockInOtherChunk ("LeafBlock", x, y+4, z);
+						}
+
+						break;
+
+					}
+				}
 			}
 		}
 
@@ -162,6 +232,7 @@ public class Chunk
      * Renders the visible blocks based on the current state of the chunk.
      * Currently this means rendering any block that touches a null "air" Block.
      */
+	/*
 	private bool nullOrWater(Block block) {
 		return block == null || block.resourceString == "WaterBlock";
 	}
@@ -174,6 +245,34 @@ public class Chunk
 		nullOrWater (blocks [x, y, z + 1]) ||
 		nullOrWater (blocks [x, y, z - 1]);
 	}
+	*/
+
+	private bool nullOrWater2(int x, int y, int z) {
+		if (isInBlocksBounds (x, y, z) == false) {
+			return false;
+		}
+
+		Block block = blocks [x, y, z];
+
+		if (block == null) {
+			return true;
+		}
+
+		if (block.resourceString == "WaterBlock") {
+			return true;
+		}
+
+		return false;
+	}
+
+	private bool horizontalNull(int x, int y, int z) {
+		bool leftNull = nullOrWater2 (x - 1, y, z);
+		bool rightNull = nullOrWater2 (x + 1, y, z);
+		bool backNull = nullOrWater2 (x, y, z - 1);
+		bool frontNull = nullOrWater2 (x, y, z + 1);
+
+		return leftNull || rightNull || backNull || frontNull;
+	}
 		
 	private void drawChunk()
 	{
@@ -181,19 +280,23 @@ public class Chunk
 
 		for (int x = 0; x < CHUNK_SIZE; x++) {
 			for (int z = 0; z < CHUNK_SIZE; z++) {
+				bool inGround = false;
+
 				for (int y = CHUNK_SIZE - 1; y >= 0; y--) {
 					if (blocks [x, y, z] == null) {
 						continue;
 					}
 
 					blockToDraw = blocks [x, y, z];
-					blockToDraw.draw ();
 
-					if (blockToDraw.resourceString == "WaterBlock") {
-						continue;
+					if (inGround == false) {
+						blockToDraw.draw ();
+						inGround = true;
+					} else if (horizontalNull (x, y, z)) {
+						blockToDraw.draw ();
+					} else {
+						break;
 					}
-
-					break;
 				}
 			}
 		}
