@@ -58,22 +58,36 @@ public class Chunk
 					perlinTerrain = Mathf.Pow (perlinTerrain, 3);
 
 					int perlinY = (int) (Mathf.PerlinNoise (perlinX/3, perlinZ/3) * CHUNK_SIZE * perlinTerrain);
+
+                    string blockType = null;
+
+					const float WATER_TYPE = 0.25f;
+
+					if (perlinTerrainType < WATER_TYPE) {
+						//int seaDescent = (int) (perlinTerrainType * 3.0f);
+						perlinY *= 0;	
+
+						blockType = "WaterBlock";
+					} else if (perlinTerrainType < 0.4f) {
+						float islandEdge = perlinTerrainType - WATER_TYPE;
+						const float tweenDistance = 0.02f;
+						const float tweenScale = 1.0f / tweenDistance;
+
+						if (islandEdge < tweenDistance) {
+							perlinY = (int) (perlinY * islandEdge * tweenScale);
+						}
+
+						blockType = "FastGrass";
+					} else {
+						blockType = "FastDirt";
+					}
+
 					perlinY += y;
 					perlinY -= (int)worldOffset.y;
 
 					if (perlinY < 0 || perlinY > CHUNK_SIZE-1) {
 						//Debug.Log ("Cannot insert chunk into block at index " + perlinY + " continuing");
 						continue;
-					}
-
-                    string blockType = null;
-
-					if (perlinTerrainType < 0.3f) {
-						blockType = "FastGrass";
-					} else if (perlinTerrainType < 0.4f) {
-						blockType = "FastDirt";
-					} else {
-						blockType = "WaterBlock";
 					}
 						
                     highestPoint = (perlinY > highestPoint) ? perlinY : highestPoint;
@@ -193,9 +207,9 @@ public class Chunk
 					blockToDraw = blocks [x, y, z];
 					blockToDraw.draw ();
 
-					if (blockToDraw.resourceString == "WaterBlock") {
-						continue;
-					}
+					//if (blockToDraw.resourceString == "WaterBlock") {
+					//	continue;
+					//}
 
 					break;
 				}
