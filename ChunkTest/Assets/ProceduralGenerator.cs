@@ -5,13 +5,9 @@ using UnityEngine;
 public class ProceduralGenerator : MonoBehaviour
 {
 	private const int MAP_SIZE = 8;
-
 	private int chunkSize;
-
 	private Vector3 startOrigin;
-
 	public SeedGenerator Seed;
-
 
 	//Maps offset => chunk
 	private Dictionary<Vector3,Chunk> chunks = new Dictionary<Vector3,Chunk> ();
@@ -149,6 +145,50 @@ public class ProceduralGenerator : MonoBehaviour
 		}
 
 		*/
+	}
+
+	/**
+	 * Second pass fixes holes in the map.
+	 */
+	public void secondPass(){
+		Vector3 adjacentChunkPos = new Vector3 (0, 0, 0);
+		Vector3 currentChunkPos = new Vector3 (0, 0, 0);
+		Chunk chunk;
+		bool checkNorth = false, checkSouth = false, checkEast = false, checkWest = false;
+
+		foreach(Chunk entry in chunks.Values){
+			if(entry.secondPass){
+				continue;
+			}
+			checkNorth = false;
+			checkSouth = false;
+			checkEast = false;
+			checkWest = false;
+			currentChunkPos = entry.getOffset();
+			//If chunk next to this one exists, fix the holes facing that side
+			//If the chunk does not exist, just skip
+			adjacentChunkPos.Set(currentChunkPos.x, currentChunkPos.y, currentChunkPos.z + chunkSize);
+			if (chunkExists(adjacentChunkPos)) {
+				checkNorth = true;
+			}
+
+			adjacentChunkPos.Set(currentChunkPos.x, currentChunkPos.y, currentChunkPos.z - chunkSize);
+			if (chunkExists(adjacentChunkPos)) {
+				checkSouth = true;
+			}
+
+			adjacentChunkPos.Set(currentChunkPos.x + chunkSize, currentChunkPos.y, currentChunkPos.z);
+			if (chunkExists(adjacentChunkPos)) {
+				checkEast = true;
+			}
+
+			adjacentChunkPos.Set(currentChunkPos.x - chunkSize, currentChunkPos.y, currentChunkPos.z);
+			if (chunkExists(adjacentChunkPos)) {
+				checkWest = true;
+			}
+
+			entry.fillHoles(checkNorth, checkSouth, checkEast, checkWest);
+		}
 	}
 
 	Vector3 deleteChunk = Vector3.zero;

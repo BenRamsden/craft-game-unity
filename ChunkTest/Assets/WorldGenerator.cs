@@ -88,6 +88,8 @@ public class WorldGenerator : MonoBehaviour
 			}
 		}
 
+		generator.secondPass();
+
         //generator.waterProcess(centerChunk);
 	}
 }
