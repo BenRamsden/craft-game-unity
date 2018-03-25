@@ -7,8 +7,7 @@ public class WorldGenerator : MonoBehaviour
 	private static int CHUNK_SIZE = Chunk.CHUNK_SIZE;
 	private static bool ENABLE_MENU = true;
 
-	private GameObject player;
-	private GameObject bot;
+	private Player player;
 
 	private ProceduralGenerator generator;
 
@@ -47,20 +46,19 @@ public class WorldGenerator : MonoBehaviour
 			Destroy (camera);
 		}
 			
-		player = (GameObject)Instantiate (Resources.Load("Steve/PlayerTorso"), new Vector3 (origin.x, origin.y+20, origin.z), Quaternion.identity);
-		PlayerInteraction playerInteraction = player.GetComponent<PlayerInteraction> ();
-		playerInteraction.pg = generator;
+		player = new Player (this);
+	}
 
-		bot = (GameObject)Instantiate (Resources.Load("Bot/BotTorso"), new Vector3 (origin.x, origin.y+20, origin.z+20), Quaternion.identity);
-		BotMove botMove = bot.GetComponent<BotMove> ();
-		botMove.pg = generator;
+	public GameObject CreatePlayer() {
+		GameObject gameObject = (GameObject) Instantiate (Resources.Load("Player/Player_Steve"), new Vector3 (origin.x, origin.y+20, origin.z), Quaternion.identity);
+		return gameObject;
 	}
 		
 	Vector3 getCenterChunkPos() {
 		Vector3 centerChunk;
 
 		if (player != null) {
-			centerChunk = player.transform.position;
+			centerChunk = player.gameObject.transform.position;
 		} else {
 			centerChunk = origin;
 		}
