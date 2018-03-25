@@ -41,9 +41,9 @@ public class BotMove : MonoBehaviour {
 		audioSource = gameObject.AddComponent<AudioSource> ();
 	}
 
-	static Vector3 leftCollider = new Vector3 (-1.5f, -1.2f, 0.0f);
-	static Vector3 frontCollider = new Vector3(0.0f,-1.2f,0.0f);
-	static Vector3 rightCollider = new Vector3 (1.5f, -1.2f, 0.0f);
+	static Vector3 leftCollider = new Vector3 (-1.5f, -0.5f, 0.0f);
+	static Vector3 frontCollider = new Vector3(0.0f,-0.5f,0.0f);
+	static Vector3 rightCollider = new Vector3 (1.5f, -0.5f, 0.0f);
 
 	/* Moving player using unity physics */
 	void FixedUpdate () {

@@ -8,6 +8,7 @@ public class WorldGenerator : MonoBehaviour
 	private static bool ENABLE_MENU = true;
 
 	private Player player;
+	private Player bot;
 
 	private ProceduralGenerator generator;
 
@@ -46,6 +47,8 @@ public class WorldGenerator : MonoBehaviour
 			Destroy (camera);
 		}
 			
+		bot = new Player (this,generator ,"Player/Player_Steve",new Vector3 (origin.x, origin.y+20, origin.z+20), Player.Behaviour.Bot);
+
 		player = new Player (this,generator ,"Player/Player_Steve",new Vector3 (origin.x, origin.y+20, origin.z), Player.Behaviour.Human);
 	}
 
