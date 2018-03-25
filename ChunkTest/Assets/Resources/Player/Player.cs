@@ -5,13 +5,26 @@ using UnityEngine;
 public class Player {
 
 	public GameObject gameObject { get; }
-	private WorldGenerator wg;
+	public enum Behaviour { Human, Bot };
 
-	public Player(WorldGenerator wg) {
+	private WorldGenerator wg;
+	private ProceduralGenerator pg;
+
+	public Player(WorldGenerator wg, ProceduralGenerator pg, string resourceString, Vector3 position, Behaviour behaviour) {
 		this.wg = wg;
-		gameObject = wg.CreatePlayer ();
-		gameObject.AddComponent<PlayerMove> ();
-		gameObject.AddComponent<PlayerInteraction> ();
-		gameObject.AddComponent<Inventory> ();
+		this.pg = pg;
+
+		gameObject = wg.CreatePlayer (resourceString,position);
+
+		if (behaviour.Equals(Behaviour.Human)) {
+			gameObject.AddComponent<PlayerMove> ();
+			PlayerInteraction pi = gameObject.AddComponent<PlayerInteraction> ();
+			pi.pg = pg;
+			gameObject.AddComponent<Inventory> ();
+		} else if (behaviour.Equals(Behaviour.Bot)) {
+			BotMove bm = gameObject.AddComponent<BotMove> ();
+			bm.pg = pg;
+		}
+
 	}
 }

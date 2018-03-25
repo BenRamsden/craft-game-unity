@@ -46,11 +46,11 @@ public class WorldGenerator : MonoBehaviour
 			Destroy (camera);
 		}
 			
-		player = new Player (this);
+		player = new Player (this,generator ,"Player/Player_Steve",new Vector3 (origin.x, origin.y+20, origin.z), Player.Behaviour.Human);
 	}
 
-	public GameObject CreatePlayer() {
-		GameObject gameObject = (GameObject) Instantiate (Resources.Load("Player/Player_Steve"), new Vector3 (origin.x, origin.y+20, origin.z), Quaternion.identity);
+	public GameObject CreatePlayer(string resourceString,Vector3 position) {
+		GameObject gameObject = (GameObject) Instantiate (Resources.Load(resourceString), position, Quaternion.identity);
 		return gameObject;
 	}
 		
