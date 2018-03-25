@@ -44,6 +44,12 @@ public class PlayerMove : MonoBehaviour {
 		grassWalkSound = (AudioClip)Resources.Load ("Sounds/walk_grass");
 		swimSound = (AudioClip)Resources.Load ("Sounds/swim");
 		audioSource = gameObject.AddComponent<AudioSource> ();
+
+		if (behaviour.Equals (Player.Behaviour.Human)) {
+			GameObject head = transform.GetChild (0).gameObject;
+			head.AddComponent<Camera> ();
+			head.AddComponent<AudioListener> ();
+		}
 	}
 
 	void Update () {
