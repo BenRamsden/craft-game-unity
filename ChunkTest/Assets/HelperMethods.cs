@@ -6,10 +6,6 @@ public class HelperMethods
 {
 	public static float div = (float) Chunk.CHUNK_SIZE;
 
-	public HelperMethods ()
-	{
-	}
-
 	public static Vector3 worldPositionToChunkPosition(Vector3 worldPosition) {
 		float originX = Mathf.Floor(worldPosition.x / div) * div;
 
@@ -19,7 +15,7 @@ public class HelperMethods
 
 		return new Vector3 (originX, originY, originZ);
 	}
-		
+
 	public static Vector3 vectorDifference(Vector3 vector1, Vector3 vector2) {
 		Vector3 diff = vector1 - vector2;
 
