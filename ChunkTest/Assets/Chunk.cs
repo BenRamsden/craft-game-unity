@@ -78,25 +78,27 @@ public class Chunk {
                 for (int y = CHUNK_SIZE - 1; y >= 0; y--) {
                     int worldY = (int)worldOffset.y + y;
 
-                    if (blocks[x, y, z] != null && blocks[x,y,z].resourceString == "FastGrass") {
-                        if (Random.Range(0, 100) < 1.0f) {
+                    if (blocks[x, y, z] != null && blocks[x, y, z].resourceString == "FastGrass") {
+                        float per = Mathf.PerlinNoise((worldOffset.x + x)*0.02f, (worldOffset.z + z)*0.02f);
+                        //Debug.Log(per);
+                        per = Mathf.Pow(per, 2);
+                        if (per < 0.05f && Random.Range(0,100)< 10.0f) {
 
                             if (!canDrawTree(x, y, z)) {
                                 break;
                             }
-
-
-                            CreateBlockInOtherChunk("LogBlock", x, y + 1, z);
-                            CreateBlockInOtherChunk("LogBlock", x, y + 2, z);
-                            CreateBlockInOtherChunk("LogBlock", x, y + 3, z);
-
-
+                            int treeTopSize = 3;
+                            int logLength = Random.Range(3, CHUNK_SIZE-treeTopSize);
+                            int y2;
+                            for (y2 = y; y2 < y + logLength; y2++) {
+                                CreateBlockInOtherChunk("LogBlock", x, y2, z);
+                            }
 
 
                             for (int x2 = x - 1; x2 <= x + 1; x2++) {
                                 for (int z2 = z - 1; z2 <= z + 1; z2++) {
-                                    for (int y2 = y + 4; y2 <= y + 6; y2++) {
-                                        CreateBlockInOtherChunk("LeafBlock", x2, y2, z2);
+                                    for (int y3 = y2; y3 <= y2+treeTopSize; y3++) {
+                                        CreateBlockInOtherChunk("LeafBlock", x2, y3, z2);
 
                                     }
 
@@ -105,20 +107,6 @@ public class Chunk {
                         }
                         break;
                     }
-
-#if false
-                    for (int xoff = xOffset - 1; xoff <= xOffset + 1; xoff++) {
-                        for (int zoff = zOffset - 1; zoff <= zOffset + 1; zoff++) {
-                            for (int yoff = yOffset; yoff < yOffset + 3; yoff++) {
-
-                                Block block = CreateBlockInOtherChunk("LeafBlock", xoff, yoff, zoff);
-                                block.draw();
-                            }
-                        }
-                    } 
-#endif
-
-
                 }
             }
         }
