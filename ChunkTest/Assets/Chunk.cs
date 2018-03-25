@@ -155,7 +155,7 @@ public class Chunk{
 			return null;
 		}
 
-		return chunk.CreateBlock ("LeafBlock", (int)blockPosition.x, (int)blockPosition.y, (int)blockPosition.z);
+		return chunk.CreateBlock (blockType, (int)blockPosition.x, (int)blockPosition.y, (int)blockPosition.z);
 	}
 
 	public void GenMinerals(Dictionary<Mineral.Type, Vector3[]> minerals) 
@@ -224,9 +224,9 @@ public class Chunk{
 			return true;
 		}
 
-		if (block.resourceString == "WaterBlock") {
-			return true;
-		}
+		//if (block.resourceString == "WaterBlock") {
+		//	return true;
+		//}
 
 		return false;
 	}
