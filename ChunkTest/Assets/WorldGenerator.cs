@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class WorldGenerator : MonoBehaviour {
-    private static readonly int GENERATE_SPEED = 3;
+    private static readonly int GENERATE_SPEED = 10;
 
     private static int CHUNK_SIZE = Chunk.CHUNK_SIZE;
     private static bool ENABLE_MENU = true;
