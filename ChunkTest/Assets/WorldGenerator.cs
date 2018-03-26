@@ -2,95 +2,95 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WorldGenerator : MonoBehaviour
-{
-	private static int CHUNK_SIZE = Chunk.CHUNK_SIZE;
-	private static bool ENABLE_MENU = true;
+public class WorldGenerator : MonoBehaviour {
+    private static readonly int GENERATE_SPEED = 3;
 
-	private Player player;
-	private Player bot;
+    private static int CHUNK_SIZE = Chunk.CHUNK_SIZE;
+    private static bool ENABLE_MENU = true;
 
-	private ProceduralGenerator generator;
+    private Player player;
+    private Player bot;
 
-	private SeedGenerator seed;
+    private ProceduralGenerator generator;
 
-	private Vector3 origin;
+    private SeedGenerator seed;
 
-	private GameObject canvas;
-	private GameObject camera;
+    private Vector3 origin;
 
-	// Use this for initialization
-	void Start ()
-    {
-		generator = new ProceduralGenerator ();
+    private GameObject canvas;
+    private GameObject camera;
 
-		seed = new SeedGenerator ("a totally random seed", 7);
 
-		origin = generator.initalise (CHUNK_SIZE, seed);
+    // Use this for initialization
+    void Start() {
+        generator = new ProceduralGenerator();
 
-		if (ENABLE_MENU) {
-			canvas = (GameObject)Instantiate (Resources.Load ("Menu/Canvas"), new Vector3 (0, 0, 0), Quaternion.identity);
+        seed = new SeedGenerator("a totally random seed", 7);
 
-			camera = (GameObject)Instantiate (Resources.Load ("Menu/Camera"), new Vector3 (origin.x+0, origin.y+20, origin.z+60), Quaternion.LookRotation (new Vector3 (0.0f, -0.3f, -1.0f)));
-		} else {
-			InitPlayer ();
-		}
-			
-		//while (generator.generateMap (origin) == true) {
-			//Loading
-		//}
-	}
+        origin = generator.initalise(CHUNK_SIZE, seed);
 
-	public void InitPlayer() {
-		if (ENABLE_MENU) {
-			Destroy (canvas);
-			Destroy (camera);
-		}
-			
-		bot = new Player (this,generator ,"Player/Player_Steve",new Vector3 (origin.x, origin.y+20, origin.z+20), Player.Behaviour.Bot);
+        if (ENABLE_MENU) {
+            canvas = (GameObject)Instantiate(Resources.Load("Menu/Canvas"), new Vector3(0, 0, 0), Quaternion.identity);
 
-		player = new Player (this,generator ,"Player/Player_Steve",new Vector3 (origin.x, origin.y+20, origin.z), Player.Behaviour.Human);
-	}
+            camera = (GameObject)Instantiate(Resources.Load("Menu/Camera"), new Vector3(origin.x + 0, origin.y + 20, origin.z + 60), Quaternion.LookRotation(new Vector3(0.0f, -0.3f, -1.0f)));
+        } else {
+            InitPlayer();
+        }
 
-	public GameObject CreatePlayer(string resourceString,Vector3 position) {
-		GameObject gameObject = (GameObject) Instantiate (Resources.Load(resourceString), position, Quaternion.identity);
-		return gameObject;
-	}
-		
-	Vector3 getCenterChunkPos() {
-		Vector3 centerChunk;
+        //while (generator.generateMap (origin) == true) {
+        //Loading
+        //}
+    }
 
-		if (player != null) {
-			centerChunk = player.gameObject.transform.position;
-		} else {
-			centerChunk = origin;
-		}
+    public void InitPlayer() {
+        if (ENABLE_MENU) {
+            Destroy(canvas);
+            Destroy(camera);
+        }
 
-		return HelperMethods.worldPositionToChunkPosition (centerChunk);
-	}
+        bot = new Player(this, generator, "Player/Player_Steve", new Vector3(origin.x, origin.y + 20, origin.z + 20), Player.Behaviour.Bot);
 
-	public ProceduralGenerator getPGenerator(){
-		return generator;
-	}
+        player = new Player(this, generator, "Player/Player_Steve", new Vector3(origin.x, origin.y + 20, origin.z), Player.Behaviour.Human);
+    }
 
-	// Update is called once per frame
-	void Update ()
-    {
-		Vector3 centerChunk = getCenterChunkPos ();
+    public GameObject CreatePlayer(string resourceString, Vector3 position) {
+        GameObject gameObject = (GameObject)Instantiate(Resources.Load(resourceString), position, Quaternion.identity);
+        return gameObject;
+    }
 
-		while (generator.garbageCollect (centerChunk)) {
-			
-		}
+    Vector3 getCenterChunkPos() {
+        Vector3 centerChunk;
 
-		int generated = 0;
-		while (generator.generateMap (centerChunk)) {
-			if (generated++ == 3) {
-				break;
-			}
-		}
+        if (player != null) {
+            centerChunk = player.gameObject.transform.position;
+        } else {
+            centerChunk = origin;
+        }
 
-		generator.secondPass();
+        return HelperMethods.worldPositionToChunkPosition(centerChunk);
+    }
+
+    public ProceduralGenerator getPGenerator() {
+        return generator;
+    }
+
+    // Update is called once per frame
+    void Update() {
+        Vector3 centerChunk = getCenterChunkPos();
+
+        while (generator.garbageCollect(centerChunk)) {
+
+        }
+
+        int generated = 0;
+        while (generator.generateMap(centerChunk)) {
+            if (generated++ == GENERATE_SPEED) {
+                break;
+            }
+        }
+
+        generator.secondPass();
 
         //generator.waterProcess(centerChunk);
-	}
+    }
 }

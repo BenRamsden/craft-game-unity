@@ -52,7 +52,7 @@ public class PlayerInteraction : MonoBehaviour {
 				currentChunk = GameObject.Find("World").GetComponent<WorldGenerator>().getPGenerator().getChunk(posOfChunk);
 				currentBlock = currentChunk.getBlock(posOfBlock);
 
-				if (isLeftMouseDown && timer < 1){
+				if (isLeftMouseDown){// && timer < 1){
 					interactWithBlock();
 					timer = 10;
 				}

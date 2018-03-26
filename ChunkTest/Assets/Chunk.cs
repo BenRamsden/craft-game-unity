@@ -15,7 +15,7 @@ public class Chunk {
     //tree paramaters
     public static readonly int maxTreeTopWidth = 3;
     public static readonly int maxTreeTopHeight = 3;
-    public static readonly int maxTreeTrunkWidth = 3;
+    public static readonly int maxTreeTrunkWidth = 2;
     public static readonly int maxTreeTrunkHeight = 3;
     int treeTopWidth = 2;
     int treeTopHeight = 2;
@@ -85,51 +85,8 @@ public class Chunk {
 
 
         //TREE_GEN
-        for (int x = 0; x < CHUNK_SIZE; x++) {
-            for (int z = 0; z < CHUNK_SIZE; z++) {
-                //DESCEND
-                for (int y = CHUNK_SIZE - 1; y >= 0; y--) {
-                    //int worldY = (int)worldOffset.y + y;
-                    if (blocks[x, y, z] != null) {
-                        if (blocks[x, y, z].resourceString == "FastGrass") {
-                            if (CanDrawTree(x, y, z)) {
-                                //if (CanDrawTree(x, y, z)) {
-                                float per = Mathf.PerlinNoise((worldOffset.x + x) * 0.02f, (worldOffset.z + z) * 0.02f);
-                                per = Mathf.Pow(per, 2);
-                                if (per < 0.05f && Random.Range(0, 100) < 20.0f) {
+        DrawTree();
 
-                                    treeTopWidth = Random.Range(minTreeSize, maxTreeTopWidth);
-                                    treeTopHeight = Random.Range(minTreeSize, maxTreeTopHeight);
-                                    treeTrunkHeight = Random.Range(minTreeSize, maxTreeTrunkHeight);
-                                    treeTrunkWidth = Random.Range(minTreeSize, maxTreeTrunkWidth);
-                                    if (treeTrunkWidth >= treeTopWidth) {
-                                        treeTrunkWidth = Mathf.Max(0, (treeTopWidth - 1));
-                                    }
-
-                                    int y2 = 0;
-                                    for (int x2 = x - treeTrunkWidth; x2 <= x + treeTrunkWidth; x2++) {
-                                        for (int z2 = z - treeTrunkWidth; z2 <= z + treeTrunkWidth; z2++) {
-                                            for (y2 = y; y2 <= y + treeTrunkHeight; y2++) {
-                                                CreateBlockInOtherChunk("LogBlock", x2, y2, z2);
-                                            }
-                                        }
-                                    }
-
-                                    for (int x3 = x - treeTopWidth; x3 <= x + treeTopWidth; x3++) {
-                                        for (int z3 = z - treeTopWidth; z3 <= z + treeTopWidth; z3++) {
-                                            for (int y3 = y2; y3 <= y2 + treeTopHeight; y3++) {
-                                                CreateBlockInOtherChunk("LeafBlock", x3, y3, z3);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            break;
-                        }
-                    }
-                }
-            }
-        }
         //WATER_GEN
         /*
 		for (int x = 0; x < CHUNK_SIZE; x++)
@@ -153,6 +110,60 @@ public class Chunk {
 		}
 		*/
         DrawChunk();
+    }
+
+    void DrawTree() {
+        int x = Random.Range(0, CHUNK_SIZE - 1);
+        int z = Random.Range(0, CHUNK_SIZE - 1);
+
+        float per = Mathf.PerlinNoise((worldOffset.x * 0.99f), (worldOffset.z * 0.99f));
+        treeTopWidth = Random.Range(minTreeSize, maxTreeTopWidth);
+        treeTopHeight = Random.Range(minTreeSize, maxTreeTopHeight);
+        treeTrunkHeight = Random.Range(minTreeSize, maxTreeTrunkHeight + maxTreeTopHeight - 1);
+        treeTrunkWidth = Random.Range(minTreeSize, maxTreeTrunkWidth);
+
+        //DESCEND
+        for (int y = CHUNK_SIZE - 1; y >= 0; y--) {
+
+            if (blocks[x, y, z] != null) {
+                if (blocks[x, y, z].resourceString == "FastGrass") {
+                    if (CanDrawTree(x, y, z)) {
+
+                        //for tree clustering
+                        //per = Mathf.Pow(per, 2);
+                        if (per < 0.3f) {
+
+                            //dont let the trunk be thicker than the leaves
+                            if (treeTrunkWidth >= treeTopWidth) {
+                                treeTrunkWidth = Mathf.Max(0, (treeTopWidth - 1));
+                            }
+
+                            int y2 = 0;
+                            //generate trunk of tree
+                            for (int x2 = x - treeTrunkWidth; x2 <= x + treeTrunkWidth; x2++) {
+                                for (int z2 = z - treeTrunkWidth; z2 <= z + treeTrunkWidth; z2++) {
+                                    for (y2 = y; y2 <= y + treeTrunkHeight; y2++) {
+                                        CreateBlockInOtherChunk("LogBlock", x2, y2, z2);
+                                    }
+                                }
+                            }
+
+                            //generate leaves
+                            int leaveOffset = treeTopHeight >= treeTrunkHeight ? treeTopHeight - treeTrunkHeight + 1 : 0;
+
+                            for (int x3 = x - treeTopWidth; x3 <= x + treeTopWidth; x3++) {
+                                for (int z3 = z - treeTopWidth; z3 <= z + treeTopWidth; z3++) {
+                                    for (int y3 = y2 - treeTopHeight + leaveOffset; y3 <= y2 + treeTopHeight; y3++) {
+                                        CreateBlockInOtherChunk("LeafBlock", x3, y3, z3);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+        }
     }
 
     private bool CanDrawTree(int x, int y, int z) {
@@ -303,9 +314,7 @@ public class Chunk {
                 bool inGround = false;
 
                 for (int y = CHUNK_SIZE - 1; y >= 0; y--) {
-                    if (blocks[x, y, z] == null) {
-                        continue;
-                    }
+                    if (blocks[x, y, z] == null) { continue; }
 
                     blockToDraw = blocks[x, y, z];
 
@@ -315,6 +324,7 @@ public class Chunk {
                     } else if (HorizontalNull(x, y, z)) {
                         blockToDraw.draw();
                     } else {
+                        //blockToDraw.draw();
                         break;
                     }
                 }
