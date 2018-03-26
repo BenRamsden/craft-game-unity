@@ -4,17 +4,17 @@ using UnityEngine;
 
 public class Player {
 
-	public GameObject gameObject { get; }
-	public enum Behaviour { Human, Bot };
+    public GameObject gameObject { get; }
+    public enum Behaviour { Human, Bot };
 
-	private WorldGenerator wg;
-	private ProceduralGenerator pg;
+    private WorldGenerator wg;
+    private ProceduralGenerator pg;
 
-	public Player(WorldGenerator wg, ProceduralGenerator pg, string resourceString, Vector3 position, Behaviour behaviour) {
-		this.wg = wg;
-		this.pg = pg;
+    public Player(WorldGenerator wg, ProceduralGenerator pg, string resourceString, Vector3 position, Behaviour behaviour) {
+        this.wg = wg;
+        this.pg = pg;
 
-		gameObject = wg.CreatePlayer (resourceString,position);
+        gameObject = wg.CreatePlayer(resourceString, position);
 
 		if (behaviour.Equals(Behaviour.Human)) {
 			PlayerMove pm = gameObject.AddComponent<PlayerMove> ();
@@ -31,5 +31,5 @@ public class Player {
 			//bm.pg = pg;
 		}
 
-	}
+    }
 }
