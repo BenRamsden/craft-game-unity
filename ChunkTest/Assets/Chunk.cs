@@ -11,6 +11,18 @@ public class Chunk {
     private ProceduralGenerator generator;
     public bool secondPass { get; set; }
 
+
+    //tree paramaters
+    public static readonly int maxTreeTopWidth = 3;
+    public static readonly int maxTreeTopHeight = 3;
+    public static readonly int maxTreeTrunkWidth = 3;
+    public static readonly int maxTreeTrunkHeight = 3;
+    int treeTopWidth = 2;
+    int treeTopHeight = 2;
+    int treeTrunkWidth = 1;
+    int treeTrunkHeight = 2;
+    int minTreeSize = 1;
+
     public Chunk(Vector3 worldOffset, ProceduralGenerator generator, bool isBelowSurface = false) {
         this.worldOffset = worldOffset;
         this.generator = generator;
@@ -71,46 +83,58 @@ public class Chunk {
             }
         }
 
+
         //TREE_GEN
         for (int x = 0; x < CHUNK_SIZE; x++) {
             for (int z = 0; z < CHUNK_SIZE; z++) {
                 //DESCEND
                 for (int y = CHUNK_SIZE - 1; y >= 0; y--) {
-                    int worldY = (int)worldOffset.y + y;
-
-                    if (blocks[x, y, z] != null && blocks[x, y, z].resourceString == "FastGrass") {
-                        float per = Mathf.PerlinNoise((worldOffset.x + x)*0.02f, (worldOffset.z + z)*0.02f);
-                        //Debug.Log(per);
-                        per = Mathf.Pow(per, 2);
-                        if (per < 0.05f && Random.Range(0,100)< 10.0f) {
-
-                            if (!canDrawTree(x, y, z)) {
+                    //int worldY = (int)worldOffset.y + y;
+                    if (blocks[x, y, z] != null) {
+                        if (blocks[x, y, z].resourceString == "FastGrass") {
+                            if (!CanDrawTree(x, y, z)) {
                                 break;
                             }
-                            int treeTopSize = 3;
-                            int logLength = Random.Range(3, CHUNK_SIZE-treeTopSize);
-                            int y2;
-                            for (y2 = y; y2 < y + logLength; y2++) {
-                                CreateBlockInOtherChunk("LogBlock", x, y2, z);
-                            }
+                            //if (CanDrawTree(x, y, z)) {
+                            float per = Mathf.PerlinNoise((worldOffset.x + x) * 0.02f, (worldOffset.z + z) * 0.02f);
+                            per = Mathf.Pow(per, 2);
+                            if (per < 0.05f && Random.Range(0, 100) < 20.0f) {
 
-
-                            for (int x2 = x - 1; x2 <= x + 1; x2++) {
-                                for (int z2 = z - 1; z2 <= z + 1; z2++) {
-                                    for (int y3 = y2; y3 <= y2+treeTopSize; y3++) {
-                                        CreateBlockInOtherChunk("LeafBlock", x2, y3, z2);
-
-                                    }
-
+                                treeTopWidth = Random.Range(minTreeSize, maxTreeTopWidth);
+                                treeTopHeight = Random.Range(minTreeSize, maxTreeTopHeight);
+                                treeTrunkHeight = Random.Range(minTreeSize, maxTreeTrunkHeight);
+                                treeTrunkWidth = Random.Range(minTreeSize, maxTreeTrunkWidth);
+                                if(treeTrunkWidth >= treeTopWidth) {
+                                    treeTrunkWidth = Mathf.Max(0, (treeTopWidth - 1));
                                 }
+
+                                int y2 = 0;
+                                for (int x2 = x - treeTrunkWidth; x2 <= x + treeTrunkWidth; x2++) {
+                                    for (int z2 = z - treeTrunkWidth; z2 <= z + treeTrunkWidth; z2++) {
+                                        for (y2 = y; y2 <= y + treeTrunkHeight; y2++) {
+                                            CreateBlockInOtherChunk("LogBlock", x2, y2, z2);
+
+                                        }
+                                    }
+                                }
+
+
+                                for (int x3 = x - treeTopWidth; x3 <= x + treeTopWidth; x3++) {
+                                    for (int z3 = z - treeTopWidth; z3 <= z + treeTopWidth; z3++) {
+                                        for (int y3 = y2; y3 <= y2 + treeTopHeight; y3++) {
+                                            CreateBlockInOtherChunk("LeafBlock", x3, y3, z3);
+
+                                        }
+                                    }
+                                }
+
                             }
+                            break;
                         }
-                        break;
                     }
                 }
             }
         }
-
         //WATER_GEN
         /*
 		for (int x = 0; x < CHUNK_SIZE; x++)
@@ -133,21 +157,21 @@ public class Chunk {
 			}
 		}
 		*/
-        drawChunk();
+        DrawChunk();
     }
 
-    bool canDrawTree(int x, int y, int z) {
-        for (int x2 = x - 1; x2 <= x + 1; x2++) {
-            for (int z2 = z - 1; z2 <= z + 1; z2++) {
-                for (int y2 = y + 4; y2 <= y + 6; y2++) {
-                    if (!isInBlocksBounds(x2, y2, z2)) {
+    private bool CanDrawTree(int x, int y, int z) {
+        //int biggestWidth = (treeTopWidth >= treeTrunkWidth) ? treeTopWidth : treeTrunkWidth;
+        for (int x2 = x - treeTopWidth; x2 <= x + treeTopWidth; x2++) {
+            for (int z2 = z - treeTopWidth; z2 <= z + treeTopWidth; z2++) {
+                for (int y2 = y + treeTrunkHeight; y2 <= y + treeTrunkHeight+treeTopHeight; y2++) {
+                    if (!IsInChunkBounds(x2, y2, z2)) {
                         return false;
                     }
                     if (blocks[x2, y2, z2] != null) {
                         return false;
                     }
                 }
-
             }
         }
         return true;
@@ -169,7 +193,7 @@ public class Chunk {
     }
 
     public Block CreateBlockInOtherChunk(string blockType, int chunkX, int chunkY, int chunkZ) {
-        if (isInBlocksBounds(chunkX, chunkY, chunkZ)) {
+        if (IsInChunkBounds(chunkX, chunkY, chunkZ)) {
             return CreateBlock(blockType, chunkX, chunkY, chunkZ);
         }
 
@@ -230,7 +254,7 @@ public class Chunk {
         int y = (int)position.y;
         int z = (int)position.z;
 
-        if (!isInBlocksBounds(x, y, z)) {
+        if (!IsInChunkBounds(x, y, z)) {
             return null;
         }
 
@@ -245,8 +269,8 @@ public class Chunk {
         blocks[(int)position.x, (int)position.y, (int)position.z] = null;
     }
 
-    private bool nullOrWater(int x, int y, int z) {
-        if (isInBlocksBounds(x, y, z) == false) {
+    private bool NullOrWater(int x, int y, int z) {
+        if (IsInChunkBounds(x, y, z) == false) {
             return false;
         }
 
@@ -263,20 +287,20 @@ public class Chunk {
         return false;
     }
 
-    private bool horizontalNull(int x, int y, int z) {
-        bool leftNull = nullOrWater(x - 1, y, z);
-        bool rightNull = nullOrWater(x + 1, y, z);
-        bool backNull = nullOrWater(x, y, z - 1);
-        bool frontNull = nullOrWater(x, y, z + 1);
+    private bool HorizontalNull(int x, int y, int z) {
+        bool leftNull = NullOrWater(x - 1, y, z);
+        bool rightNull = NullOrWater(x + 1, y, z);
+        bool backNull = NullOrWater(x, y, z - 1);
+        bool frontNull = NullOrWater(x, y, z + 1);
 
         return leftNull || rightNull || backNull || frontNull;
     }
 
-    /**drawChunk()
+    /**DrawChunk()
      * Renders the visible blocks based on the current state of the chunk.
      * Currently this means rendering any block that touches a null "air" Block.
      */
-    private void drawChunk() {
+    private void DrawChunk() {
         Block blockToDraw;
 
         for (int x = 0; x < CHUNK_SIZE; x++) {
@@ -293,7 +317,7 @@ public class Chunk {
                     if (inGround == false) {
                         blockToDraw.draw();
                         inGround = true;
-                    } else if (horizontalNull(x, y, z)) {
+                    } else if (HorizontalNull(x, y, z)) {
                         blockToDraw.draw();
                     } else {
                         break;
@@ -318,49 +342,49 @@ public class Chunk {
                     }
                     blockToDraw = blocks[x, y, z];
                     if (checkNorth) {
-                        if (!isInBlocksBounds(x, y, z + 1)) {
+                        if (!IsInChunkBounds(x, y, z + 1)) {
                             chunkPos.Set(worldOffset.x, worldOffset.y, worldOffset.z + CHUNK_SIZE);
                             blockPos.Set(x, y, 0);
                             if (generator.getChunk(chunkPos).getBlock(blockPos) == null) {
                                 blockToDraw.draw();
                             }
-                        } else if (nullOrWater(x, y, z + 1)) {
+                        } else if (NullOrWater(x, y, z + 1)) {
                             blockToDraw.draw();
                         }
                     }
 
                     if (checkSouth) {
-                        if (!isInBlocksBounds(x, y, z - 1)) {
+                        if (!IsInChunkBounds(x, y, z - 1)) {
                             chunkPos.Set(worldOffset.x, worldOffset.y, worldOffset.z - CHUNK_SIZE);
                             blockPos.Set(x, y, CHUNK_SIZE - 1);
                             if (generator.getChunk(chunkPos).getBlock(blockPos) == null) {
                                 blockToDraw.draw();
                             }
-                        } else if (nullOrWater(x, y, z - 1)) {
+                        } else if (NullOrWater(x, y, z - 1)) {
                             blockToDraw.draw();
                         }
                     }
 
                     if (checkEast) {
-                        if (!isInBlocksBounds(x + 1, y, z)) {
+                        if (!IsInChunkBounds(x + 1, y, z)) {
                             chunkPos.Set(worldOffset.x + CHUNK_SIZE, worldOffset.y, worldOffset.z);
                             blockPos.Set(0, y, z);
                             if (generator.getChunk(chunkPos).getBlock(blockPos) == null) {
                                 blockToDraw.draw();
                             }
-                        } else if (nullOrWater(x + 1, y, z)) {
+                        } else if (NullOrWater(x + 1, y, z)) {
                             blockToDraw.draw();
                         }
                     }
 
                     if (checkWest) {
-                        if (!isInBlocksBounds(x - 1, y, z)) {
+                        if (!IsInChunkBounds(x - 1, y, z)) {
                             chunkPos.Set(worldOffset.x - CHUNK_SIZE, worldOffset.y, worldOffset.z);
                             blockPos.Set(CHUNK_SIZE - 1, y, z);
                             if (generator.getChunk(chunkPos).getBlock(blockPos) == null) {
                                 blockToDraw.draw();
                             }
-                        } else if (nullOrWater(x - 1, y, z)) {
+                        } else if (NullOrWater(x - 1, y, z)) {
                             blockToDraw.draw();
                         }
                     }
@@ -369,7 +393,7 @@ public class Chunk {
         }
     }
 
-    bool isInBlocksBounds(int x, int y, int z) {
+    private bool IsInChunkBounds(int x, int y, int z) {
         return x >= 0 && x < CHUNK_SIZE && y >= 0 && y < CHUNK_SIZE && z >= 0 && z < CHUNK_SIZE;
     }
 
@@ -402,7 +426,7 @@ public class Chunk {
     }
 
     bool waterProcessBlock(int x2, int y2, int z2) {
-        if (isInBlocksBounds(x2, y2, z2)) {
+        if (IsInChunkBounds(x2, y2, z2)) {
             if (blocks[x2, y2, z2] == null) {
                 Block block = CreateBlock("WaterBlock", x2, y2, z2);
                 block.draw();
@@ -428,7 +452,7 @@ public class Chunk {
             int chunkY = (int)chunkIndex.y;
             int chunkZ = (int)chunkIndex.z;
 
-            if (isInBlocksBounds(chunkX, chunkY, chunkZ) == false) {
+            if (IsInChunkBounds(chunkX, chunkY, chunkZ) == false) {
                 return false;
             }
 
