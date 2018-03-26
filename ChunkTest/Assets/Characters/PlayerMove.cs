@@ -4,9 +4,12 @@ using UnityEngine;
 
 public class PlayerMove : MonoBehaviour {
 
-    public Rigidbody rb;
-    private Animator animator;
-    public bool isGrounded;
+	public ProceduralGenerator pg;
+	public Player.Behaviour behaviour;
+
+	public Rigidbody rb;
+	private  Animator animator;
+	public bool isGrounded;
 
     public readonly Vector3 jump = new Vector3(0.0f, 10.0f, 0.0f);
 
@@ -25,6 +28,10 @@ public class PlayerMove : MonoBehaviour {
     public static float x_AxisRotateClamp = 80.0f;
     public static float y_AxisRotateClamp = 10.0f;
 
+	static Vector3 leftCollider = new Vector3 (-1.5f, -0.5f, 0.0f);
+	static Vector3 frontCollider = new Vector3(0.0f,-0.5f,0.0f);
+	static Vector3 rightCollider = new Vector3 (1.5f, -0.5f, 0.0f);
+
     // Use this for initialization
     void Start() {
         rb = GetComponent<Rigidbody>();
@@ -33,18 +40,40 @@ public class PlayerMove : MonoBehaviour {
         rotY = rot.y;
         rotX = rot.x;
 
-        jumpSound = (AudioClip)Resources.Load("Sounds/jump");
-        grassWalkSound = (AudioClip)Resources.Load("Sounds/walk_grass");
-        swimSound = (AudioClip)Resources.Load("Sounds/swim");
-        audioSource = gameObject.AddComponent<AudioSource>();
-    }
+		jumpSound = (AudioClip)Resources.Load ("Sounds/jump");
+		grassWalkSound = (AudioClip)Resources.Load ("Sounds/walk_grass");
+		swimSound = (AudioClip)Resources.Load ("Sounds/swim");
+		audioSource = gameObject.AddComponent<AudioSource> ();
 
-    /** Moving player using unity physics */
-    void FixedUpdate() {
-        moveX = Input.GetAxis("Horizontal");
-        moveZ = Input.GetAxis("Vertical");
-        //float move
-        Vector3 movement = new Vector3(moveX, 0.0f, moveZ);
+		if (behaviour.Equals (Player.Behaviour.Human)) {
+			GameObject head = transform.GetChild (0).gameObject;
+			head.AddComponent<Camera> ();
+			head.AddComponent<AudioListener> ();
+		}
+	}
+
+	void Update () {
+		if (behaviour.Equals (Player.Behaviour.Human)) {
+			HumanUpdate ();
+		} else if (behaviour.Equals (Player.Behaviour.Bot)) {
+			BotUpdate ();
+		}
+	}
+
+	/** Moving player using unity physics */
+	void FixedUpdate () {
+		if (behaviour.Equals (Player.Behaviour.Human)) {
+			HumanFixedUpdate ();
+		} else if (behaviour.Equals (Player.Behaviour.Bot)) {
+			BotFixedUpdate ();
+		}
+	}
+
+	void HumanFixedUpdate() {
+		moveX = Input.GetAxis ("Horizontal");
+		moveZ = Input.GetAxis ("Vertical");
+		//float move
+		Vector3 movement = new Vector3 (moveX, 0.0f, moveZ);
 
         //use delta time to make it consistent rotation, fps doesnt matter
         rb.transform.Translate(movement * moveSpeed * Time.deltaTime);
@@ -57,63 +86,88 @@ public class PlayerMove : MonoBehaviour {
         }
     }
 
+	void BotFixedUpdate() {
+		if (avoidCollision (frontCollider)) {
+			jumpPlayer ();
+		}
 
-    void OnCollisionStay() {
-        isGrounded = true;
-        animator.SetBool("isJumping", false);
-    }
+		float moveX = 0;// Input.GetAxis ("Horizontal");
+		float moveZ = 0.2f;// Input.GetAxis ("Vertical");
 
+		movePlayer (moveX, moveZ);
+	}
+		
+	void HumanUpdate() {
+		// Rotating player with mouse
+		mouseX = Input.GetAxis("Mouse X");
+		mouseY = -Input.GetAxis("Mouse Y"); // "-" because otherwise it is inverted up and down 
+		rotY += mouseX * mouseSensitivity * Time.deltaTime;
+		rotX += mouseY * mouseSensitivity * Time.deltaTime;
 
-    void Update() {
-        // Rotating player with mouse
-        mouseX = Input.GetAxis("Mouse X");
-        mouseY = -Input.GetAxis("Mouse Y"); // "-" because otherwise it is inverted up and down 
-        rotY += mouseX * mouseSensitivity * Time.deltaTime;
-        rotX += mouseY * mouseSensitivity * Time.deltaTime;
+		//set up rotations for the torso and head. allow head to look up and down but not torso.
+		Quaternion rotationHead = Quaternion.Euler(rotX, rotY, 0.0f);
+		Quaternion rotationTorso = Quaternion.Euler(0.0f, rotY, 0.0f);
 
-        //set up rotations for the torso and head. allow head to look up and down but not torso.
-        Quaternion rotationHead = Quaternion.Euler(rotX, rotY, 0.0f);
-        Quaternion rotationTorso = Quaternion.Euler(0.0f, rotY, 0.0f);
+		transform.rotation = rotationTorso;
+		transform.GetChild(0).rotation = rotationHead;
 
-        transform.rotation = rotationTorso;
-        transform.GetChild(0).rotation = rotationHead;
+		//player jumping code
+		if (Input.GetKeyDown(KeyCode.Space) && isGrounded){
+			rb.AddForce(jump, ForceMode.Impulse);
+			isGrounded = false;
 
-        //player jumping code
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded) {
-            rb.AddForce(jump, ForceMode.Impulse);
-            isGrounded = false;
-            animator.SetBool("isJumping", true);
+			animator.SetBool("isJumping", true);
 
-            if (Random.Range(0, 2) != 0) {
-                animator.SetBool("alternateJumpLeg", false);
-            } else {
-                animator.SetBool("alternateJumpLeg", true);
-            }
+			if (Random.Range(0, 2) != 0)
+			{
+				animator.SetBool("alternateJumpLeg", false);
+			}
+			else
+			{
+				animator.SetBool("alternateJumpLeg", true);
+			}
 
-            if (Random.Range(0, 2) != 0) {
-                animator.SetBool("alternateJumpArm", false);
-            } else {
-                animator.SetBool("alternateJumpArm", true);
-            }
+			if (Random.Range(0, 2) != 0)
+			{
+				animator.SetBool("alternateJumpArm", false);
+			}
+			else
+			{
+				animator.SetBool("alternateJumpArm", true);
+			}
 
             audioSource.PlayOneShot(jumpSound);
         }
 
-        // If a key is pressed, play a sound
-        if (Input.anyKey && !audioSource.isPlaying) {
-            if (isInWater)
-                audioSource.PlayOneShot(swimSound);
-            else
-                audioSource.PlayOneShot(walkSound);
-        }
-    }
+			audioSource.PlayOneShot (jumpSound);
+		}
 
     void OnCollisionEnter(Collision collision) {
         // Get the walk sound from the collided block
         walkSound = collision.gameObject.GetComponent<BlockProperties>().PlayerWalkSound;
     }
 
-    /**
+	void BotUpdate() {
+		// Rotating player with mouse
+		float mouseX = 0;// Input.GetAxis("Mouse X");
+		float mouseY = 0;// -Input.GetAxis("Mouse Y"); // "-" because otherwise it is inverted up and down 
+
+		moveCamera (mouseX, mouseY);
+	}
+
+	void OnCollisionStay()
+	{
+		isGrounded = true;
+		animator.SetBool ("isJumping", false);
+	}
+
+	void OnCollisionEnter(Collision collision)
+	{
+		// Get the walk sound from the collided block
+		walkSound = collision.gameObject.GetComponent<BlockProperties> ().PlayerWalkSound;
+	}
+
+	/**
 	 * Water blocks are triggers, check whether we are in water
 	 */
 
@@ -122,8 +176,101 @@ public class PlayerMove : MonoBehaviour {
             isInWater = true;
     }
 
-    void OnTriggerExit(Collider trigger) {
-        if (trigger.gameObject.name == "WaterBlock")
-            isInWater = false;
-    }
+	void OnTriggerExit(Collider trigger)
+	{
+		if (trigger.gameObject.name == "WaterBlock")
+			isInWater = false;
+	}
+
+	/* Methods below imported from BotMove */
+
+	bool avoidCollision(Vector3 collider) {
+		Vector3 forward = transform.forward;
+
+		Vector3 botPos = this.gameObject.transform.position;
+		botPos += collider;
+		botPos += forward * 3.0f;
+
+		/*if (cube == null) {
+			cube = GameObject.CreatePrimitive (PrimitiveType.Cube);
+			cube.transform.localScale = new Vector3 (0.1f, 0.1f, 0.1f);
+
+			Physics.IgnoreCollision (cube.GetComponent<Collider> (), GetComponent<Collider> ());
+		}
+			
+		cube.transform.position = botPos;*/
+
+		Vector3 chunkPos = HelperMethods.worldPositionToChunkPosition (botPos);
+		Vector3 blockPos = HelperMethods.vectorDifference (chunkPos,botPos);
+
+		Chunk chunk = pg.getChunk (chunkPos);
+
+		if (chunk == null)
+			return false;
+
+		Block block = chunk.getBlock (blockPos);
+
+		if (block == null)
+			return false;
+
+		if (block.resourceString == "WaterBlock")
+			return false;
+
+		return true;
+	}
+
+	void jumpPlayer() {
+		if (isGrounded){
+			rb.AddForce(jump, ForceMode.Impulse);
+			isGrounded = false;
+
+			animator.SetBool ("isJumping", true);
+
+			audioSource.PlayOneShot (jumpSound);
+		}
+	}
+
+	void movePlayer(float moveX, float moveZ) {
+		//float move
+		Vector3 movement = new Vector3 (moveX, 0.0f, moveZ);
+
+		//use delta time to make it consistent rotation, fps doesnt matter
+		rb.transform.Translate(movement * moveSpeed * Time.deltaTime);
+
+		//check for which type of movement for appropiate animation
+		if (moveX != 0 || moveZ != 0) {
+			animator.SetBool ("isMoving", true);
+		} else {
+			animator.SetBool ("isMoving", false);
+		}
+	}
+
+	void moveCamera(float mouseX, float mouseY) {
+		rotYHead += mouseX * mouseSensitivity * Time.deltaTime;
+		rotX += mouseY * mouseSensitivity * Time.deltaTime;
+		//stop the player being able to look up/down too much
+		rotX = Mathf.Clamp(rotX, -x_AxisRotateClamp, x_AxisRotateClamp);
+		//rotYHead = Mathf.Clamp(rotY, -y_AxisRotateClamp, y_AxisRotateClamp);
+
+		if (avoidCollision (leftCollider)) {
+			rotYHead += 45;
+		} else if (avoidCollision (rightCollider)) {
+			rotYHead -= 45;
+		}
+
+		//set up rotations for the torso and head. allow head to look up and down but not torso.
+		Quaternion rotationHead = Quaternion.Euler(rotX, rotYHead, 0.0f);
+		transform.GetChild(0).rotation = rotationHead;
+
+		float diff = rotYHead - rotY;
+
+		if(diff > y_AxisRotateClamp || diff < y_AxisRotateClamp)
+		{
+			rotY += diff / 3;
+		}
+
+		Quaternion rotationTorso = Quaternion.Euler(0.0f, rotY, 0.0f);
+		transform.rotation = rotationTorso;
+	}
+
 }
