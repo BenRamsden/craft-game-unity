@@ -9,12 +9,11 @@ public class PlayerMove : MonoBehaviour {
 
     public Rigidbody rb;
     private Animator animator;
-    public bool isGrounded;
 
-    public readonly Vector3 jump = new Vector3(0.0f, 10.0f, 0.0f);
+    public readonly Vector3 jump = new Vector3(0.0f, 15.0f, 0.0f);
 
-    public float mouseSensitivity = 200.0f;
-    public float moveSpeed = 20.0F;
+    public float mouseSensitivity = 100.0f;
+    public float moveSpeed = 15.0F;
 
     private AudioClip jumpSound;
     private AudioClip grassWalkSound;
@@ -53,7 +52,7 @@ public class PlayerMove : MonoBehaviour {
 
     void Update() {
         if (behaviour.Equals(Player.Behaviour.Human)) {
-            HumanUpdate();
+            PlayerUpdate();
         } else if (behaviour.Equals(Player.Behaviour.Bot)) {
             BotUpdate();
         }
@@ -62,16 +61,18 @@ public class PlayerMove : MonoBehaviour {
     /** Moving player using unity physics */
     void FixedUpdate() {
         if (behaviour.Equals(Player.Behaviour.Human)) {
-            HumanFixedUpdate();
+            PlayerFixedUpdate();
         } else if (behaviour.Equals(Player.Behaviour.Bot)) {
             BotFixedUpdate();
         }
     }
 
-    void HumanFixedUpdate() {
+    void PlayerFixedUpdate() {
+
+
+
         float moveX = Input.GetAxis("Horizontal");
         float moveZ = Input.GetAxis("Vertical");
-        //float move
         Vector3 movement = new Vector3(moveX, 0.0f, moveZ);
 
         //use delta time to make it consistent rotation, fps doesnt matter
@@ -86,8 +87,8 @@ public class PlayerMove : MonoBehaviour {
     }
 
     void BotFixedUpdate() {
-        if (avoidCollision(frontCollider)) {
-            jumpPlayer();
+        if (AvoidCollision(frontCollider)) {
+            Jump();
         }
 
         float moveX = 0;// Input.GetAxis ("Horizontal");
@@ -96,54 +97,20 @@ public class PlayerMove : MonoBehaviour {
         MovePlayer(moveX, moveZ);
     }
 
-    void HumanUpdate() {
+    void PlayerUpdate() {
         // Rotating player with mouse
         float mouseX = Input.GetAxis("Mouse X");
         float mouseY = -Input.GetAxis("Mouse Y"); // "-" because otherwise it is inverted up and down
         MoveCamera(mouseX, mouseY);
 
-#if false        
-        rotYHead += mouseX * mouseSensitivity * Time.deltaTime;
-        rotX += mouseY * mouseSensitivity * Time.deltaTime;
-        rotX = Mathf.Clamp(rotX, -x_AxisRotateClamp, x_AxisRotateClamp);
-
-        //set up rotations for the torso and head. allow head to look up and down but not torso.
-
-
-
-        float diff = rotYHead - rotY;
-
-        if (diff > y_AxisRotateClamp || diff < y_AxisRotateClamp) {
-            rotY += diff / 3;
-        }
-        Quaternion rotationHead = Quaternion.Euler(rotX, rotYHead, 0.0f);
-        Quaternion rotationTorso = Quaternion.Euler(0.0f, rotY, 0.0f);
-        transform.rotation = rotationTorso;
-        transform.GetChild(0).rotation = rotationHead; 
-#endif
-
         //player jumping code
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded) {
-            rb.AddForce(jump, ForceMode.Impulse);
-            isGrounded = false;
-
-            animator.SetBool("isJumping", true);
-
-            if (Random.Range(0, 2) == 0) {
-                animator.SetBool("alternateJumpLeg", false);
-            } else {
-                animator.SetBool("alternateJumpLeg", true);
+        if (IsGrounded()) {
+            animator.SetBool("isJumping", false);
+            if (Input.GetKeyDown(KeyCode.Space)) {
+                Jump();
             }
-
-            if (Random.Range(0, 2) == 0) {
-                animator.SetBool("alternateJumpArm", false);
-            } else {
-                animator.SetBool("alternateJumpArm", true);
-            }
-
-
-            audioSource.PlayOneShot(jumpSound);
         }
+
 
         // If a key is pressed, play a sound
         if (Input.anyKey && !audioSource.isPlaying) {
@@ -162,10 +129,14 @@ public class PlayerMove : MonoBehaviour {
         MoveCamera(mouseX, mouseY);
     }
 
-    void OnCollisionStay() {
-        isGrounded = true;
-        animator.SetBool("isJumping", false);
+    bool IsGrounded() {
+        RaycastHit hit;
+        if (Physics.Raycast(rb.transform.position, -Vector3.up, out hit, 1.15f)) {
+            return true;
+        }
+        return false;
     }
+
 
     void OnCollisionEnter(Collision collision) {
         // Get the walk sound from the collided block
@@ -188,7 +159,7 @@ public class PlayerMove : MonoBehaviour {
 
     /* Methods below imported from BotMove */
 
-    bool avoidCollision(Vector3 collider) {
+    bool AvoidCollision(Vector3 collider) {
         Vector3 forward = transform.forward;
 
         Vector3 botPos = this.gameObject.transform.position;
@@ -223,15 +194,24 @@ public class PlayerMove : MonoBehaviour {
         return true;
     }
 
-    void jumpPlayer() {
-        if (isGrounded) {
-            rb.AddForce(jump, ForceMode.Impulse);
-            isGrounded = false;
+    void Jump() {
+        rb.AddForce(jump, ForceMode.Impulse);
+        animator.SetBool("isJumping", true);
 
-            animator.SetBool("isJumping", true);
-
-            audioSource.PlayOneShot(jumpSound);
+        if (Random.Range(0, 2) == 0) {
+            animator.SetBool("alternateJumpLeg", false);
+        } else {
+            animator.SetBool("alternateJumpLeg", true);
         }
+
+        if (Random.Range(0, 2) == 0) {
+            animator.SetBool("alternateJumpArm", false);
+        } else {
+            animator.SetBool("alternateJumpArm", true);
+        }
+
+
+        audioSource.PlayOneShot(jumpSound);
     }
 
     void MovePlayer(float moveX, float moveZ) {
@@ -256,9 +236,9 @@ public class PlayerMove : MonoBehaviour {
         rotX = Mathf.Clamp(rotX, -x_AxisRotateClamp, x_AxisRotateClamp);
 
         if (behaviour.Equals(Player.Behaviour.Bot)) {
-            if (avoidCollision(leftCollider)) {
+            if (AvoidCollision(leftCollider)) {
                 rotYHead += 45;
-            } else if (avoidCollision(rightCollider)) {
+            } else if (AvoidCollision(rightCollider)) {
                 rotYHead -= 45;
             }
         }
@@ -266,7 +246,6 @@ public class PlayerMove : MonoBehaviour {
 
         //set up rotations for the torso and head. allow head to look up and down but not torso.
         float diff = (rotYHead - rotY);
-        Debug.Log(diff);
         if (diff != y_AxisRotateClamp) {
             rotY += diff / 2;
         }
