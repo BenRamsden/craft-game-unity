@@ -25,7 +25,7 @@ public class PlayerMove : MonoBehaviour {
     private bool isInWater = false;
 
     private const float x_AxisRotateClamp = 80.0f;
-    private const float y_AxisRotateClamp = 20.0f;
+    private const float y_AxisRotateClamp = 15.0f;
 
     static Vector3 leftCollider = new Vector3(-1.5f, -0.5f, 0.0f);
     static Vector3 frontCollider = new Vector3(0.0f, -0.5f, 0.0f);
@@ -269,7 +269,7 @@ public class PlayerMove : MonoBehaviour {
 
         float diff = rotYHead - rotY;
         if (diff > y_AxisRotateClamp || diff < y_AxisRotateClamp) {
-            rotY += diff / 3;
+            rotY += diff / 4;
         }
         Quaternion rotationHead = Quaternion.Euler(rotX, rotYHead, 0.0f);
 
