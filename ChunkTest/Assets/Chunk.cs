@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Chunk {
-    public static int CHUNK_SIZE = 8;
+    public const int CHUNK_SIZE = 8;
 
     //blocks[,,] is a 3D array in the form [x, y, z]
     private Block[,,] blocks = new Block[CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE];
@@ -15,15 +15,21 @@ public class Chunk {
     const float PERLIN_TERRAIN_THRESHOLD = 0.25f;
 
     //tree parameters
-    public const int maxTreeTopWidth = 3;
-    public const int maxTreeTopHeight = 3;
-    public const int maxTreeTrunkWidth = 2;
-    public const int maxTreeTrunkHeight = 3;
-    int treeTopWidth = 2;
-    int treeTopHeight = 2;
-    int treeTrunkWidth = 1;
-    int treeTrunkHeight = 2;
-    int minTreeSize = 1;
+    public const int maxTreeTopWidth = CHUNK_SIZE/2;
+    public const int maxTreeTopHeight = CHUNK_SIZE;
+    public const int maxTreeTrunkWidth = CHUNK_SIZE / 2;
+    public const int maxTreeTrunkHeight = CHUNK_SIZE;
+    private const int minTreeSize = 1;
+    int treeTopWidth = 0;
+    int treeTopHeight = 0;
+    int treeTrunkWidth = 0;
+    int treeTrunkHeight = 0;
+
+
+    bool optimisation = true;
+
+
+
 
     public Chunk(Vector3 worldOffset, ProceduralGenerator generator, bool isBelowSurface = false) {
         this.worldOffset = worldOffset;
@@ -117,16 +123,21 @@ public class Chunk {
 
         float perlin = Mathf.PerlinNoise((worldOffset.x * 0.89f), (worldOffset.z * 0.89f));
 
-        treeTopWidth = Random.Range(minTreeSize, maxTreeTopWidth);
+        treeTopWidth = Random.Range(minTreeSize, maxTreeTopWidth + 1);
+        treeTrunkHeight = Random.Range(minTreeSize, maxTreeTrunkHeight+1);
         treeTopHeight = Random.Range(minTreeSize, maxTreeTopHeight);
-        treeTrunkHeight = Random.Range(minTreeSize, maxTreeTrunkHeight + maxTreeTopHeight - 1);
-        treeTrunkWidth = Random.Range(minTreeSize, maxTreeTrunkWidth);
-        float perlinCheck = 0.3f;
+        treeTrunkWidth = Random.Range(minTreeSize, maxTreeTrunkWidth + 1);
+
+        if(treeTopHeight >= 8)
+        Debug.Log(treeTopHeight);
+
+        float perlinCheck = 1f;
 
         //DESCEND
         for (int y = CHUNK_SIZE - 1; y >= 0; y--) {
             if (blocks[x, y, z] != null) {
                 if (blocks[x, y, z].resourceString == "FastGrass") {
+                    y += 1;
                     if (CanCreateTree(x, y, z)) {
                         //for tree clustering
                         //per = Mathf.Pow(per, 2);
@@ -147,12 +158,13 @@ public class Chunk {
                             }
 
                             //generate leaves
-                            int leaveOffset = treeTopHeight >= treeTrunkHeight ? treeTopHeight - treeTrunkHeight + 1 : 0;
-
+                            int leafOffset = treeTopHeight >= treeTrunkHeight ? treeTopHeight - treeTrunkHeight : 0;
                             for (int x3 = x - treeTopWidth; x3 <= x + treeTopWidth; x3++) {
                                 for (int z3 = z - treeTopWidth; z3 <= z + treeTopWidth; z3++) {
-                                    for (int y3 = y2 - treeTopHeight + leaveOffset; y3 <= y2 + treeTopHeight; y3++) {
-                                        CreateBlockInOtherChunk("LeafBlock", x3, y3, z3);
+                                    for (int y3 = y2 - treeTopHeight + leafOffset; y3 < y2 + treeTopHeight; y3++) {
+                                        if (blocks[x3, y3, z3] == null) { //checks for if a log already exists
+                                            CreateBlockInOtherChunk("LeafBlock", x3, y3, z3);
+                                        }
                                     }
                                 }
                             }
@@ -167,7 +179,7 @@ public class Chunk {
     private bool CanCreateTree(int x, int y, int z) {
         for (int x2 = x - treeTopWidth; x2 <= x + treeTopWidth; x2++) {
             for (int z2 = z - treeTopWidth; z2 <= z + treeTopWidth; z2++) {
-                for (int y2 = y + treeTrunkHeight; y2 <= y + treeTrunkHeight + treeTopHeight; y2++) {
+                for (int y2 = y; y2 <= y + treeTrunkHeight + treeTopHeight; y2++) {
                     if (!IsInChunkBounds(x2, y2, z2)) {
                         return false;
                     }
@@ -179,6 +191,8 @@ public class Chunk {
         }
         return true;
     }
+
+
 
 
 
@@ -214,7 +228,7 @@ public class Chunk {
         Block block = chunk.getBlock(blockPosition);
 
         if (block != null) {
-            //Debug.Log ("Cant create block, block already there");
+            Debug.Log("Cant create block, block already there");
             return null;
         }
 
@@ -321,7 +335,10 @@ public class Chunk {
                     } else if (HorizontalNull(x, y, z)) {
                         blockToDraw.draw();
                     } else {
-                        //blockToDraw.draw();
+                        //turn optimisation off
+                        if (!optimisation) {
+                            blockToDraw.draw();
+                        }
                         break;
                     }
                 }
