@@ -11,14 +11,14 @@ public class Chunk {
     private ProceduralGenerator generator;
     public bool secondPass { get; set; }
 
-	//terrain parameters
-	const float PERLIN_TERRAIN_THRESHOLD = 0.25f;
+    //terrain parameters
+    const float PERLIN_TERRAIN_THRESHOLD = 0.25f;
 
     //tree parameters
-	public const int maxTreeTopWidth = 3;
-	public const int maxTreeTopHeight = 3;
-	public const int maxTreeTrunkWidth = 2;
-	public const int maxTreeTrunkHeight = 3;
+    public const int maxTreeTopWidth = 3;
+    public const int maxTreeTopHeight = 3;
+    public const int maxTreeTrunkWidth = 2;
+    public const int maxTreeTrunkHeight = 3;
     int treeTopWidth = 2;
     int treeTopHeight = 2;
     int treeTrunkWidth = 1;
@@ -36,22 +36,22 @@ public class Chunk {
 
         for (int x = 0; x < CHUNK_SIZE; x++) {
             for (int z = 0; z < CHUNK_SIZE; z++) {
-				//Calculate absolute position of block (world space)
-				int worldX = (int)worldOffset.x + x;
-				int worldZ = (int)worldOffset.z + z;
+                //Calculate absolute position of block (world space)
+                int worldX = (int)worldOffset.x + x;
+                int worldZ = (int)worldOffset.z + z;
 
-				//Generate a scaled X and Z for input into PerlinNoise function
-				float perlinX = ((float)worldX) / CHUNK_SIZE;
-				float perlinZ = ((float)worldZ) / CHUNK_SIZE;
+                //Generate a scaled X and Z for input into PerlinNoise function
+                float perlinX = ((float)worldX) / CHUNK_SIZE;
+                float perlinZ = ((float)worldZ) / CHUNK_SIZE;
 
-				//Generate perlin
-				float perlinTerrainType = Mathf.PerlinNoise(perlinX / 30, perlinZ / 30);
-				float perlinTerrain = Mathf.Pow(Mathf.PerlinNoise(perlinX / 10, perlinZ / 10) * 2, 3);
-				int perlinYMaster = (int)(Mathf.PerlinNoise(perlinX / 3, perlinZ / 3) * CHUNK_SIZE * perlinTerrain);
+                //Generate perlin
+                float perlinTerrainType = Mathf.PerlinNoise(perlinX / 30, perlinZ / 30);
+                float perlinTerrain = Mathf.Pow(Mathf.PerlinNoise(perlinX / 10, perlinZ / 10) * 2, 3);
+                int perlinYMaster = (int)(Mathf.PerlinNoise(perlinX / 3, perlinZ / 3) * CHUNK_SIZE * perlinTerrain);
 
                 for (int y = 0; y < CHUNK_SIZE; y++) {
                     int worldY = (int)worldOffset.y + y;
-					int perlinY = perlinYMaster;
+                    int perlinY = perlinYMaster;
 
                     string blockType = null;
 
@@ -72,8 +72,8 @@ public class Chunk {
                         blockType = "FastDirt";
                     }
 
-					perlinY += y;
-					perlinY -= (int)worldOffset.y;
+                    perlinY += y;
+                    perlinY -= (int)worldOffset.y;
 
                     if (perlinY >= 0 && perlinY < CHUNK_SIZE) {
                         CreateBlock(blockType, x, perlinY, z);

@@ -238,7 +238,6 @@ public class PlayerMove : MonoBehaviour {
         //float move
         Vector3 movement = new Vector3(moveX, 0.0f, moveZ);
 
-        //use delta time to make it consistent rotation, fps doesnt matter
         rb.transform.Translate(movement * moveSpeed * Time.deltaTime);
 
         //check for which type of movement for appropiate animation
@@ -266,10 +265,10 @@ public class PlayerMove : MonoBehaviour {
 
 
         //set up rotations for the torso and head. allow head to look up and down but not torso.
-
-        float diff = rotYHead - rotY;
-        if (diff > y_AxisRotateClamp || diff < y_AxisRotateClamp) {
-            rotY += diff / 4;
+        float diff = (rotYHead - rotY);
+        Debug.Log(diff);
+        if (diff != y_AxisRotateClamp) {
+            rotY += diff / 2;
         }
         Quaternion rotationHead = Quaternion.Euler(rotX, rotYHead, 0.0f);
 
