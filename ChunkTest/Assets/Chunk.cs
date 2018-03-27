@@ -85,7 +85,7 @@ public class Chunk {
 
 
         //TREE_GEN
-        DrawTree();
+        CreateTree();
 
         //WATER_GEN
         /*
@@ -112,34 +112,33 @@ public class Chunk {
         DrawChunk();
     }
 
-    void DrawTree() {
+    void CreateTree() {
         int x = Random.Range(0, CHUNK_SIZE - 1);
         int z = Random.Range(0, CHUNK_SIZE - 1);
 
-        float per = Mathf.PerlinNoise((worldOffset.x * 0.99f), (worldOffset.z * 0.99f));
+        float perlin = Mathf.PerlinNoise((worldOffset.x * 0.89f), (worldOffset.z * 0.89f));
+
         treeTopWidth = Random.Range(minTreeSize, maxTreeTopWidth);
         treeTopHeight = Random.Range(minTreeSize, maxTreeTopHeight);
         treeTrunkHeight = Random.Range(minTreeSize, maxTreeTrunkHeight + maxTreeTopHeight - 1);
         treeTrunkWidth = Random.Range(minTreeSize, maxTreeTrunkWidth);
+        float perlinCheck = 0.3f;
 
         //DESCEND
         for (int y = CHUNK_SIZE - 1; y >= 0; y--) {
-
             if (blocks[x, y, z] != null) {
                 if (blocks[x, y, z].resourceString == "FastGrass") {
-                    if (CanDrawTree(x, y, z)) {
-
+                    if (CanCreateTree(x, y, z)) {
                         //for tree clustering
                         //per = Mathf.Pow(per, 2);
-                        if (per < 0.3f) {
-
+                        if (perlin < perlinCheck) {
                             //dont let the trunk be thicker than the leaves
                             if (treeTrunkWidth >= treeTopWidth) {
                                 treeTrunkWidth = Mathf.Max(0, (treeTopWidth - 1));
                             }
 
-                            int y2 = 0;
                             //generate trunk of tree
+                            int y2 = 0;
                             for (int x2 = x - treeTrunkWidth; x2 <= x + treeTrunkWidth; x2++) {
                                 for (int z2 = z - treeTrunkWidth; z2 <= z + treeTrunkWidth; z2++) {
                                     for (y2 = y; y2 <= y + treeTrunkHeight; y2++) {
@@ -166,8 +165,7 @@ public class Chunk {
         }
     }
 
-    private bool CanDrawTree(int x, int y, int z) {
-        //int biggestWidth = (treeTopWidth >= treeTrunkWidth) ? treeTopWidth : treeTrunkWidth;
+    private bool CanCreateTree(int x, int y, int z) {
         for (int x2 = x - treeTopWidth; x2 <= x + treeTopWidth; x2++) {
             for (int z2 = z - treeTopWidth; z2 <= z + treeTopWidth; z2++) {
                 for (int y2 = y + treeTrunkHeight; y2 <= y + treeTrunkHeight + treeTopHeight; y2++) {
