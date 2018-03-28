@@ -10,10 +10,10 @@ public class PlayerMove : MonoBehaviour {
     public Rigidbody rb;
     private Animator animator;
 
-    public readonly Vector3 jump = new Vector3(0.0f, 15.0f, 0.0f);
+    public readonly Vector3 jump = new Vector3(0.0f, 2.0f, 0.0f);
 
     public float mouseSensitivity = 100.0f;
-    public float moveSpeed = 15.0F;
+    public float moveSpeed = 20f;
 
     private AudioClip jumpSound;
     private AudioClip grassWalkSound;
@@ -68,21 +68,9 @@ public class PlayerMove : MonoBehaviour {
     }
 
     void PlayerFixedUpdate() {
-
-
-
-        float moveX = Input.GetAxis("Horizontal");
-        float moveZ = Input.GetAxis("Vertical");
-        Vector3 movement = new Vector3(moveX, 0.0f, moveZ);
-
-        //use delta time to make it consistent rotation, fps doesnt matter
         rb.transform.Translate(movement * moveSpeed * Time.deltaTime);
-
-        //check for which type of movement for appropiate animation
-        if (moveX != 0 || moveZ != 0) {
-            animator.SetBool("isMoving", true);
-        } else {
-            animator.SetBool("isMoving", false);
+        if (IsGrounded()) {
+            movement.y = 0;
         }
     }
 
@@ -96,8 +84,22 @@ public class PlayerMove : MonoBehaviour {
 
         MovePlayer(moveX, moveZ);
     }
+    float moveX;
+    float moveZ;
+    Vector3 movement = Vector3.zero;
 
     void PlayerUpdate() {
+
+        //if (!Input.GetKeyDown(KeyCode.Space)) {
+
+        moveX = Input.GetAxis("Horizontal");
+        moveZ = Input.GetAxis("Vertical");
+
+        movement.x = moveX;
+        movement.z = moveZ;
+        //}
+
+
         // Rotating player with mouse
         float mouseX = Input.GetAxis("Mouse X");
         float mouseY = -Input.GetAxis("Mouse Y"); // "-" because otherwise it is inverted up and down
@@ -111,6 +113,12 @@ public class PlayerMove : MonoBehaviour {
             }
         }
 
+        //check for which type of movement for appropiate animation
+        if (moveX != 0 || moveZ != 0) {
+            animator.SetBool("isMoving", true);
+        } else {
+            animator.SetBool("isMoving", false);
+        }
 
         // If a key is pressed, play a sound
         if (Input.anyKey && !audioSource.isPlaying) {
@@ -195,7 +203,8 @@ public class PlayerMove : MonoBehaviour {
     }
 
     void Jump() {
-        rb.AddForce(jump, ForceMode.Impulse);
+        movement.y = jump.y;
+        //rb.AddForce(jump, ForceMode.Impulse);
         animator.SetBool("isJumping", true);
 
         if (Random.Range(0, 2) == 0) {
@@ -203,14 +212,11 @@ public class PlayerMove : MonoBehaviour {
         } else {
             animator.SetBool("alternateJumpLeg", true);
         }
-
         if (Random.Range(0, 2) == 0) {
             animator.SetBool("alternateJumpArm", false);
         } else {
             animator.SetBool("alternateJumpArm", true);
         }
-
-
         audioSource.PlayOneShot(jumpSound);
     }
 
