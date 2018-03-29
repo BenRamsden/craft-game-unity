@@ -20,6 +20,8 @@ public class WorldGenerator : MonoBehaviour {
     private GameObject canvas;
     private GameObject camera;
 
+	private Campaign game;
+
 
     // Use this for initialization
     void Start() {
@@ -42,7 +44,14 @@ public class WorldGenerator : MonoBehaviour {
         //}
     }
 
-    public void InitPlayer() {
+	public void StartGame()
+	{
+		game = new Campaign ("scrapmetal");
+
+		InitPlayer ();
+	}
+
+    private void InitPlayer() {
         if (ENABLE_MENU) {
             Destroy(canvas);
             Destroy(camera);

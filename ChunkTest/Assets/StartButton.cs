@@ -13,6 +13,6 @@ public class StartButton : MonoBehaviour {
 	void TaskOnClick () {
 		GameObject world = GameObject.Find ("World");
 		WorldGenerator wg = world.GetComponent<WorldGenerator> ();
-		wg.InitPlayer ();
+		wg.StartGame ();
 	}
 }

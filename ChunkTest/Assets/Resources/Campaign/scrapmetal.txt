@@ -1,0 +1,16 @@
+{
+	"objectives" : [
+		{
+			"name" : "get_grass",
+			"display" : "Collect 10 grass",
+			"on_complete" : "award xp 2000",
+			"critera" : "inventory grass 10"
+		},
+		{
+			"name" : "get_sand",
+			"display" : "Collect 20 sand",
+			"on_complete" : "award xp 3000",
+			"criteria" : "inventory sand 20"
+		}
+	]
+}
