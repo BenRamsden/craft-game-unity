@@ -23,8 +23,6 @@ public class PlayerInteraction : MonoBehaviour {
 		animator = GetComponent<Animator> ();
 		camera = GetComponentInChildren<Camera>();
 		inventory = GetComponent<Inventory>();
-
-		Cursor.lockState = CursorLockMode.Locked;
 	}
 
 	void FixedUpdate() {
@@ -41,7 +39,7 @@ public class PlayerInteraction : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		if (Input.anyKey) {
-			if (currentObject != null) {
+			if (currentObject != null && !inventory.isToggled) {
 				isLeftMouseDown = Input.GetMouseButton(0);
 				isRightMouseClicked = Input.GetMouseButtonDown(1);
 

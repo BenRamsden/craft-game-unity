@@ -8,6 +8,8 @@ public class Inventory : MonoBehaviour {
 	private Container activeBar;
 	private Container craftingMatrix;
 
+	public bool isToggled { get; set;}
+
 	private int selectedSlot = 5;
 
 	public void Start(){
@@ -17,6 +19,7 @@ public class Inventory : MonoBehaviour {
 
 		mainBag.toggle();
 		craftingMatrix.toggle();
+		isToggled = false;
 	}
 
 	public void Delete(){
@@ -33,7 +36,7 @@ public class Inventory : MonoBehaviour {
 	}
 
 	public void toggleBag(){
-		mainBag.toggle();
+		isToggled = mainBag.toggle();
 		craftingMatrix.toggle();
 	}
 

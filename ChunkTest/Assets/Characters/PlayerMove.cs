@@ -89,16 +89,18 @@ public class PlayerMove : MonoBehaviour {
     Vector3 movement = Vector3.zero;
 
     void PlayerUpdate() {
-
-        //if (!Input.GetKeyDown(KeyCode.Space)) {
+		if (GetComponent<Inventory> ().isToggled) {
+			Cursor.lockState = CursorLockMode.None;
+			return;
+		} else {
+			Cursor.lockState = CursorLockMode.Locked;
+		}
 
         moveX = Input.GetAxis("Horizontal");
         moveZ = Input.GetAxis("Vertical");
 
         movement.x = moveX;
         movement.z = moveZ;
-        //}
-
 
         // Rotating player with mouse
         float mouseX = Input.GetAxis("Mouse X");

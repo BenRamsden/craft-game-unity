@@ -70,8 +70,9 @@ public class Container {
         }
     }
 
-	public void toggle(){
+	public bool toggle(){
 		selfRef.SetActive(!selfRef.activeSelf);
+		return selfRef.activeSelf;
 	}
 
     private int checkIfListFree(string itemName) {
