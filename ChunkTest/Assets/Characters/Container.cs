@@ -8,6 +8,7 @@ public class Container {
     private Text[] slotItemCounts;
     private Image[] slotItemImages;
     private int containerSize;
+	private GameObject selfRef;
 
     public readonly static int SLOT_SIZE = 64;
 
@@ -17,9 +18,10 @@ public class Container {
         container = new List<Item>[containerSize];
         slotItemCounts = new Text[containerSize];
         slotItemImages = new Image[containerSize];
+		selfRef = GameObject.Find(name);
 
-        slotItemCounts = GameObject.Find(name).GetComponentsInChildren<Text>();
-        slotItemImages = GameObject.Find(name).GetComponentsInChildren<Image>();
+        slotItemCounts = selfRef.GetComponentsInChildren<Text>();
+        slotItemImages = selfRef.GetComponentsInChildren<Image>();
 
         for (int i = 0; i < containerSize; i++) {
             container[i] = new List<Item>(64);
@@ -67,6 +69,10 @@ public class Container {
             slotItemImages[i].material = (Material)Resources.Load(string.Concat("Menu/", materialName));
         }
     }
+
+	public void toggle(){
+		selfRef.SetActive(!selfRef.activeSelf);
+	}
 
     private int checkIfListFree(string itemName) {
         int index = -1;

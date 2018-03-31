@@ -12,21 +12,29 @@ public class Inventory : MonoBehaviour {
 
 	public void Start(){
 		activeBar = new Container(6, "activeBar");
-		//mainBag = new Container(20);
-		//craftingMatrix = new Container(9);
+		mainBag = new Container(20, "inventoryZone");
+		craftingMatrix = new Container (9, "craftingZone");
+
+		mainBag.toggle();
+		craftingMatrix.toggle();
 	}
 
 	public void Delete(){
-		
+
 	}
 
 	public bool addItem(Item item){
 		if (!activeBar.isFull()) {
 			return activeBar.addItem(item);
 		} else {
-			//AddBlockToMainBag
+			return mainBag.addItem(item);
 		}
 		return false;
+	}
+
+	public void toggleBag(){
+		mainBag.toggle();
+		craftingMatrix.toggle();
 	}
 
 	public string removeItem(){
@@ -38,9 +46,16 @@ public class Inventory : MonoBehaviour {
 	}
 
 	public void setUI(){
-		if(activeBar != null)
+		if (activeBar != null) {
 			activeBar.setUI();
-		//mainBag.setUI();
-		//craftingMatrix.setUI();
+		}
+
+		if (mainBag != null) {
+			mainBag.setUI();
+		}
+			
+		if (craftingMatrix != null) {
+			craftingMatrix.setUI();
+		}
 	}
 }

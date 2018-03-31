@@ -76,6 +76,11 @@ public class PlayerInteraction : MonoBehaviour {
 			}else if(Input.GetKey (KeyCode.Keypad6) || Input.GetKey (KeyCode.Alpha6)){
 				currentActiveItem = 6;
 			}
+
+			if(Input.GetKey(KeyCode.I)){
+				inventory.toggleBag();
+			}
+
 			inventory.setSelectedSlot(currentActiveItem - 1);
 			inventory.setUI();
 		}
@@ -141,7 +146,7 @@ public class PlayerInteraction : MonoBehaviour {
 		if(currentBlock != null){
 			String blockType;
 			if ((blockType = inventory.removeItem()) != null){
-				Block tempBlock = currentChunk.CreateBlock(blockType, (int)posOfBlock.x, (int)posOfBlock.y+1, (int)posOfBlock.z);
+				Block tempBlock = currentChunk.CreateBlockInOtherChunk(blockType, (int)posOfBlock.x, (int)posOfBlock.y+1, (int)posOfBlock.z);
 				tempBlock.draw();
 				inventory.setUI();
 			}

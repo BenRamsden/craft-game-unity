@@ -120,6 +120,25 @@ public class ProceduralGenerator : MonoBehaviour {
 
         Chunk chunk = new Chunk(cp.position, this);
         storeChunk(chunk);
+
+		Vector3 currentChunkPos = cp.position;  
+		Vector3 adjacentChunkPos = new Vector3(currentChunkPos.x + chunkSize, currentChunkPos.y, currentChunkPos.z);  
+		if((chunk = getChunk(adjacentChunkPos)) != null){  
+			chunk.secondPass = false;  
+		}  
+		adjacentChunkPos.Set(currentChunkPos.x - chunkSize, currentChunkPos.y, currentChunkPos.z);  
+		if((chunk = getChunk(adjacentChunkPos)) != null){  
+			chunk.secondPass = false;  
+		}  
+		adjacentChunkPos.Set(currentChunkPos.x, currentChunkPos.y, currentChunkPos.z + chunkSize);  
+		if((chunk = getChunk(adjacentChunkPos)) != null){  
+			chunk.secondPass = false;  
+		}  
+		adjacentChunkPos.Set(currentChunkPos.x, currentChunkPos.y, currentChunkPos.z - chunkSize);  
+		if((chunk = getChunk(adjacentChunkPos)) != null){  
+			chunk.secondPass = false;  
+		} 
+
         return true;
 
         /**

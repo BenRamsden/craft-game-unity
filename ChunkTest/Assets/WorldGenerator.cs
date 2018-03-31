@@ -17,6 +17,7 @@ public class WorldGenerator : MonoBehaviour {
 
     private Vector3 origin;
 
+	private GameObject inventoryMenu;
     private GameObject canvas;
     private GameObject camera;
 
@@ -30,6 +31,9 @@ public class WorldGenerator : MonoBehaviour {
         origin = generator.initalise(CHUNK_SIZE, seed);
 
         if (ENABLE_MENU) {
+			inventoryMenu = GameObject.Find ("inventoryMenu");
+			inventoryMenu.SetActive(false);
+
             canvas = (GameObject)Instantiate(Resources.Load("Menu/Canvas"), new Vector3(0, 0, 0), Quaternion.identity);
 
             camera = (GameObject)Instantiate(Resources.Load("Menu/Camera"), new Vector3(origin.x + 0, origin.y + 20, origin.z + 60), Quaternion.LookRotation(new Vector3(0.0f, -0.3f, -1.0f)));
@@ -44,6 +48,7 @@ public class WorldGenerator : MonoBehaviour {
 
     public void InitPlayer() {
         if (ENABLE_MENU) {
+			inventoryMenu.SetActive (true);
             Destroy(canvas);
             Destroy(camera);
         }
