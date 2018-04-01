@@ -9,11 +9,13 @@ public class Container {
     private Image[] slotItemImages;
     private int containerSize;
 	private GameObject selfRef;
+	public string name;
 
     public readonly static int SLOT_SIZE = 64;
 
     public Container(int containerSize, string name) {
         this.containerSize = containerSize;
+		this.name = name;
 
         container = new List<Item>[containerSize];
         slotItemCounts = new Text[containerSize];
@@ -25,7 +27,9 @@ public class Container {
 
         for (int i = 0; i < containerSize; i++) {
             container[i] = new List<Item>(64);
+			slotItemImages[i].gameObject.AddComponent<ItemDragHandler>();
         }
+		selfRef.AddComponent<ItemDropHandler>();
     }
 
     public bool isFull() {
@@ -70,8 +74,13 @@ public class Container {
         }
     }
 
-	public void toggle(){
+	public RectTransform getBoundary(){
+		return selfRef.transform as RectTransform;
+	}
+
+	public bool toggle(){
 		selfRef.SetActive(!selfRef.activeSelf);
+		return selfRef.activeSelf;
 	}
 
     private int checkIfListFree(string itemName) {

@@ -8,15 +8,20 @@ public class Inventory : MonoBehaviour {
 	private Container activeBar;
 	private Container craftingMatrix;
 
+	public bool isToggled { get; set;}
+
+	enum containerNames {activeBar, mainBag, craftingMatrix};
+
 	private int selectedSlot = 5;
 
 	public void Start(){
-		activeBar = new Container(6, "activeBar");
-		mainBag = new Container(20, "inventoryZone");
-		craftingMatrix = new Container (9, "craftingZone");
+		activeBar = new Container(6, containerNames.activeBar.ToString());
+		mainBag = new Container(20, containerNames.mainBag.ToString());
+		craftingMatrix = new Container (9, containerNames.craftingMatrix.ToString());
 
 		mainBag.toggle();
 		craftingMatrix.toggle();
+		isToggled = false;
 	}
 
 	public void Delete(){
@@ -33,7 +38,7 @@ public class Inventory : MonoBehaviour {
 	}
 
 	public void toggleBag(){
-		mainBag.toggle();
+		isToggled = mainBag.toggle();
 		craftingMatrix.toggle();
 	}
 
@@ -56,6 +61,56 @@ public class Inventory : MonoBehaviour {
 			
 		if (craftingMatrix != null) {
 			craftingMatrix.setUI();
+		}
+	}
+
+	GameObject item;
+	public void dragEnd(GameObject item){
+		this.item = item;
+	}
+
+	public void itemDrop(){
+		Block newBlock = new Block();
+		bool isBeingDropped = false;
+		Container oldContainer = null, newContainer = null;
+
+		if (item != null) {
+			newBlock.resourceString = item.GetComponent<Image>().material.name;
+			int numOfItems = int.Parse(item.GetComponentInChildren<Text>().text);
+			string oldContainerName = item.transform.parent.name;
+
+			if (oldContainerName == containerNames.activeBar.ToString ()) {
+				oldContainer = activeBar;
+			} else if (oldContainerName == containerNames.mainBag.ToString ()) {
+				oldContainer = mainBag;
+			} else {
+				oldContainer = craftingMatrix;
+			}
+			if (RectTransformUtility.RectangleContainsScreenPoint (craftingMatrix.getBoundary (), Input.mousePosition)) {
+				newContainer = craftingMatrix;
+			} else if (RectTransformUtility.RectangleContainsScreenPoint (mainBag.getBoundary (), Input.mousePosition)) {
+				newContainer = mainBag;
+			} else if (RectTransformUtility.RectangleContainsScreenPoint (activeBar.getBoundary (), Input.mousePosition)) {
+				newContainer = activeBar;
+			} else{
+				isBeingDropped = true;
+			}
+
+			//if(newContainer.name != oldContainer.name){
+			Debug.Log("----------");
+			Debug.Log(oldContainer.name);
+			Debug.Log(newContainer.name);
+				int containerIndex = item.transform.GetSiblingIndex();
+				for (int i = 0; i < numOfItems; i++) {
+					if(!isBeingDropped){
+						newContainer.addItem(newBlock);
+					}
+					oldContainer.removeItem(containerIndex);
+				}
+				if (isBeingDropped) {
+					Debug.Log ("Item Dropped");
+				}
+			//}
 		}
 	}
 }
