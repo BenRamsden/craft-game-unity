@@ -47,7 +47,7 @@ public class WorldGenerator : MonoBehaviour {
 	public void StartGame()
 	{
 		game = new Campaign ("scrapmetal");
-
+		game.Objectives.Next ();
 		InitPlayer ();
 	}
 

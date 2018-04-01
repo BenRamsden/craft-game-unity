@@ -1,16 +1,53 @@
 {
 	"objectives" : [
 		{
-			"name" : "get_grass",
-			"display" : "Collect 10 grass",
-			"on_complete" : "award xp 2000",
-			"critera" : "inventory grass 10"
+			"name" : "getting_started",
+			"display" : "Getting started",
+			"description" : "Welcome to the game! Do these objectives!",
+			"on_complete" : "award xp 5000; objective next",
+			"criteria" : null,
+			"objectives" : [
+				{
+					"name" : "get_grass",
+					"display" : "Collect 10 grass",
+					"on_complete" : "award xp 2000",
+					"criteria" : {
+						"category" : "inventory",
+						"item" : "grass",
+						"amount" : 10
+					}
+				},
+				{
+					"name" : "get_sand",
+					"display" : "Collect 5 sand",
+					"on_complete" : "award xp 2000",
+					"criteria" : {
+						"category" : "inventory",
+						"item" : "sand",
+						"amount" : 5
+					}
+				}
+			]
 		},
 		{
-			"name" : "get_sand",
+			"name" : "get_sand2",
 			"display" : "Collect 20 sand",
 			"on_complete" : "award xp 3000",
-			"criteria" : "inventory sand 20"
+			"criteria" : {
+				"category" : "inventory",
+				"item" : "sand",
+				"amount" : 20
+			}
+		},
+		{
+			"name" : "test",
+			"display" : "test",
+			"on_complete" : "award xp 3000",
+			"criteria" : {
+				"category" : "inventory",
+				"item" : "grass",
+				"amount" : "5"
+			}
 		}
 	]
 }

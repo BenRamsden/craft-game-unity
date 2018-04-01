@@ -8,7 +8,19 @@ public class Objective
 	public string name;
 	public string display;
 	public string on_complete;
-	public string criteria;
+	public Criteria criteria;
+	public Objective[] objectives;
+
+	public bool achieved;
+}
+
+[System.Serializable]
+public class Criteria
+{
+	public string category;
+	public string item;
+	public int amount;
+	public int amountAchieved;
 }
 
 [System.Serializable]
