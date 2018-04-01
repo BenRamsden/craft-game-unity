@@ -40,24 +40,24 @@ public class PlayerInteraction : MonoBehaviour {
 	void Update () {
 		if (Input.anyKey) {
 			if (currentObject != null && !inventory.isToggled) {
-				isLeftMouseDown = Input.GetMouseButton(0);
-				isRightMouseClicked = Input.GetMouseButtonDown(1);
+				isLeftMouseDown = Input.GetMouseButton (0);
+				isRightMouseClicked = Input.GetMouseButtonDown (1);
 
-				worldPosition = currentObject.GetComponent<Transform>().position;
+				worldPosition = currentObject.GetComponent<Transform> ().position;
 				posOfChunk = HelperMethods.worldPositionToChunkPosition (worldPosition);
 				posOfBlock = HelperMethods.vectorDifference (worldPosition, posOfChunk);
 
-				currentChunk = GameObject.Find("World").GetComponent<WorldGenerator>().getPGenerator().getChunk(posOfChunk);
-				currentBlock = currentChunk.getBlock(posOfBlock);
+				currentChunk = GameObject.Find ("World").GetComponent<WorldGenerator> ().getPGenerator ().getChunk (posOfChunk);
+				currentBlock = currentChunk.getBlock (posOfBlock);
 
-				if (isLeftMouseDown){// && timer < 1){
-					interactWithBlock();
+				if (isLeftMouseDown) {// && timer < 1){
+					interactWithBlock ();
 					timer = 10;
 				}
-				timer = (timer < 1)? 0: --timer;
+				timer = (timer < 1) ? 0 : --timer;
 
-				if(isRightMouseClicked){
-					placeBlock();
+				if (isRightMouseClicked) {
+					placeBlock ();
 				}
 			}
 
@@ -82,6 +82,9 @@ public class PlayerInteraction : MonoBehaviour {
 			inventory.setSelectedSlot(currentActiveItem - 1);
 			inventory.setUI();
 		}
+		if (inventory.isToggled) {
+			inventory.setUI();
+		}
 	}
 
 	void OnCollisionEnter(Collision col){
@@ -96,7 +99,6 @@ public class PlayerInteraction : MonoBehaviour {
 			}
 		}
 	}
-
 
 	private void interactWithBlock(){
 		animator.ResetTrigger("Interact");

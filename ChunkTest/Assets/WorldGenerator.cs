@@ -56,6 +56,7 @@ public class WorldGenerator : MonoBehaviour {
         bot = new Player(this, generator, "Player/Player_Steve", new Vector3(origin.x, origin.y + 20, origin.z + 20), Player.Behaviour.Bot);
 
         player = new Player(this, generator, "Player/Player_Steve", new Vector3(origin.x, origin.y + 20, origin.z), Player.Behaviour.Human);
+		player.gameObject.name = "Main_Character";
     }
 
     public GameObject CreatePlayer(string resourceString, Vector3 position) {
