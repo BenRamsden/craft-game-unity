@@ -81,10 +81,10 @@ public class PlayerMove : MonoBehaviour {
 	RaycastHit hit;
 
     void BotFixedUpdate() {
-        float moveX = 0;// Input.GetAxis ("Horizontal");
-        float moveZ = 0.2f;// Input.GetAxis ("Vertical");
+		float moveX = 0;// Input.GetAxis ("Horizontal");
+		float moveZ = 0.2f;// Input.GetAxis ("Vertical");
 
-        MovePlayer(moveX, moveZ);
+		MovePlayer(moveX, moveZ);
 
 		Vector3 rayLeft = leftAngle * transform.forward;
 		Vector3 rayCenter = transform.forward;

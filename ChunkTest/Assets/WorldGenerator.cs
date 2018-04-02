@@ -53,9 +53,9 @@ public class WorldGenerator : MonoBehaviour {
             Destroy(camera);
         }
 
-        bot = new Player(this, generator, "Player/Player_Steve", new Vector3(origin.x, origin.y + 20, origin.z + 45), Player.Behaviour.Bot);
+        bot = new Player(this, generator, "Player/Player_Steve", new Vector3(origin.x, origin.y + 20, origin.z + 80), Player.Behaviour.Bot);
 
-        player = new Player(this, generator, "Player/Player_Steve", new Vector3(origin.x+5, origin.y + 20, origin.z + 35), Player.Behaviour.Human);
+        player = new Player(this, generator, "Player/Player_Steve", new Vector3(origin.x+5, origin.y + 20, origin.z + 75), Player.Behaviour.Human);
 		player.gameObject.name = "Main_Character";
     }
 
