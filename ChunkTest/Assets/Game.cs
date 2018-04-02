@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Campaign
+public class Game
 {
 	public ObjectiveManager Objectives { get; set; }
 
-	public Campaign(string campaignName)
+	public Game(string campaignName)
 	{
 		Objectives = ObjectiveManager.Instance;
 		Objectives.Load (campaignName);

@@ -7,7 +7,7 @@ public class Objective
 {
 	public string name;
 	public string display;
-	public string on_complete;
+	public OnComplete[] oncomplete;
 	public Criteria criteria;
 	public Objective[] objectives;
 
@@ -22,6 +22,14 @@ public class Criteria
 	public string item;
 	public int amount;
 	public int amountAchieved;
+}
+
+[System.Serializable]
+public class OnComplete
+{
+	public string category;
+	public string item;
+	public int amount;
 }
 
 [System.Serializable]

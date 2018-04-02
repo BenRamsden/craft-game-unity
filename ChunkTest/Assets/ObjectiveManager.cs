@@ -13,6 +13,10 @@ public class ObjectiveManager : MonoBehaviour
 	private int objectiveIndex;
 	private bool inSubObjectives;
 
+	public delegate void ObjectiveComplete(string item, int amount);
+
+	public Dictionary<string, ObjectiveComplete> ObjectiveCompleteHandlers { get; set; }
+
 	private static ObjectiveManager instance;
 
 	public static ObjectiveManager Instance{ get; private set; }
@@ -25,6 +29,12 @@ public class ObjectiveManager : MonoBehaviour
 			DontDestroyOnLoad (gameObject);
 		} else
 			Destroy (gameObject);
+	}
+
+	public ObjectiveManager()
+	{
+		ObjectiveCompleteHandlers = new Dictionary<string, ObjectiveComplete> ();
+		ObjectiveCompleteHandlers.Add ("objective", objectiveComplete);
 	}
 
 	public bool Load(string campaign)
@@ -115,6 +125,7 @@ public class ObjectiveManager : MonoBehaviour
 				{
   					objectiveLabels [i].text = obj.display + " Complete!";
 					obj.achieved = true;
+					onComplete (obj.oncomplete);
 					continue;
 				}
 				else
@@ -130,11 +141,32 @@ public class ObjectiveManager : MonoBehaviour
 			inSubObjectives = false;
 			objectives [objectiveIndex].achieved = true;
 			objectiveLabels [0].text = objectives [objectiveIndex].display + " Complete!";
+			onComplete (objectives [objectiveIndex].oncomplete);
 		}
 	}
 
-	private void onComplete()
+	private void onComplete(OnComplete[] events)
 	{
+		if (events == null)
+			return;
 
+		foreach (OnComplete complete in events)
+		{
+			if (ObjectiveCompleteHandlers.ContainsKey (complete.category))
+			{
+				ObjectiveCompleteHandlers [complete.category] (complete.item, complete.amount);
+			} else
+				Debug.Log ("Not exists: " + complete.category);
+		}
+	}
+
+	private void objectiveComplete(string item, int amount)
+	{
+		switch (item)
+		{
+		case "next":
+			NextObjective ();
+			break;
+		}
 	}
 }

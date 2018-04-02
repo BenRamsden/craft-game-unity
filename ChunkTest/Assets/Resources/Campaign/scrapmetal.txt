@@ -4,13 +4,29 @@
 			"name" : "getting_started",
 			"display" : "Getting started",
 			"description" : "Welcome to the game! Do these objectives!",
-			"on_complete" : "award xp 5000; objective next",
+			"oncomplete" : [
+				{
+					"category" : "player",
+					"item" : "xp",
+					"amount" : 5000
+				},
+				{
+					"category" : "objective",
+					"item" : "next"
+				}
+			],
 			"criteria" : null,
 			"objectives" : [
 				{
 					"name" : "get_grass",
 					"display" : "Collect 10 grass",
-					"on_complete" : "award xp 2000",
+					"oncomplete" : [
+						{
+							"category" : "player",
+							"item" : "xp",
+							"amount" : 2000
+						}
+					],
 					"criteria" : {
 						"category" : "inventory",
 						"item" : "FastGrass",
@@ -20,7 +36,13 @@
 				{
 					"name" : "get_sand",
 					"display" : "Collect 5 dirt",
-					"on_complete" : "award xp 2000",
+					"oncomplete" : [
+						{
+							"category" : "inventory",
+							"item" : "FastGrass",
+							"amount" : 64
+						}
+					],
 					"criteria" : {
 						"category" : "inventory",
 						"item" : "FastDirt",
@@ -32,21 +54,17 @@
 		{
 			"name" : "get_sand2",
 			"display" : "Collect 20 dtir",
-			"on_complete" : "award xp 3000",
+			"oncomplete" : [
+				{
+					"category" : "player",
+					"item" : "xp",
+					"amount" : 2000
+				}
+			],
 			"criteria" : {
 				"category" : "inventory",
 				"item" : "FastDirt",
 				"amount" : 20
-			}
-		},
-		{
-			"name" : "test",
-			"display" : "test",
-			"on_complete" : "award xp 3000",
-			"criteria" : {
-				"category" : "inventory",
-				"item" : "FastGrass",
-				"amount" : "5"
 			}
 		}
 	]

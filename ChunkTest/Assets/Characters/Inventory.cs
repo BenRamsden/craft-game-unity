@@ -11,6 +11,8 @@ public class Inventory : MonoBehaviour {
 	private int selectedSlot = 5;
 
 	public void Start(){
+		ObjectiveManager.Instance.ObjectiveCompleteHandlers.Add ("inventory", objectiveComplete);
+
 		activeBar = new Container(6, "activeBar");
 		//mainBag = new Container(20);
 		//craftingMatrix = new Container(9);
@@ -42,5 +44,10 @@ public class Inventory : MonoBehaviour {
 			activeBar.setUI();
 		//mainBag.setUI();
 		//craftingMatrix.setUI();
+	}
+
+	private void objectiveComplete(string item, int amount)
+	{
+		Debug.Log ("Award: " + item + " " + amount);
 	}
 }

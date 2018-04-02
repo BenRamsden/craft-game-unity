@@ -20,7 +20,7 @@ public class WorldGenerator : MonoBehaviour {
     private GameObject canvas;
     private GameObject camera;
 
-	private Campaign game;
+	private Game game;
 
 
     // Use this for initialization
@@ -46,7 +46,7 @@ public class WorldGenerator : MonoBehaviour {
 
 	public void StartGame()
 	{
-		game = new Campaign ("scrapmetal");
+		game = new Game ("scrapmetal");
 		game.Objectives.NextObjective ();
 		InitPlayer ();
 	}
