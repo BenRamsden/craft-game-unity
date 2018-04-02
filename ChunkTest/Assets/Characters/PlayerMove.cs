@@ -74,15 +74,34 @@ public class PlayerMove : MonoBehaviour {
         }
     }
 
+	Vector3 collisionRayTransform = new Vector3 (0.0f, -1.0f, 0.0f);
+	Quaternion leftAngle = Quaternion.AngleAxis (-15, new Vector3 (0, 1, 0));
+	Quaternion rightAngle = Quaternion.AngleAxis (15, new Vector3 (0, 1, 0));
+
+	RaycastHit hit;
+
     void BotFixedUpdate() {
         float moveX = 0;// Input.GetAxis ("Horizontal");
         float moveZ = 0.2f;// Input.GetAxis ("Vertical");
 
         MovePlayer(moveX, moveZ);
 
-		RaycastHit hit;
-		if (Physics.Raycast (rb.transform.position + collisionRayTransform, rb.transform.forward, out hit, 3.0f)) {
+		Vector3 rayLeft = leftAngle * transform.forward;
+		Vector3 rayCenter = transform.forward;
+		Vector3 rayRight = rightAngle * transform.forward;
+
+		Vector3 from = rb.transform.position + collisionRayTransform;
+
+		if (Physics.Raycast (from, rayLeft, out hit, 3.0f)) {
 			MoveCamera (1, 0);
+		}
+
+		if (Physics.Raycast (from, rayRight, out hit, 3.0f)) {
+			MoveCamera (-1, 0);
+		}
+
+		if (Physics.Raycast (from, rayCenter, out hit, 3.0f)) {
+			rb.AddForce(Vector3.up*2.0f, ForceMode.Impulse);
 		}
     }
 
@@ -132,9 +151,7 @@ public class PlayerMove : MonoBehaviour {
                 audioSource.PlayOneShot(walkSound);
         }
     }
-
-	Vector3 collisionRayTransform = new Vector3 (0.0f, -1.0f, 0.0f);
-
+				
     void BotUpdate() {
 
     }
