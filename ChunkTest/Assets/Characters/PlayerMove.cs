@@ -176,14 +176,10 @@ public class PlayerMove : MonoBehaviour {
         botPos += collider;
         botPos += forward * 3.0f;
 
-        /*if (cube == null) {
-			cube = GameObject.CreatePrimitive (PrimitiveType.Cube);
-			cube.transform.localScale = new Vector3 (0.1f, 0.1f, 0.1f);
-
-			Physics.IgnoreCollision (cube.GetComponent<Collider> (), GetComponent<Collider> ());
-		}
-			
-		cube.transform.position = botPos;*/
+		GameObject cube = GameObject.CreatePrimitive (PrimitiveType.Cube);
+		cube.transform.localScale = new Vector3 (0.1f, 0.1f, 0.1f);			
+		cube.transform.position = botPos;
+		Physics.IgnoreCollision (cube.GetComponent<Collider> (), GetComponent<Collider> ());
 
         Vector3 chunkPos = HelperMethods.worldPositionToChunkPosition(botPos);
         Vector3 blockPos = HelperMethods.vectorDifference(chunkPos, botPos);
