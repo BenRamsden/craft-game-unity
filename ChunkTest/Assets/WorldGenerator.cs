@@ -49,7 +49,7 @@ public class WorldGenerator : MonoBehaviour {
 		game = new Game ("scrapmetal");
 		game.Objectives.NextObjective ();
 		InitPlayer ();
-	}
+		}
 
     private void InitPlayer() {
         if (ENABLE_MENU) {
@@ -100,6 +100,10 @@ public class WorldGenerator : MonoBehaviour {
 
         generator.secondPass();
 
+		// Temp for detecting object destruction objective event
+		if (bot != null)
+		if (bot.gameObject == null)
+			ObjectiveManager.Instance.ObjectiveCheck ("object_destroy", "Player_Steve(Clone)", 1);
         //generator.waterProcess(centerChunk);
     }
 }

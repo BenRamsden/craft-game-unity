@@ -11,6 +11,10 @@
 					"amount" : 5000
 				},
 				{
+					"category" : "objective_sound",
+					"item" : "well_done"
+				},
+				{
 					"category" : "objective",
 					"item" : "next"
 				}
@@ -25,6 +29,10 @@
 							"category" : "player",
 							"item" : "xp",
 							"amount" : 2000
+						},
+						{
+							"category" : "objective_sound",
+							"item" : "well_done"
 						}
 					],
 					"criteria" : {
@@ -40,7 +48,11 @@
 						{
 							"category" : "inventory",
 							"item" : "FastGrass",
-							"amount" : 64
+							"amount" : 4
+						},
+						{
+							"category" : "objective_sound",
+							"item" : "well_done"
 						}
 					],
 					"criteria" : {
@@ -52,19 +64,33 @@
 			]
 		},
 		{
-			"name" : "get_sand2",
-			"display" : "Collect 20 dtir",
+			"name" : "kill_steve",
+			"display" : "Kill that wandering Steve guy",
+			"ongiven" : [
+				{
+					"category" : "objective_sound",
+					"item" : "fight"
+				}
+			],
 			"oncomplete" : [
 				{
 					"category" : "player",
 					"item" : "xp",
-					"amount" : 2000
+					"amount" : 10000
+				},
+				{
+					"category" : "objective_sound",
+					"item" : "well_done"
+				},
+				{
+					"category" : "objective",
+					"item" : "next"
 				}
 			],
 			"criteria" : {
-				"category" : "inventory",
-				"item" : "FastDirt",
-				"amount" : 20
+				"category" : "object_destroy",
+				"item" : "Player_Steve(Clone)",
+				"amount" : 1
 			}
 		}
 	]

@@ -38,6 +38,7 @@ public class Container {
         int currentIndex = checkIfListFree(item.resourceString);
         if (currentIndex != -1) {
             container[currentIndex].Add(item);
+			ObjectiveManager.Instance.ObjectiveCheck ("inventory", item.resourceString, container[currentIndex].Count);
             return true;
         }
         return false;
@@ -65,8 +66,6 @@ public class Container {
 
             slotItemCounts[i].text = currentSlotSize.ToString();
             slotItemImages[i].material = (Material)Resources.Load(string.Concat("Menu/", materialName));
-
-			ObjectiveManager.Instance.ObjectiveCheck ("inventory", materialName, currentSlotSize);
         }
     }
 

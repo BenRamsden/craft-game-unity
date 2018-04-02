@@ -15,6 +15,8 @@ public class Player {
         this.pg = pg;
 
         gameObject = wg.CreatePlayer(resourceString, position);
+		if (behaviour == Behaviour.Human)
+			gameObject.name = "player";
 
         if (behaviour.Equals(Behaviour.Human)) {
             PlayerMove pm = gameObject.AddComponent<PlayerMove>();
@@ -30,6 +32,6 @@ public class Player {
             //BotMove bm = gameObject.AddComponent<BotMove> ();
             //bm.pg = pg;
         }
-
+		
     }
 }

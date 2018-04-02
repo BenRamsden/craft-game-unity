@@ -2,38 +2,34 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[System.Serializable]
-public class Objective
+namespace Objectives
 {
-	public string name;
-	public string display;
-	public OnComplete[] oncomplete;
-	public Criteria criteria;
-	public Objective[] objectives;
+	[System.Serializable]
+	public class Objective
+	{
+		public string name;
+		public string display;
+		public Details[] ongiven;
+		public Details[] oncomplete;
+		public Details criteria;
+		public Objective[] objectives;
 
-	public bool achieved;
-	public bool isParent;
-}
+		public bool achieved;
+		public bool isParent;
+	}
 
-[System.Serializable]
-public class Criteria
-{
-	public string category;
-	public string item;
-	public int amount;
-	public int amountAchieved;
-}
+	[System.Serializable]
+	public class Details
+	{
+		public string category;
+		public string item;
+		public int amount;
+		public int amountAchieved;
+	}
 
-[System.Serializable]
-public class OnComplete
-{
-	public string category;
-	public string item;
-	public int amount;
-}
-
-[System.Serializable]
-public class Objectives
-{
-	public Objective[] objectives;
+	[System.Serializable]
+	public class Objectives
+	{
+		public Objective[] objectives;
+	}
 }
