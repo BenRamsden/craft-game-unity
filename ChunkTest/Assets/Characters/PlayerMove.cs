@@ -100,7 +100,7 @@ public class PlayerMove : MonoBehaviour {
 			MoveCamera (-1, 0);
 		}
 
-		if (Physics.Raycast (from, rayCenter, out hit, 3.0f)) {
+		if (Physics.Raycast (from, rayCenter, out hit, 1.5f)) {
 			rb.AddForce(Vector3.up*2.0f, ForceMode.Impulse);
 		}
     }
