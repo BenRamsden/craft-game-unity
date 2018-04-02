@@ -65,6 +65,8 @@ public class Container {
 
             slotItemCounts[i].text = currentSlotSize.ToString();
             slotItemImages[i].material = (Material)Resources.Load(string.Concat("Menu/", materialName));
+
+			ObjectiveManager.Instance.ObjectiveCheck ("inventory", materialName, currentSlotSize);
         }
     }
 

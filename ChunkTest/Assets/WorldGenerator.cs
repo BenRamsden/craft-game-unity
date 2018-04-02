@@ -47,7 +47,7 @@ public class WorldGenerator : MonoBehaviour {
 	public void StartGame()
 	{
 		game = new Campaign ("scrapmetal");
-		game.Objectives.Next ();
+		game.Objectives.NextObjective ();
 		InitPlayer ();
 	}
 
@@ -99,11 +99,6 @@ public class WorldGenerator : MonoBehaviour {
         }
 
         generator.secondPass();
-
-		if (Input.GetKeyUp (KeyCode.V))
-			game.Objectives.ObjectiveCheck ("inventory", "grass", ++i);
-		if (Input.GetKeyUp (KeyCode.B))
-			game.Objectives.ObjectiveCheck ("inventory", "sand", ++j);
 
         //generator.waterProcess(centerChunk);
     }

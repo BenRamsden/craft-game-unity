@@ -12,6 +12,7 @@ public class Objective
 	public Objective[] objectives;
 
 	public bool achieved;
+	public bool isParent;
 }
 
 [System.Serializable]

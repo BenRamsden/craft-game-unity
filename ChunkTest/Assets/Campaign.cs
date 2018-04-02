@@ -8,7 +8,7 @@ public class Campaign
 
 	public Campaign(string campaignName)
 	{
-		Objectives = new ObjectiveManager ();
+		Objectives = ObjectiveManager.Instance;
 		Objectives.Load (campaignName);
 	}
 }

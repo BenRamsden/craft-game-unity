@@ -13,17 +13,17 @@
 					"on_complete" : "award xp 2000",
 					"criteria" : {
 						"category" : "inventory",
-						"item" : "grass",
+						"item" : "FastGrass",
 						"amount" : 10
 					}
 				},
 				{
 					"name" : "get_sand",
-					"display" : "Collect 5 sand",
+					"display" : "Collect 5 dirt",
 					"on_complete" : "award xp 2000",
 					"criteria" : {
 						"category" : "inventory",
-						"item" : "sand",
+						"item" : "FastDirt",
 						"amount" : 5
 					}
 				}
@@ -31,11 +31,11 @@
 		},
 		{
 			"name" : "get_sand2",
-			"display" : "Collect 20 sand",
+			"display" : "Collect 20 dtir",
 			"on_complete" : "award xp 3000",
 			"criteria" : {
 				"category" : "inventory",
-				"item" : "sand",
+				"item" : "FastDirt",
 				"amount" : 20
 			}
 		},
@@ -45,7 +45,7 @@
 			"on_complete" : "award xp 3000",
 			"criteria" : {
 				"category" : "inventory",
-				"item" : "grass",
+				"item" : "FastGrass",
 				"amount" : "5"
 			}
 		}
