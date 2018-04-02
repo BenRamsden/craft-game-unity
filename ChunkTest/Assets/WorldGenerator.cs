@@ -82,7 +82,7 @@ public class WorldGenerator : MonoBehaviour {
     public ProceduralGenerator getPGenerator() {
         return generator;
     }
-
+	int i = 0, j = 0;
     // Update is called once per frame
     void Update() {
         Vector3 centerChunk = getCenterChunkPos();
@@ -99,6 +99,11 @@ public class WorldGenerator : MonoBehaviour {
         }
 
         generator.secondPass();
+
+		if (Input.GetKeyUp (KeyCode.V))
+			game.Objectives.ObjectiveCheck ("inventory", "grass", ++i);
+		if (Input.GetKeyUp (KeyCode.B))
+			game.Objectives.ObjectiveCheck ("inventory", "sand", ++j);
 
         //generator.waterProcess(centerChunk);
     }
