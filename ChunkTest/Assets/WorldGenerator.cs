@@ -46,10 +46,10 @@ public class WorldGenerator : MonoBehaviour {
 
 	public void StartGame()
 	{
-		game = new Game ("scrapmetal");
-		game.Objectives.NextObjective ();
+		Game.Instance.Load("scrapmetal");
+		ObjectiveManager.Instance.NextObjective ();
 		InitPlayer ();
-		}
+	}
 
     private void InitPlayer() {
         if (ENABLE_MENU) {

@@ -83,8 +83,8 @@
 					"item" : "well_done"
 				},
 				{
-					"category" : "objective",
-					"item" : "next"
+					"category" : "game",
+					"item" : "end"
 				}
 			],
 			"criteria" : {

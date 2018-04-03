@@ -6,6 +6,9 @@ using UnityEngine.UI;
 
 using Objectives;
 
+/**
+ * A class to manage the game objectives
+ */
 public class ObjectiveManager : MonoBehaviour
 {
 	private Objective[] objectives;
@@ -28,8 +31,15 @@ public class ObjectiveManager : MonoBehaviour
 		{
 			Instance = this;
 			DontDestroyOnLoad (gameObject);
-		} else
-			Destroy (gameObject);
+		}
+	}
+
+	/**
+	 * Resets the objective manager
+	 */
+	public void Reset()
+	{
+		Instance = new ObjectiveManager ();
 	}
 
 	public ObjectiveManager()
