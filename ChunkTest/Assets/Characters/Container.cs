@@ -49,6 +49,13 @@ public class Container {
         return false;
     }
 
+	public Item getItem(int slot){
+		if (container[slot].Count > 0) {
+			return container [slot] [0];
+		}
+		return null;
+	}
+
     public string removeItem(int slot) {
         int currentSlotSize = container[slot].Count;
         List<Item> currentSlot = container[slot];

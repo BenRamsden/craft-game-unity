@@ -120,6 +120,15 @@ public class Inventory : MonoBehaviour {
 				}
 				oldContainer.removeItemsAtIndex(oldContainerIndex);
 			}
+				
+			if (newContainer != null) {
+				if (newContainer == craftingMatrix) {
+					Item newItem = CraftingHandler.craftItem(craftingMatrix);
+					if (newItem != null) {
+						craftingProduce.addItem(newItem);
+					}
+				}
+			}
 		}
 	}
 }
