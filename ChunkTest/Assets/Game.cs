@@ -20,7 +20,7 @@ public class Game : MonoBehaviour
 		ObjectiveManager.Instance.Reset ();
 	}
 
-	public void Load(string campaignName)
+	public void LoadCampaign(string campaignName)
 	{
 		ObjectiveManager.Instance.Load (campaignName);
 

@@ -161,7 +161,7 @@ public class ObjectiveManager : MonoBehaviour
 	 */
 	public void ObjectiveCheck(string category, string item, int achieved)
 	{
-		if (item == "DefaultItem")
+		if (item == "DefaultItem" || activeObjectives == null)
 			return;
 
 		int iterationCount = 0; // Used to check if all objectives have been met. 0 = all achieved
