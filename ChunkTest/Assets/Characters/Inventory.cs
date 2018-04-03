@@ -73,6 +73,7 @@ public class Inventory : MonoBehaviour {
 		Block newBlock = new Block();
 		bool isBeingDropped = false;
 		Container oldContainer = null, newContainer = null;
+		int oldContainerIndex = -1, newContainerIndex = -1;
 
 		if (item != null) {
 			newBlock.resourceString = item.GetComponent<Image>().material.name;
@@ -96,21 +97,19 @@ public class Inventory : MonoBehaviour {
 				isBeingDropped = true;
 			}
 
-			//if(newContainer.name != oldContainer.name){
-			Debug.Log("----------");
-			Debug.Log(oldContainer.name);
-			Debug.Log(newContainer.name);
-				int containerIndex = item.transform.GetSiblingIndex();
-				for (int i = 0; i < numOfItems; i++) {
-					if(!isBeingDropped){
-						newContainer.addItem(newBlock);
-					}
-					oldContainer.removeItem(containerIndex);
-				}
-				if (isBeingDropped) {
+			oldContainerIndex = item.transform.GetSiblingIndex();
+			if (newContainer != null) {
+				newContainerIndex = newContainer.findSlotThatIsnt(Input.mousePosition, oldContainerIndex);
+			}
+
+			if (newContainerIndex != -1) {
+				if (!isBeingDropped) {
+					newContainer.addItemsAtIndex(newBlock, numOfItems, newContainerIndex);
+				} else {
 					Debug.Log ("Item Dropped");
 				}
-			//}
+				oldContainer.removeItemsAtIndex(oldContainerIndex);
+			}
 		}
 	}
 }

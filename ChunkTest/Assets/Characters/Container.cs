@@ -78,6 +78,31 @@ public class Container {
 		return selfRef.transform as RectTransform;
 	}
 
+	public int findSlotThatIsnt(Vector3 mousePosition, int oldContainerIndex){
+		foreach(Image img in slotItemImages){
+			if (RectTransformUtility.RectangleContainsScreenPoint(img.rectTransform, mousePosition)) {
+				if(img.transform.GetSiblingIndex() != oldContainerIndex){
+					return img.transform.GetSiblingIndex();
+				}
+			}
+		}
+		return -1;
+	}
+
+	public void addItemsAtIndex(Item item, int numOfItems, int index){
+		if (container [index].Count < 1) {
+			for (int i = 0; i < numOfItems; i++) {
+				container[index].Add(item);
+			}
+		}
+	}
+
+	public void removeItemsAtIndex(int index){
+		while(container[index].Count > 0){
+			container[index].RemoveAt(container[index].Count-1);
+		}
+	}
+
 	public bool toggle(){
 		selfRef.SetActive(!selfRef.activeSelf);
 		return selfRef.activeSelf;
