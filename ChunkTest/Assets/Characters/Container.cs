@@ -44,6 +44,7 @@ public class Container {
         int currentIndex = checkIfListFree(item.resourceString);
         if (currentIndex != -1) {
             container[currentIndex].Add(item);
+			ObjectiveManager.Instance.ObjectiveCheck ("inventory", item.resourceString, container[currentIndex].Count);
             return true;
         }
         return false;

@@ -16,6 +16,9 @@ public class Inventory : MonoBehaviour {
 	private int selectedSlot = 5;
 
 	public void Start(){
+		// Add a event to allow objectives to add to the inventory on objective omplete
+		ObjectiveManager.Instance.ObjectiveCompleteHandlers.Add ("inventory", objectiveComplete);
+
 		activeBar = new Container(6, containerNames.activeBar.ToString());
 		mainBag = new Container(20, containerNames.mainBag.ToString());
 		craftingMatrix = new Container (9, containerNames.craftingMatrix.ToString());
@@ -130,5 +133,18 @@ public class Inventory : MonoBehaviour {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Objective complete callback to add item to the inventory
+	 * @param string item The item name
+	 * @param int amount The amount to add
+	 */
+	private void objectiveComplete(string item, int amount)
+	{
+		Block b = new Block ();
+		b.resourceString = item;
+		for(int i = 0; i < amount; i++)
+			addItem (b);
 	}
 }

@@ -21,14 +21,17 @@ public class WorldGenerator : MonoBehaviour {
     private GameObject canvas;
     private GameObject camera;
 
+	private GameObject objectivePanel;
+
+	private Game game;
+
 
     // Use this for initialization
     void Start() {
-        generator = new ProceduralGenerator();
+		CreateGenerator ();
 
-        seed = new SeedGenerator("a totally random seed", 7);
-
-        origin = generator.initalise(CHUNK_SIZE, seed);
+		objectivePanel = GameObject.Find ("ObjectiveCanvas");
+		objectivePanel.SetActive (false);
 
         if (ENABLE_MENU) {
 			inventoryMenu = GameObject.Find ("inventoryMenu");
@@ -45,6 +48,46 @@ public class WorldGenerator : MonoBehaviour {
         //Loading
         //}
     }
+
+	public void StartGame(string seed = "", bool creative = true)
+	{
+		if (!creative)
+		{
+			Game.Instance.LoadCampaign ("scrapmetal");
+			objectivePanel.SetActive (true);
+
+			ObjectiveManager.Instance.NextObjective ();
+		}
+
+		CreateGenerator (seed);
+
+		InitPlayer ();
+	}
+
+	private void CreateGenerator(string seed = "")
+	{
+		generator = new ProceduralGenerator();
+
+		if (seed == "")
+		{
+			// Generate a random seed
+			int randomSeed = (int)(System.DateTime.UtcNow - new System.DateTime (1970, 1, 1, 0, 0, 0, System.DateTimeKind.Utc)).TotalSeconds;
+			Random.InitState (randomSeed);
+			randomSeed *= Random.Range (-1000, 1000);
+			randomSeed += Random.Range ((int)-Mathf.Sqrt (Mathf.Sqrt (randomSeed)), (int)Mathf.Sqrt (Mathf.Sqrt (randomSeed * Random.Range (2, 5))));
+
+			this.seed = new SeedGenerator (randomSeed, randomSeed.ToString ().Length / 2);
+		}
+		else
+		{
+			// If the seed length < 7, increase it. (It makes the generator better)
+			if (seed.Length < 7)
+				seed = seed + seed + seed + seed + seed;
+			this.seed = new SeedGenerator (seed, seed.Length / 2);
+		}
+
+		origin = generator.initalise(CHUNK_SIZE, this.seed);
+	}
 
     public void InitPlayer() {
         if (ENABLE_MENU) {
@@ -96,6 +139,11 @@ public class WorldGenerator : MonoBehaviour {
         }
 
         generator.secondPass();
+
+		// Temp for detecting object destruction objective event
+		if (bot != null)
+		if (bot.gameObject == null)
+			ObjectiveManager.Instance.ObjectiveCheck ("object_destroy", "Player_Steve(Clone)", 1);
 
         //generator.waterProcess(centerChunk);
     }

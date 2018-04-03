@@ -10,7 +10,7 @@ public class PlayerMove : MonoBehaviour {
     public Rigidbody rb;
     private Animator animator;
 
-    public readonly Vector3 jump = new Vector3(0.0f, 2.0f, 0.0f);
+    public readonly Vector3 jump = new Vector3(0.0f, 1f, 0.0f);
 
     public float mouseSensitivity = 100.0f;
     public float moveSpeed = 20f;
