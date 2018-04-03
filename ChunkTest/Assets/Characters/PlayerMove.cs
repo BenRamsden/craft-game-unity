@@ -74,16 +74,37 @@ public class PlayerMove : MonoBehaviour {
         }
     }
 
+	Vector3 collisionRayTransform = new Vector3 (0.0f, -1.0f, 0.0f);
+	Quaternion leftAngle = Quaternion.AngleAxis (-15, new Vector3 (0, 1, 0));
+	Quaternion rightAngle = Quaternion.AngleAxis (15, new Vector3 (0, 1, 0));
+
+	RaycastHit hit;
+
     void BotFixedUpdate() {
-        if (AvoidCollision(frontCollider)) {
-            Jump();
-        }
+		float moveX = 0;// Input.GetAxis ("Horizontal");
+		float moveZ = 0.2f;// Input.GetAxis ("Vertical");
 
-        float moveX = 0;// Input.GetAxis ("Horizontal");
-        float moveZ = 0.2f;// Input.GetAxis ("Vertical");
+		MovePlayer(moveX, moveZ);
 
-        MovePlayer(moveX, moveZ);
+		Vector3 rayLeft = leftAngle * transform.forward;
+		Vector3 rayCenter = transform.forward;
+		Vector3 rayRight = rightAngle * transform.forward;
+
+		Vector3 from = rb.transform.position + collisionRayTransform;
+
+		if (Physics.Raycast (from, rayLeft, out hit, 3.0f)) {
+			MoveCamera (1, 0);
+		}
+
+		if (Physics.Raycast (from, rayRight, out hit, 3.0f)) {
+			MoveCamera (-1, 0);
+		}
+
+		if (Physics.Raycast (from, rayCenter, out hit, 1.5f)) {
+			rb.AddForce(Vector3.up*2.0f, ForceMode.Impulse);
+		}
     }
+
     float moveX;
     float moveZ;
     Vector3 movement = Vector3.zero;
@@ -130,13 +151,9 @@ public class PlayerMove : MonoBehaviour {
                 audioSource.PlayOneShot(walkSound);
         }
     }
-
+				
     void BotUpdate() {
-        // Rotating player with mouse
-        float mouseX = 0;// Input.GetAxis("Mouse X");
-        float mouseY = 0;// -Input.GetAxis("Mouse Y"); // "-" because otherwise it is inverted up and down 
 
-        MoveCamera(mouseX, mouseY);
     }
 
     bool IsGrounded() {
@@ -165,43 +182,6 @@ public class PlayerMove : MonoBehaviour {
     void OnTriggerExit(Collider trigger) {
         if (trigger.gameObject.name == "WaterBlock")
             isInWater = false;
-    }
-
-    /* Methods below imported from BotMove */
-
-    bool AvoidCollision(Vector3 collider) {
-        Vector3 forward = transform.forward;
-
-        Vector3 botPos = this.gameObject.transform.position;
-        botPos += collider;
-        botPos += forward * 3.0f;
-
-        /*if (cube == null) {
-			cube = GameObject.CreatePrimitive (PrimitiveType.Cube);
-			cube.transform.localScale = new Vector3 (0.1f, 0.1f, 0.1f);
-
-			Physics.IgnoreCollision (cube.GetComponent<Collider> (), GetComponent<Collider> ());
-		}
-			
-		cube.transform.position = botPos;*/
-
-        Vector3 chunkPos = HelperMethods.worldPositionToChunkPosition(botPos);
-        Vector3 blockPos = HelperMethods.vectorDifference(chunkPos, botPos);
-
-        Chunk chunk = pg.getChunk(chunkPos);
-
-        if (chunk == null)
-            return false;
-
-        Block block = chunk.getBlock(blockPos);
-
-        if (block == null)
-            return false;
-
-        if (block.resourceString == "WaterBlock")
-            return false;
-
-        return true;
     }
 
     void Jump() {
@@ -242,15 +222,6 @@ public class PlayerMove : MonoBehaviour {
         rotX += mouseY * mouseSensitivity * Time.deltaTime;
         //stop the player being able to look up/down too much
         rotX = Mathf.Clamp(rotX, -x_AxisRotateClamp, x_AxisRotateClamp);
-
-        if (behaviour.Equals(Player.Behaviour.Bot)) {
-            if (AvoidCollision(leftCollider)) {
-                rotYHead += 45;
-            } else if (AvoidCollision(rightCollider)) {
-                rotYHead -= 45;
-            }
-        }
-
 
         //set up rotations for the torso and head. allow head to look up and down but not torso.
         float diff = (rotYHead - rotY);
