@@ -7,10 +7,11 @@ public class Inventory : MonoBehaviour {
 	private Container mainBag;
 	private Container activeBar;
 	private Container craftingMatrix;
+	private Container craftingProduce;
 
 	public bool isToggled { get; set;}
 
-	enum containerNames {activeBar, mainBag, craftingMatrix};
+	enum containerNames {activeBar, mainBag, craftingMatrix, craftingProduce};
 
 	private int selectedSlot = 5;
 
@@ -18,14 +19,15 @@ public class Inventory : MonoBehaviour {
 		activeBar = new Container(6, containerNames.activeBar.ToString());
 		mainBag = new Container(20, containerNames.mainBag.ToString());
 		craftingMatrix = new Container (9, containerNames.craftingMatrix.ToString());
+		craftingProduce = new Container (1, containerNames.craftingProduce.ToString ());
 
 		mainBag.toggle();
 		craftingMatrix.toggle();
+		craftingProduce.toggle();
 		isToggled = false;
 	}
 
 	public void Delete(){
-
 	}
 
 	public bool addItem(Item item){
@@ -40,6 +42,7 @@ public class Inventory : MonoBehaviour {
 	public void toggleBag(){
 		isToggled = mainBag.toggle();
 		craftingMatrix.toggle();
+		craftingProduce.toggle();
 	}
 
 	public string removeItem(){
@@ -62,6 +65,10 @@ public class Inventory : MonoBehaviour {
 		if (craftingMatrix != null) {
 			craftingMatrix.setUI();
 		}
+
+		if (craftingProduce != null) {
+			craftingProduce.setUI();
+		}
 	}
 
 	GameObject item;
@@ -73,6 +80,7 @@ public class Inventory : MonoBehaviour {
 		Block newBlock = new Block();
 		bool isBeingDropped = false;
 		Container oldContainer = null, newContainer = null;
+		int oldContainerIndex = -1, newContainerIndex = -1;
 
 		if (item != null) {
 			newBlock.resourceString = item.GetComponent<Image>().material.name;
@@ -83,9 +91,12 @@ public class Inventory : MonoBehaviour {
 				oldContainer = activeBar;
 			} else if (oldContainerName == containerNames.mainBag.ToString ()) {
 				oldContainer = mainBag;
-			} else {
+			} else if (oldContainerName == containerNames.craftingMatrix.ToString ()) {
 				oldContainer = craftingMatrix;
+			} else {
+				oldContainer = craftingProduce;
 			}
+
 			if (RectTransformUtility.RectangleContainsScreenPoint (craftingMatrix.getBoundary (), Input.mousePosition)) {
 				newContainer = craftingMatrix;
 			} else if (RectTransformUtility.RectangleContainsScreenPoint (mainBag.getBoundary (), Input.mousePosition)) {
@@ -96,21 +107,28 @@ public class Inventory : MonoBehaviour {
 				isBeingDropped = true;
 			}
 
-			//if(newContainer.name != oldContainer.name){
-			Debug.Log("----------");
-			Debug.Log(oldContainer.name);
-			Debug.Log(newContainer.name);
-				int containerIndex = item.transform.GetSiblingIndex();
-				for (int i = 0; i < numOfItems; i++) {
-					if(!isBeingDropped){
-						newContainer.addItem(newBlock);
-					}
-					oldContainer.removeItem(containerIndex);
-				}
-				if (isBeingDropped) {
+			oldContainerIndex = item.transform.GetSiblingIndex();
+			if (newContainer != null) {
+				newContainerIndex = newContainer.findSlotThatIsnt(Input.mousePosition, oldContainerIndex);
+			}
+
+			if (newContainerIndex != -1) {
+				if (!isBeingDropped) {
+					newContainer.addItemsAtIndex(newBlock, numOfItems, newContainerIndex);
+				} else {
 					Debug.Log ("Item Dropped");
 				}
-			//}
+				oldContainer.removeItemsAtIndex(oldContainerIndex);
+			}
+				
+			if (newContainer != null) {
+				if (newContainer == craftingMatrix) {
+					Item newItem = CraftingHandler.craftItem(craftingMatrix);
+					if (newItem != null) {
+						craftingProduce.addItem(newItem);
+					}
+				}
+			}
 		}
 	}
 }
