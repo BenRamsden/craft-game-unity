@@ -1,0 +1,22 @@
+﻿{
+	"recipes" : [
+		{
+			"name" : "WoodBlock",
+			"amount" : 4,
+			"recipe" : {
+			"slot1" : "empty",		"slot2" : "empty",		"slot3" : "empty",
+			"slot4" : "empty",		"slot5" : "LogBlock",	"slot6" : "empty", 
+			"slot7" : "empty",		"slot8" : "empty",		"slot9" : "empty"
+			}
+		},
+		{
+			"name" : "LogBlock",
+			"amount" : 1,
+			"recipe" : {
+			"slot1" : "empty",		"slot2" : "empty",		"slot3" : "empty",
+			"slot4" : "empty",		"slot5" : "WoodBlock",	"slot6" : "WoodBlock", 
+			"slot7" : "empty",		"slot8" : "WoodBlock",	"slot9" : "WoodBlock"
+			}
+		}
+	]
+}
