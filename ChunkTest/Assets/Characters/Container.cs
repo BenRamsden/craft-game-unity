@@ -98,9 +98,15 @@ public class Container {
 	}
 
 	public void addItemsAtIndex(Item item, int numOfItems, int index){
+		int i = 0;
 		if (container [index].Count < 1) {
-			for (int i = 0; i < numOfItems; i++) {
-				container[index].Add(item);
+			for (i = 0; i < numOfItems; i++) {
+				container [index].Add (item);
+			}
+		} else if (container [index] [0].resourceString == item.resourceString) {
+			while (container [index].Count <= 64 && i < numOfItems) {
+				i++;
+				container [index].Add (item);
 			}
 		}
 	}
