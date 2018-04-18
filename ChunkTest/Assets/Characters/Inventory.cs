@@ -9,6 +9,8 @@ public class Inventory : MonoBehaviour {
 	private Container craftingMatrix;
 	private Container craftingProduce;
 
+	private CraftingHandler ch;
+
 	public bool isToggled { get; set;}
 
 	enum containerNames {activeBar, mainBag, craftingMatrix, craftingProduce};
@@ -28,6 +30,9 @@ public class Inventory : MonoBehaviour {
 		craftingMatrix.toggle();
 		craftingProduce.toggle();
 		isToggled = false;
+
+		ch = new CraftingHandler();
+		ch.initialise();
 	}
 
 	public void Delete(){
@@ -126,9 +131,11 @@ public class Inventory : MonoBehaviour {
 				
 			if (newContainer != null) {
 				if (newContainer == craftingMatrix) {
-					Item newItem = CraftingHandler.craftItem(craftingMatrix);
-					if (newItem != null) {
-						craftingProduce.addItem(newItem);
+					Item[] newItems = ch.craftItem(craftingMatrix);
+					if (newItems != null) {
+						foreach (Item newItem in newItems) {
+							craftingProduce.addItem(newItem);
+						}
 					}
 				}
 			}
