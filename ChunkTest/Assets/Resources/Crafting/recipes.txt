@@ -1,0 +1,22 @@
+﻿{
+	"recipes" : [
+		{
+			"name" : "WoodBlock",
+			"amount" : 4,
+			"recipe" : [
+			"DefaultItem",	"DefaultItem",	"DefaultItem",
+			"DefaultItem",	"LogBlock",	"DefaultItem",
+			"DefaultItem",	"DefaultItem",	"DefaultItem"
+			]
+		},
+		{
+			"name" : "LogBlock",
+			"amount" : 1,
+			"recipe" : [
+			"DefaultItem",	"DefaultItem",	"DefaultItem",
+			"DefaultItem",	"WoodBlock",	"WoodBlock", 
+			"DefaultItem",	"WoodBlock",	"WoodBlock"
+			]
+		}
+	]
+}

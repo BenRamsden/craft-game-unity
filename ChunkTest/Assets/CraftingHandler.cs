@@ -2,20 +2,69 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class CraftingHandler{
+using Recipe;
 
-	public static Item craftItem(Container matrix){
-		Block block = new Block();
-		Debug.Log ("1");
-		if (matrix.getItem (0) != null){
-			Debug.Log ("2");
-			Debug.Log (matrix.getItem (0).resourceString);
-			if(matrix.getItem(0).resourceString == "LogBlock"){
-				Debug.Log ("3");
-				block.resourceString = "WoodBlock";
-				return block;
+public class CraftingHandler{
+	public Recipe.Recipe[] craftingRecipes;
+	int numberOfRecipes;
+
+	public bool initialise(){
+		var recipes = Resources.Load("Crafting/recipes") as TextAsset;
+		if (recipes == null)
+			return false;
+
+		Recipe.Recipes tmp = JsonUtility.FromJson<Recipe.Recipes>(recipes.text);
+		craftingRecipes = tmp.recipes;
+
+		numberOfRecipes = craftingRecipes.Length;
+		return true;
+	}
+
+	public Item[] craftItem(Container matrix){
+		Block[] blocks = null;
+		bool[] possible = new bool[numberOfRecipes];
+		for(int k = 0; k < numberOfRecipes; k++){
+			possible [k] = false;
+		}
+
+		Recipe.Recipe currentRecipe;
+		for (int i = 0; i < numberOfRecipes; i++) {
+			//This Recipe
+			currentRecipe = craftingRecipes[i];
+			for(int j = 0; j < 9; j++){
+				if (matrix.getItem (j) == null && currentRecipe.recipe[j] != "DefaultItem") {
+					possible [i] = false;
+					break;
+				}
+
+				if(matrix.getItem(j) != null){
+					if (currentRecipe.recipe[j] == matrix.getItem (j).resourceString) {
+						possible [i] = true;
+					} else {
+						possible [i] = false;
+						break;
+					}
+				}
 			}
 		}
-		return null;
+
+		for(int l = 0; l < numberOfRecipes; l++){
+			if (possible [l]) {
+				blocks = new Block[craftingRecipes[l].amount];
+				for(int m = 0; m < blocks.Length; m++){
+					blocks[m] = new Block();
+					blocks[m].resourceString = craftingRecipes[l].name;
+				}
+				//Consume resources
+				for (int n = 0; n < 9; n++) {
+					if (craftingRecipes [l].recipe [n] != "DefaultItem") {
+						matrix.removeItem(n);
+					}
+				}
+				break;
+			}
+		}
+
+		return blocks;
 	}
 }
