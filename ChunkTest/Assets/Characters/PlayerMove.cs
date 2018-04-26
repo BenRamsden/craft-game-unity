@@ -43,11 +43,13 @@ public class PlayerMove : MonoBehaviour {
         swimSound = (AudioClip)Resources.Load("Sounds/swim");
         audioSource = gameObject.AddComponent<AudioSource>();
 
-        if (behaviour.Equals(Player.Behaviour.Human)) {
-            GameObject head = transform.GetChild(0).gameObject;
-            head.AddComponent<Camera>();
-            head.AddComponent<AudioListener>();
-        }
+		if (behaviour.Equals (Player.Behaviour.Human)) {
+			Camera cam = transform.GetComponentInChildren<Camera> ();
+			cam.enabled = true;
+		} else {
+			AudioListener al = transform.GetComponentInChildren<AudioListener> ();
+			al.enabled = false;
+		}
     }
 
     void Update() {
