@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class ProceduralGenerator : MonoBehaviour {
-    private static readonly int MAP_SIZE = 10;
+	public int MAP_SIZE {get; set;}
+
     private int chunkSize;
     private Vector3 startOrigin;
     public SeedGenerator Seed;
@@ -18,6 +19,7 @@ public class ProceduralGenerator : MonoBehaviour {
 	 * @return Vector3 Returns the starting origin
 	 */
     public Vector3 initalise(int size, SeedGenerator seed) {
+		this.MAP_SIZE = 10;
         this.Seed = seed;
         Random.InitState(seed.ChunkSeed);
 

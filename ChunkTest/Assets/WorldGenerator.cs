@@ -125,6 +125,23 @@ public class WorldGenerator : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
+		
+		float fps = 1/Time.smoothDeltaTime;
+		int newMapSize = generator.MAP_SIZE;
+
+		if (fps < 30) {
+			newMapSize -= 1;
+		} else if (fps > 60) {
+			newMapSize += 1;
+		}
+
+		newMapSize = Mathf.Clamp (newMapSize, 5, 15);
+
+		if (generator.MAP_SIZE != newMapSize) {
+			generator.MAP_SIZE = newMapSize;
+			Debug.Log ("Map Size Set " + newMapSize);
+		}
+
         Vector3 centerChunk = getCenterChunkPos();
 
         while (generator.garbageCollect(centerChunk)) {
