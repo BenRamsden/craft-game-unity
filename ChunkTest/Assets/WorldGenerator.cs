@@ -28,6 +28,8 @@ public class WorldGenerator : MonoBehaviour {
 
     // Use this for initialization
     void Start() {
+		generator = new ProceduralGenerator();
+
 		CreateGenerator ();
 
 		objectivePanel = GameObject.Find ("ObjectiveCanvas");
@@ -66,8 +68,6 @@ public class WorldGenerator : MonoBehaviour {
 
 	private void CreateGenerator(string seed = "")
 	{
-		generator = new ProceduralGenerator();
-
 		if (seed == "")
 		{
 			// Generate a random seed
