@@ -6,6 +6,11 @@ using UnityEngine.EventSystems;
 public class ItemDragHandler : MonoBehaviour, IDragHandler, IEndDragHandler{
 	Vector3 originalPosition;
 	bool dragStart = false;
+
+	/// <summary>
+	/// Event listener for beginning to drag an item in the inventory.
+	/// </summary>
+	/// <param name="eventData">Event data.</param>
 	public void OnDrag(PointerEventData eventData){
 		if (!dragStart) {
 			originalPosition = transform.localPosition;
@@ -15,6 +20,10 @@ public class ItemDragHandler : MonoBehaviour, IDragHandler, IEndDragHandler{
 		GameObject.Find("Main_Character").GetComponent<Inventory>().dragEnd(this.gameObject);
 	}
 
+	/// <summary>
+	/// Event listener for ending the drag of an item in the inventory.
+	/// </summary>
+	/// <param name="eventData">Event data.</param>
 	public void OnEndDrag(PointerEventData eventData){
 		transform.localPosition = originalPosition;
 		dragStart = false;

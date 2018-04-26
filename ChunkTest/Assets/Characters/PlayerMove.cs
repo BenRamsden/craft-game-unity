@@ -6,7 +6,6 @@ public class PlayerMove : MonoBehaviour {
 
     public ProceduralGenerator pg;
     public Player.Behaviour behaviour;
-
     public Rigidbody rb;
     private Animator animator;
 
@@ -52,6 +51,7 @@ public class PlayerMove : MonoBehaviour {
 		}
     }
 
+	// Update is called once per frame
     void Update() {
         if (behaviour.Equals(Player.Behaviour.Human)) {
             PlayerUpdate();
@@ -60,7 +60,7 @@ public class PlayerMove : MonoBehaviour {
         }
     }
 
-    /** Moving player using unity physics */
+	// FixedUpdate is called once per tick
     void FixedUpdate() {
         if (behaviour.Equals(Player.Behaviour.Human)) {
             PlayerFixedUpdate();
@@ -69,7 +69,10 @@ public class PlayerMove : MonoBehaviour {
         }
     }
 
-    void PlayerFixedUpdate() {
+	/// <summary>
+	/// Handles player movement updates.
+	/// </summary>
+    private void PlayerFixedUpdate() {
         rb.transform.Translate(movement * moveSpeed * Time.deltaTime);
         if (IsGrounded()) {
             movement.y = 0;
@@ -82,7 +85,10 @@ public class PlayerMove : MonoBehaviour {
 
 	RaycastHit hit;
 
-    void BotFixedUpdate() {
+	/// <summary>
+	/// Handles bot movement updates.
+	/// </summary>
+    private void BotFixedUpdate() {
 		float moveX = 0;// Input.GetAxis ("Horizontal");
 		float moveZ = 0.2f;// Input.GetAxis ("Vertical");
 
@@ -111,7 +117,10 @@ public class PlayerMove : MonoBehaviour {
     float moveZ;
     Vector3 movement = Vector3.zero;
 
-    void PlayerUpdate() {
+	/// <summary>
+	/// Handles how to move the player model based on user input.
+	/// </summary>
+    public void PlayerUpdate() {
 		if (GetComponent<Inventory> ().isToggled) {
 			Cursor.lockState = CursorLockMode.None;
 			return;
@@ -130,7 +139,7 @@ public class PlayerMove : MonoBehaviour {
         float mouseY = -Input.GetAxis("Mouse Y"); // "-" because otherwise it is inverted up and down
         MoveCamera(mouseX, mouseY);
 
-        //player jumping code
+        // Player jumping code
         if (IsGrounded()) {
             animator.SetBool("isJumping", false);
             if (Input.GetKeyDown(KeyCode.Space)) {
@@ -138,7 +147,7 @@ public class PlayerMove : MonoBehaviour {
             }
         }
 
-        //check for which type of movement for appropiate animation
+        // Check for which type of movement for appropiate animation
         if (moveX != 0 || moveZ != 0) {
             animator.SetBool("isMoving", true);
         } else {
@@ -153,12 +162,12 @@ public class PlayerMove : MonoBehaviour {
                 audioSource.PlayOneShot(walkSound);
         }
     }
-				
-    void BotUpdate() {
 
-    }
-
-    bool IsGrounded() {
+	/// <summary>
+	/// Determines whether the player is grounded.
+	/// </summary>
+	/// <returns><c>true</c> if this instance is grounded; otherwise, <c>false</c>.</returns>
+    public bool IsGrounded() {
         RaycastHit hit;
         if (Physics.Raycast(rb.transform.position, -Vector3.up, out hit, 1.15f)) {
             return true;
@@ -166,27 +175,36 @@ public class PlayerMove : MonoBehaviour {
         return false;
     }
 
-
-    void OnCollisionEnter(Collision collision) {
-        // Get the walk sound from the collided block
+	/// <summary>
+	/// Listens for collisions with blocks and plays the corresponding sound.
+	/// </summary>
+	/// <param name="collision">Collision.</param>
+    public void OnCollisionEnter(Collision collision) {
         walkSound = collision.gameObject.GetComponent<BlockProperties>().PlayerWalkSound;
     }
 
-    /**
-	 * Water blocks are triggers, check whether we are in water
-	 */
-
-    void OnTriggerStay(Collider trigger) {
+	/// <summary>
+	/// Checks whether player has entered water.
+	/// </summary>
+	/// <param name="trigger">Trigger.</param>
+    public void OnTriggerStay(Collider trigger) {
         if (trigger.gameObject.name == "WaterBlock")
             isInWater = true;
     }
 
-    void OnTriggerExit(Collider trigger) {
+	/// <summary>
+	/// Checks whether player has exited water.
+	/// </summary>
+	/// <param name="trigger">Trigger.</param>
+    public void OnTriggerExit(Collider trigger) {
         if (trigger.gameObject.name == "WaterBlock")
             isInWater = false;
     }
 
-    void Jump() {
+	/// <summary>
+	/// Handle the player jumping.
+	/// </summary>
+    public void Jump() {
         movement.y = jump.y;
         //rb.AddForce(jump, ForceMode.Impulse);
         animator.SetBool("isJumping", true);
@@ -204,6 +222,11 @@ public class PlayerMove : MonoBehaviour {
         audioSource.PlayOneShot(jumpSound);
     }
 
+	/// <summary>
+	/// Moves the player on the x-z plane.
+	/// </summary>
+	/// <param name="moveX">Move x.</param>
+	/// <param name="moveZ">Move z.</param>
     void MovePlayer(float moveX, float moveZ) {
         //float move
         Vector3 movement = new Vector3(moveX, 0.0f, moveZ);
@@ -219,6 +242,12 @@ public class PlayerMove : MonoBehaviour {
     }
 
     private float rotY, rotYHead, rotX = 0.0f;
+
+	/// <summary>
+	/// Moves the camera.
+	/// </summary>
+	/// <param name="mouseX">Mouse x.</param>
+	/// <param name="mouseY">Mouse y.</param>
     void MoveCamera(float mouseX, float mouseY) {
         rotYHead += mouseX * mouseSensitivity * Time.deltaTime;
         rotX += mouseY * mouseSensitivity * Time.deltaTime;

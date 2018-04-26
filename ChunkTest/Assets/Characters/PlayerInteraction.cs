@@ -17,7 +17,7 @@ public class PlayerInteraction : MonoBehaviour {
 	Vector3 rayOrigin;
 	int timer = 10, currentActiveItem = 6;
 
-    // Use this for initialization
+	// Use this for initialization
     void Start () {
 		rb = GetComponent<Rigidbody>();
 		animator = GetComponent<Animator> ();
@@ -25,15 +25,15 @@ public class PlayerInteraction : MonoBehaviour {
 		inventory = GetComponent<Inventory>();
 	}
 
+	// FixedUpdate is called once per tick
 	void FixedUpdate() {
 		if (camera == null) {
 			return;
 		}
-
 		rayOrigin = camera.ViewportToWorldPoint (new Vector3(.5f,.5f,0));
 		if (Physics.Raycast (rayOrigin, camera.transform.forward, out hit, 100)) {
 			currentObject = hit.collider.gameObject;
-		} 
+		}
     }
 
 	// Update is called once per frame
@@ -87,7 +87,11 @@ public class PlayerInteraction : MonoBehaviour {
 		}
 	}
 
-	void OnCollisionEnter(Collision col){
+	/// <summary>
+	/// On collision with a loose block, adds that block to the inventory.
+	/// </summary>
+	/// <param name="col">Collision data.</param>
+	public void OnCollisionEnter(Collision col){
 		if (col.gameObject.GetComponent<Rigidbody>() != null) {
 			Block newBlock = new Block();
 			newBlock.resourceString = col.gameObject.tag;
@@ -100,6 +104,9 @@ public class PlayerInteraction : MonoBehaviour {
 		}
 	}
 
+	/// <summary>
+	/// Interacts the with block.
+	/// </summary>
 	private void interactWithBlock(){
 		animator.ResetTrigger("Interact");
 		animator.SetTrigger("Interact");
@@ -122,6 +129,12 @@ public class PlayerInteraction : MonoBehaviour {
 		}
 	}
 
+	/// <summary>
+	/// Draws the adjacent blocks.
+	/// </summary>
+	/// <param name="x">The x coordinate.</param>
+	/// <param name="y">The y coordinate.</param>
+	/// <param name="z">The z coordinate.</param>
 	private void drawAdjacentBlock(float x, float y, float z) {
 		Vector3 deletedPos = new Vector3 (x, y, z);
 		Vector3 chunkPos = HelperMethods.worldPositionToChunkPosition (deletedPos);
@@ -140,6 +153,9 @@ public class PlayerInteraction : MonoBehaviour {
 		block.draw ();
 	}
 
+	/// <summary>
+	/// Places a block above the currently looked-at block.
+	/// </summary>
 	private void placeBlock(){
 		animator.ResetTrigger("Interact");
 		animator.SetTrigger("Interact");

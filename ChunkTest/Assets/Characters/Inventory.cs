@@ -17,8 +17,9 @@ public class Inventory : MonoBehaviour {
 
 	private int selectedSlot = 5;
 
+	// Use this for initialization
 	public void Start(){
-		// Add a event to allow objectives to add to the inventory on objective omplete
+		// Add an event to allow objectives to add to the inventory on objective complete
 		ObjectiveManager.Instance.ObjectiveCompleteHandlers.Add ("inventory", objectiveComplete);
 
 		activeBar = new Container(6, containerNames.activeBar.ToString());
@@ -35,9 +36,11 @@ public class Inventory : MonoBehaviour {
 		ch.initialise();
 	}
 
-	public void Delete(){
-	}
-
+	/// <summary>
+	/// Adds the item to a container in the inventory in the priority: activeBar > mainBag.
+	/// </summary>
+	/// <returns><c>true</c>, if item was added, <c>false</c> otherwise.</returns>
+	/// <param name="item">Item.</param>
 	public bool addItem(Item item){
 		if (!activeBar.isFull()) {
 			return activeBar.addItem(item);
@@ -47,20 +50,34 @@ public class Inventory : MonoBehaviour {
 		return false;
 	}
 
+	/// <summary>
+	/// Toggles the inventory's visibility.
+	/// </summary>
 	public void toggleBag(){
 		isToggled = mainBag.toggle();
 		craftingMatrix.toggle();
 		craftingProduce.toggle();
 	}
 
+	/// <summary>
+	/// Removes the item at the currently selected slot of the activeBar.
+	/// </summary>
+	/// <returns>The item.</returns>
 	public string removeItem(){
 		return activeBar.removeItem(selectedSlot);
 	}
 
+	/// <summary>
+	/// Sets the selected slot of the activeBar.
+	/// </summary>
+	/// <param name="selectedSlot">Selected slot.</param>
 	public void setSelectedSlot(int selectedSlot){
 		this.selectedSlot = selectedSlot;
 	}
 
+	/// <summary>
+	/// Sets the UI of all of the containers in the inventory.
+	/// </summary>
 	public void setUI(){
 		if (activeBar != null) {
 			activeBar.setUI();
@@ -80,10 +97,19 @@ public class Inventory : MonoBehaviour {
 	}
 
 	GameObject item;
+	/// <summary>
+	/// Upon dropping an item, sets that item in the inventory's memory for later use.
+	/// </summary>
+	/// <param name="item">Item.</param>
 	public void dragEnd(GameObject item){
 		this.item = item;
 	}
 
+	/// <summary>
+	/// Finds the current position of the mouse in relation to the container positions on screen.
+	/// Finds the correct container and slot within said container in order to place the item
+	/// (referenced in memory by the dragEnd function) at that location.
+	/// </summary>
 	public void itemDrop(){
 		Block newBlock = new Block();
 		bool isBeingDropped = false;
@@ -141,14 +167,8 @@ public class Inventory : MonoBehaviour {
 			}
 		}
 	}
-
-	/**
-	 * Objective complete callback to add item to the inventory
-	 * @param string item The item name
-	 * @param int amount The amount to add
-	 */
-	private void objectiveComplete(string item, int amount)
-	{
+		
+	private void objectiveComplete(string item, int amount){
 		Block b = new Block ();
 		b.resourceString = item;
 		for(int i = 0; i < amount; i++)
