@@ -62,7 +62,13 @@ public class Chunk {
 
                     if (perlinTerrainType < PERLIN_TERRAIN_THRESHOLD) {
                         perlinY = 0;
-                        blockType = "WaterBlock";
+
+						if (worldY == 7) {
+							blockType = "WaterBlock";
+						} else {
+							blockType = "StoneBlock";
+						}
+
                     } else if (perlinTerrainType < 0.4f) {
                         float islandEdge = perlinTerrainType - PERLIN_TERRAIN_THRESHOLD;
                         const float tweenDistance = 0.02f;
@@ -196,6 +202,10 @@ public class Chunk {
 
 
     public Block CreateBlock(string blockType, int chunkX, int chunkY, int chunkZ) {
+		if (blocks [chunkX, chunkY, chunkZ] != null) {
+			Debug.Log ("Duplicate Block Creation");
+		}
+
         int worldX = (int)worldOffset.x + chunkX;
         int worldY = (int)worldOffset.y + chunkY;
         int worldZ = (int)worldOffset.z + chunkZ;
@@ -331,7 +341,10 @@ public class Chunk {
 
                     if (inGround == false) {
                         blockToDraw.draw();
-                        inGround = true;
+
+						if (blockToDraw.resourceString != "WaterBlock") {
+							inGround = true;
+						}
                     } else if (HorizontalNull(x, y, z)) {
                         blockToDraw.draw();
                     } else {
