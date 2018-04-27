@@ -56,7 +56,7 @@ public class PlayerMove : MonoBehaviour {
         if (behaviour.Equals(Player.Behaviour.Human)) {
             PlayerUpdate();
         } else if (behaviour.Equals(Player.Behaviour.Bot)) {
-            BotUpdate();
+            //BotUpdate();
         }
     }
 

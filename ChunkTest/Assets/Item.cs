@@ -7,15 +7,20 @@ public abstract class Item{
 	protected Vector3 worldPosition;
 	public string resourceString { get; set; }
 
-	public void draw(){
-		if (thisBody == null)
-		{
+	/// <summary>
+	/// Draw this instance.
+	/// </summary>
+	public void draw() {
+		if (thisBody == null) {
 			thisBody = GameObject.Instantiate(Resources.Load(resourceString), worldPosition , Quaternion.identity) as GameObject;
 			thisBody.name = resourceString;
 		}
 	}
 
-	public void Delete(){
+	/// <summary>
+	/// Delete this instance.
+	/// </summary>
+	public void Delete() {
 		if (thisBody != null) {
 			GameObject.Destroy (thisBody);
 			thisBody = null;

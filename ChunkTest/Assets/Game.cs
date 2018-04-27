@@ -2,54 +2,67 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Game : MonoBehaviour
-{
+public class Game : MonoBehaviour {
 	public static Game Instance{ get; private set; }
 
-	private void Awake()
-	{
-		if (Instance == null)
-		{
+	/// <summary>
+	/// Sets a static reference to itself.
+	/// </summary>
+	private void Awake() {
+		if (Instance == null) {
 			Instance = this;
 			DontDestroyOnLoad (gameObject);
 		} 
 	}
 
-	public void Reset()
-	{
+	/// <summary>
+	/// Reset this instance.
+	/// </summary>
+	public void Reset() {
 		ObjectiveManager.Instance.Reset ();
 	}
 
-	public void LoadCampaign(string campaignName)
-	{
+	/// <summary>
+	/// Loads the campaign.
+	/// </summary>
+	/// <param name="campaignName">Campaign name.</param>
+	public void LoadCampaign(string campaignName) {
 		ObjectiveManager.Instance.Load (campaignName);
-
 		ObjectiveManager.Instance.ObjectiveCompleteHandlers.Add ("game", GameComplete);
 	}
 
-	private void GameComplete(string item, int amount)
-	{
-		switch (item)
-		{
+	/// <summary>
+	/// Handles completion of the game.
+	/// </summary>
+	/// <param name="item">Item.</param>
+	/// <param name="amount">Amount.</param>
+	private void GameComplete(string item, int amount) {
+		switch (item) {
 		case "end":
 			ShowCredits ();
 			break;
 		}
 	}
 
-	public void ShowCredits()
-	{
+	/// <summary>
+	/// Shows the credits.
+	/// </summary>
+	public void ShowCredits() {
 		Animator a = (Animator)GameObject.Find ("CreditsFade").GetComponent ("Animator");
 		a.enabled = true;
 	}
 
-	private void LoadCreditsScene()
-	{
+	/// <summary>
+	/// Loads the credits scene.
+	/// </summary>
+	private void LoadCreditsScene() {
 		UnityEngine.SceneManagement.SceneManager.LoadScene ("credits");
 	}
 
-	private void LoadGameScene()
-	{
+	/// <summary>
+	/// Loads the game scene.
+	/// </summary>
+	private void LoadGameScene() {
 		Cursor.lockState = CursorLockMode.None;
 		Reset ();
 		Destroy (GameObject.Find ("World"));

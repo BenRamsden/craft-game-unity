@@ -6,11 +6,18 @@ public class Block : Item {
     private BlockProperties bp;
     Vector3 chunkPosition;
 
+	/// <summary>
+	/// Damages the block.
+	/// </summary>
+	/// <param name="inputDamage">Input damage.</param>
     public void damageBlock(int inputDamage) {
         bp.blockHealth -= inputDamage;
         //Debug.Log(bp.blockHealth);
     }
 
+	/// <summary>
+	/// Drops a collectable version of this object the world.
+	/// </summary>
     public void dropSelf() {
         Transform thisTransform = thisBody.transform;
         thisTransform.localScale -= new Vector3(0.75f, 0.75f, 0.75f);
@@ -19,9 +26,9 @@ public class Block : Item {
         thisBody.GetComponent<Rigidbody>().AddForce(thisTransform.forward * 1.0f);
     }
 
-    /**draw() 
-     * Draws the physical representation of a Block in the world.
-     */
+    /// <summary>
+    /// Draw this instance.
+    /// </summary>
     public void draw() {
         base.draw();
         if (thisBody != null) {
@@ -29,44 +36,54 @@ public class Block : Item {
         }
     }
 
-    /**setPosition(int,int,int)
-     * Sets the Block's knowledge of its position in the world.
-     * @param row - the x coordinate of where the Block is in the world.
-     * @param layer - the y coordinate of where the Block is in the world.
-     * @param column - the z coordinate of where the Block isin the world.
-     */
+	/// <summary>
+	/// Sets the Block's knowledge of its position in the world.
+	/// </summary>
+	/// <param name="row">Row.</param>
+	/// <param name="layer">Layer.</param>
+	/// <param name="column">Column.</param>
     public void setPosition(int row, int layer, int column) {
         worldPosition = new Vector3(row, layer, column);
     }
 
+	/// <summary>
+	/// Gets the position.
+	/// </summary>
+	/// <returns>The position.</returns>
     public Vector3 getPosition() {
         return worldPosition;
     }
 
-    /**setChunkPosition(int,int,int)
-     * Sets the Block's knowledge of its position in its Chunk.
-     * @param row - the x coordinate of where the Block is in its Chunk.
-     * @param layer - the y coordinate of where the Block is in its Chunk.
-     * @param column - the z coordinate of where the Block is in its Chunk.
-     */
+	/// <summary>
+	/// Sets the Block's knowledge of its position in its Chunk.
+	/// </summary>
+	/// <param name="posX">Position x.</param>
+	/// <param name="posY">Position y.</param>
+	/// <param name="posZ">Position z.</param>
     public void setChunkPosition(int posX, int posY, int posZ) {
         chunkPosition = new Vector3(posX, posY, posZ);
     }
 
+	/// <summary>
+	/// Gets the properties.
+	/// </summary>
+	/// <returns>The properties.</returns>
     public BlockProperties getProperties() {
         return bp;
     }
 
-    /**getChunkX()
-     * @return chunkX - the x coordinate of where the Block is in its Chunk.
-     */
+	/// <summary>
+	/// Gets the x coordinate of where the Block is in its Chunk.
+	/// </summary>
+	/// <returns>The chunk x.</returns>
     public float getChunkX() {
         return chunkPosition.x;
     }
 
-    /**getChunkY()
-     * @return chunkZ - the z coordinate of where the Block is in its Chunk.
-     */
+	/// <summary>
+	/// Gets the z coordinate of where the Block is in its Chunk.
+	/// </summary>
+	/// <returns>The chunk x.</returns>
     public float getChunkZ() {
         return chunkPosition.z;
     }

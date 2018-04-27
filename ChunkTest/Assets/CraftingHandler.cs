@@ -1,14 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 using Recipe;
 
-public class CraftingHandler{
+public class CraftingHandler {
 	public Recipe.Recipe[] craftingRecipes;
 	int numberOfRecipes;
 
-	public bool initialise(){
+	/// <summary>
+	/// Initialise the crafting recipes.
+	/// </summary>
+	public bool initialise() {
 		var recipes = Resources.Load("Crafting/recipes") as TextAsset;
 		if (recipes == null)
 			return false;
@@ -20,7 +22,12 @@ public class CraftingHandler{
 		return true;
 	}
 
-	public Item[] craftItem(Container matrix){
+	/// <summary>
+	/// Crafts the item from the recipe input into the crafting UI.
+	/// </summary>
+	/// <returns>The item.</returns>
+	/// <param name="matrix">Container reference.</param>
+	public Item[] craftItem(Container matrix) {
 		Block[] blocks = null;
 		bool[] possible = new bool[numberOfRecipes];
 		for(int k = 0; k < numberOfRecipes; k++){
@@ -64,7 +71,6 @@ public class CraftingHandler{
 				break;
 			}
 		}
-
 		return blocks;
 	}
 }

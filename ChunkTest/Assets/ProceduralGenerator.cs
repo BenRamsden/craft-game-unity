@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class ProceduralGenerator : MonoBehaviour {
-	public int MAP_SIZE {get; set;}
-
+	public int MAP_SIZE { get; set; }
     private int chunkSize;
     private Vector3 startOrigin;
     public SeedGenerator Seed;
@@ -12,12 +11,12 @@ public class ProceduralGenerator : MonoBehaviour {
     //Maps offset => chunk
     private Dictionary<Vector3, Chunk> chunks = new Dictionary<Vector3, Chunk>();
 
-    /**
-	 * Initalises the procedual generator
-	 * @param int size The Chunk size
-	 * @param SeedGenerator seed The seed generator
-	 * @return Vector3 Returns the starting origin
-	 */
+	/// <summary>
+	/// Initalise the specified size and seed.
+	/// </summary>
+	/// <returns>The starting origin.</returns>
+	/// <param name="size">Size.</param>
+	/// <param name="seed">Seed.</param>
     public Vector3 initalise(int size, SeedGenerator seed) {
 		this.MAP_SIZE = 10;
         this.Seed = seed;
@@ -29,7 +28,6 @@ public class ProceduralGenerator : MonoBehaviour {
         //TODO: Water update has trouble when this is set to 0
         //Likely due to inter-chunk math failing on float boundaries
         float originY = 0.0f;
-
         float originZ = Random.Range(320, 960);
         originX -= originZ % size;
 
@@ -40,12 +38,20 @@ public class ProceduralGenerator : MonoBehaviour {
         return startOrigin;
     }
 
+	/// <summary>
+	/// Stores the chunk in memory.
+	/// </summary>
+	/// <param name="chunk">Chunk.</param>
     private void storeChunk(Chunk chunk) {
         Vector3 offset = chunk.getOffset();
-
         chunks[offset] = chunk;
     }
 
+	/// <summary>
+	/// Checks if a Chunk already exists at the given offset.
+	/// </summary>
+	/// <returns><c>true</c>, if the chunk exists, <c>false</c> otherwise.</returns>
+	/// <param name="offset">Offset.</param>
     private bool chunkExists(Vector3 offset) {
         bool exists = chunks.ContainsKey(offset);
 
@@ -56,15 +62,18 @@ public class ProceduralGenerator : MonoBehaviour {
         return exists;
     }
 
+	/// <summary>
+	/// Gets the chunk at the given position.
+	/// </summary>
+	/// <returns>The chunk.</returns>
+	/// <param name="position">Position.</param>
     public Chunk getChunk(Vector3 position) {
         if (chunks.ContainsKey(position) == false) {
             return null;
         }
-
         return chunks[position];
     }
-
-
+		
     private class ChunkPosition {
         public Vector3 position { get; set; }
         public float distance { get; set; }
@@ -76,7 +85,11 @@ public class ProceduralGenerator : MonoBehaviour {
 
     }
 
-
+	/// <summary>
+	/// Finds the closest null chunk.
+	/// </summary>
+	/// <returns>The position of the closest null chunk.</returns>
+	/// <param name="target">Target.</param>
     ChunkPosition closestNullChunk(Vector3 target) {
         ChunkPosition cp = null;
         Vector3 chunkPos = new Vector3(0, 0, 0);
@@ -85,12 +98,10 @@ public class ProceduralGenerator : MonoBehaviour {
         for (int x = -MAP_SIZE; x <= MAP_SIZE; x++) {
             for (int y = -2; y <= 1; y++) {
                 for (int z = -MAP_SIZE; z <= MAP_SIZE; z++) {
-
                     chunkPos.Set(target.x + (chunkSize * x), target.y + (chunkSize * y), target.z + (chunkSize * z));
 
                     if (chunkExists(chunkPos) == false) {
                         //Chunk is null at this position, compare its distance to the current closest chunk
-
                         float dist = Vector3.Distance(target, chunkPos);
 
                         if (cp == null) {
@@ -99,20 +110,18 @@ public class ProceduralGenerator : MonoBehaviour {
                             cp.distance = dist;
                             cp.position = chunkPos;
                         }
-
                     }
-
                 }
             }
         }
-
         return cp;
     }
 
-    /**
-	 * Generates a new random map around a point
-	 * @param Vector3 offset The offset position
-	 */
+	/// <summary>
+	/// Generates the map.
+	/// </summary>
+	/// <returns><c>true</c>, if map was generated, <c>false</c> otherwise.</returns>
+	/// <param name="playerPos">Player position.</param>
     public bool generateMap(Vector3 playerPos) {
         ChunkPosition cp = closestNullChunk(playerPos);
 
@@ -142,31 +151,11 @@ public class ProceduralGenerator : MonoBehaviour {
 		} 
 
         return true;
-
-        /**
-
-		Random.InitState (Seed.MineralSeed);
-		for (int offsetY = 0; offsetY >= -1; offsetY--) {
-			//Generate mineral layer
-			Vector3 mineralVec = new Vector3 (chunkPos.x, chunkPos.y + (offsetY * Chunk.CHUNK_SIZE), chunkPos.z);
-
-			Dictionary<Mineral.Type, Vector3[]> minerals = this.calculateMinerals ((int)mineralVec.y);
-
-			if (chunkExists (mineralVec) == false) {
-				Chunk earth = new Chunk(mineralVec, this, true);
-				earth.GenMinerals (minerals);
-
-				storeChunk (earth);
-				return true;
-			}
-		}
-
-		*/
     }
 
-    /**
-	 * Second pass fixes holes in the map.
-	 */
+	/// <summary>
+	/// Fixes holes in the map.
+	/// </summary>
     public void secondPass() {
         Vector3 adjacentChunkPos = new Vector3(0, 0, 0);
         Vector3 currentChunkPos = new Vector3(0, 0, 0);
@@ -211,8 +200,12 @@ public class ProceduralGenerator : MonoBehaviour {
     Vector3 deleteChunk = Vector3.zero;
     bool deleteChunkSet = false;
 
+	/// <summary>
+	/// Deletes chunks that go out of specified drawing range (for efficiency).
+	/// </summary>
+	/// <returns><c>true</c>, if garbage was collected, <c>false</c> otherwise.</returns>
+	/// <param name="playerPos">Player position.</param>
     public bool garbageCollect(Vector3 playerPos) {
-
         foreach (Vector3 otherChunk in chunks.Keys) {
             float dist = Vector3.Distance(playerPos, otherChunk);
 
@@ -232,9 +225,12 @@ public class ProceduralGenerator : MonoBehaviour {
         }
 
         return false;
-
     }
 
+	/// <summary>
+	/// Calls waterProcess on chunks that are close enough to the player to be seen.
+	/// </summary>
+	/// <param name="playerPos">Player position.</param>
     public void waterProcess(Vector3 playerPos) {
         foreach (Vector3 otherChunk in chunks.Keys) {
             Chunk chunk = chunks[otherChunk];
@@ -242,9 +238,14 @@ public class ProceduralGenerator : MonoBehaviour {
         }
     }
 
+	/// <summary>
+	/// Spawns minerals in the world.
+	/// </summary>
+	/// <returns>The minerals.</returns>
+	/// <param name="y">The y coordinate.</param>
     private Dictionary<Mineral.Type, Vector3[]> calculateMinerals(int y) {
         Dictionary<Mineral.Type, Vector3[]> minerals = new Dictionary<Mineral.Type, Vector3[]>();
-        //Debug.Log (y);
+
         // Generate coal
         if (y < Mineral.getSpawnLayer(Mineral.Type.Coal)) {
             if (Mineral.hasSpawnChance(Mineral.Type.Coal)) {
@@ -264,11 +265,15 @@ public class ProceduralGenerator : MonoBehaviour {
         return minerals;
     }
 
+	/// <summary>
+	/// Generates the mineral positions.
+	/// </summary>
+	/// <returns>The mineral positions.</returns>
+	/// <param name="size">Size.</param>
     private Vector3[] generateMineralPositions(int size) {
         Vector3[] positions = new Vector3[size];
 
         positions[0] = new Vector3(Random.Range(1, this.chunkSize), Random.Range(1, this.chunkSize), Random.Range(1, this.chunkSize));
-
 
         for (int i = 1; i < size; i++) {
             int rx = (int)positions[i - 1].x + Random.Range(-1, 1);

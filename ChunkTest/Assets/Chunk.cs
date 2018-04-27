@@ -4,16 +4,15 @@ using UnityEngine;
 public class Chunk {
     public const int CHUNK_SIZE = 8;
 
-    //blocks[,,] is a 3D array in the form [x, y, z]
+    // Blocks[,,] is a 3D array in the form [x, y, z]
     private Block[,,] blocks = new Block[CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE];
     private Vector3 worldOffset;
     private ProceduralGenerator generator;
     public bool secondPass { get; set; }
 
-    //terrain parameters
     const float PERLIN_TERRAIN_THRESHOLD = 0.25f;
 
-    //tree parameters
+    // Tree parameters
     public const int maxTreeTopWidth = CHUNK_SIZE / 2;
     public const int maxTreeTopHeight = CHUNK_SIZE;
     public const int maxTreeTrunkWidth = CHUNK_SIZE / 2;
@@ -24,12 +23,14 @@ public class Chunk {
     int treeTrunkWidth = 0;
     int lowestLeafHeight = 0;
 
-
     bool optimiseDraw = true;
 
-
-
-
+	/// <summary>
+	/// Initializes a new instance of the <see cref="Chunk"/> class.
+	/// </summary>
+	/// <param name="worldOffset">World offset.</param>
+	/// <param name="generator">Generator.</param>
+	/// <param name="isBelowSurface">If set to <c>true</c> is below surface.</param>
     public Chunk(Vector3 worldOffset, ProceduralGenerator generator, bool isBelowSurface = false) {
         this.worldOffset = worldOffset;
         this.generator = generator;
@@ -41,15 +42,15 @@ public class Chunk {
 
         for (int x = 0; x < CHUNK_SIZE; x++) {
             for (int z = 0; z < CHUNK_SIZE; z++) {
-                //Calculate absolute position of block (world space)
+                // Calculate absolute position of block (world space)
                 int worldX = (int)worldOffset.x + x;
                 int worldZ = (int)worldOffset.z + z;
 
-                //Generate a scaled X and Z for input into PerlinNoise function
+                // Generate a scaled X and Z for input into PerlinNoise function
                 float perlinX = ((float)worldX) / CHUNK_SIZE;
                 float perlinZ = ((float)worldZ) / CHUNK_SIZE;
 
-                //Generate perlin
+                // Generate perlin
                 float perlinTerrainType = Mathf.PerlinNoise(perlinX / 30, perlinZ / 30);
                 float perlinTerrain = Mathf.Pow(Mathf.PerlinNoise(perlinX / 10, perlinZ / 10) * 2, 3);
                 int perlinYMaster = (int)(Mathf.PerlinNoise(perlinX / 3, perlinZ / 3) * CHUNK_SIZE * perlinTerrain);
@@ -93,36 +94,14 @@ public class Chunk {
             }
         }
 
-
-        //TREE_GEN
-        CreateTree();
-
-        //WATER_GEN
-        /*
-		for (int x = 0; x < CHUNK_SIZE; x++)
-		{
-			for (int z = 0; z < CHUNK_SIZE; z++)
-			{
-				//DESCEND
-				for (int y = CHUNK_SIZE-1; y >= 0; y--)
-				{
-					int worldY = (int)worldOffset.y + y;
-
-					if (blocks [x, y, z] != null) {
-						break;  //quit descending this y, as hit ground
-					}
-
-					if (worldY > 7 && worldY < 9) {
-						CreateBlock ("WaterBlock", x, y, z);
-					}
-				}
-			}
-		}
-		*/
+        CreateTrees();
         DrawChunk();
     }
 
-    void CreateTree() {
+	/// <summary>
+	/// Generates trees.
+	/// </summary>
+    public void CreateTrees() {
         int x = Random.Range(0, CHUNK_SIZE - 1);
         int z = Random.Range(0, CHUNK_SIZE - 1);
 
@@ -181,6 +160,14 @@ public class Chunk {
         }
     }
 
+	/// <summary>
+	/// Determines whether this instance can create tree in the specified x y z location.
+	/// </summary>
+	/// <returns><c>true</c> if this instance can create tree in the specified x y z location; otherwise, <c>false</c>.</returns>
+	/// <param name="x">The x coordinate.</param>
+	/// <param name="y">The y coordinate.</param>
+	/// <param name="z">The z coordinate.</param>
+	/// <param name="lowestLeaf">Lowest leaf.</param>
     private bool CanCreateTree(int x, int y, int z, int lowestLeaf) {
         for (int x2 = x - treeTrunkWidth; x2 <= x + treeTrunkWidth; x2++) {
             for (int z2 = z - treeTrunkWidth; z2 <= z + treeTrunkWidth; z2++) {
@@ -197,10 +184,14 @@ public class Chunk {
         return true;
     }
 
-
-
-
-
+	/// <summary>
+	/// Creates the specified block in the specified x y z location.
+	/// </summary>
+	/// <returns>The block.</returns>
+	/// <param name="blockType">Block type.</param>
+	/// <param name="chunkX">Chunk x.</param>
+	/// <param name="chunkY">Chunk y.</param>
+	/// <param name="chunkZ">Chunk z.</param>
     public Block CreateBlock(string blockType, int chunkX, int chunkY, int chunkZ) {
 		if (blocks [chunkX, chunkY, chunkZ] != null) {
 			Debug.Log ("Duplicate Block Creation");
@@ -218,7 +209,14 @@ public class Chunk {
         return tempBlock;
     }
 
-
+	/// <summary>
+	/// Creates the block in another chunk.
+	/// </summary>
+	/// <returns>The block from the other chunk.</returns>
+	/// <param name="blockType">Block type.</param>
+	/// <param name="chunkX">Chunk x.</param>
+	/// <param name="chunkY">Chunk y.</param>
+	/// <param name="chunkZ">Chunk z.</param>
     public Block CreateBlockInOtherChunk(string blockType, int chunkX, int chunkY, int chunkZ) {
         if (IsInChunkBounds(chunkX, chunkY, chunkZ)) {
             return CreateBlock(blockType, chunkX, chunkY, chunkZ);
@@ -245,6 +243,10 @@ public class Chunk {
         return chunk.CreateBlock(blockType, (int)blockPosition.x, (int)blockPosition.y, (int)blockPosition.z);
     }
 
+	/// <summary>
+	/// Generates the minerals.
+	/// </summary>
+	/// <param name="minerals">Minerals.</param>
     public void GenMinerals(Dictionary<Mineral.Type, Vector3[]> minerals) {
         foreach (KeyValuePair<Mineral.Type, Vector3[]> pair in minerals) {
             Vector3[] mineralPosition = pair.Value;
@@ -256,6 +258,9 @@ public class Chunk {
         }
     }
 
+	/// <summary>
+	/// Delete this instance.
+	/// </summary>
     public void Delete() {
         for (int x = 0; x < CHUNK_SIZE; x++) {
             for (int y = 0; y < CHUNK_SIZE; y++) {
@@ -272,10 +277,19 @@ public class Chunk {
 
     }
 
+	/// <summary>
+	/// Gets the offset of this Chunk.
+	/// </summary>
+	/// <returns>The offset.</returns>
     public Vector3 getOffset() {
         return this.worldOffset;
     }
 
+	/// <summary>
+	/// Gets the block at the specified position.
+	/// </summary>
+	/// <returns>The block.</returns>
+	/// <param name="position">Position.</param>
     public Block getBlock(Vector3 position) {
         int x = (int)position.x;
         int y = (int)position.y;
@@ -292,28 +306,41 @@ public class Chunk {
         return blocks[x, y, z];
     }
 
+	/// <summary>
+	/// Removes the block at the specified position.
+	/// </summary>
+	/// <param name="position">Position.</param>
     public void removeBlock(Vector3 position) {
         blocks[(int)position.x, (int)position.y, (int)position.z] = null;
     }
 
+	/// <summary>
+	/// Checks whether a block is null or water.
+	/// </summary>
+	/// <returns><c>true</c>, if block is null or water, <c>false</c> otherwise.</returns>
+	/// <param name="x">The x coordinate.</param>
+	/// <param name="y">The y coordinate.</param>
+	/// <param name="z">The z coordinate.</param>
     private bool NullOrWater(int x, int y, int z) {
         if (IsInChunkBounds(x, y, z) == false) {
             return false;
         }
 
         Block block = blocks[x, y, z];
-
         if (block == null) {
             return true;
         }
 
-        //if (block.resourceString == "WaterBlock") {
-        //	return true;
-        //}
-
         return false;
     }
 
+	/// <summary>
+	/// Checks if the surrounding blocks are null.
+	/// </summary>
+	/// <returns><c>true</c>, if null, <c>false</c> otherwise.</returns>
+	/// <param name="x">The x coordinate.</param>
+	/// <param name="y">The y coordinate.</param>
+	/// <param name="z">The z coordinate.</param>
     private bool HorizontalNull(int x, int y, int z) {
         bool leftNull = NullOrWater(x - 1, y, z);
         bool rightNull = NullOrWater(x + 1, y, z);
@@ -323,10 +350,9 @@ public class Chunk {
         return leftNull || rightNull || backNull || frontNull;
     }
 
-    /**DrawChunk()
-     * Renders the visible blocks based on the current state of the chunk.
-     * Currently this means rendering any block that touches a null "air" Block.
-     */
+	/// <summary>
+	/// Draws the chunk.
+	/// </summary>
     private void DrawChunk() {
         Block blockToDraw;
 
@@ -359,7 +385,13 @@ public class Chunk {
         }
     }
 
-
+	/// <summary>
+	/// Fills the holes in the drawn map.
+	/// </summary>
+	/// <param name="checkNorth">If set to <c>true</c> check north.</param>
+	/// <param name="checkSouth">If set to <c>true</c> check south.</param>
+	/// <param name="checkEast">If set to <c>true</c> check east.</param>
+	/// <param name="checkWest">If set to <c>true</c> check west.</param>
     public void fillHoles(bool checkNorth, bool checkSouth, bool checkEast, bool checkWest) {
         Block blockToDraw;
         Vector3 chunkPos = new Vector3(0, 0, 0), blockPos = new Vector3(0, 0, 0);
@@ -425,10 +457,21 @@ public class Chunk {
         }
     }
 
+	/// <summary>
+	/// Determines whether the specified x y z is in chunk bounds.
+	/// </summary>
+	/// <returns><c>true</c> if the specified x y z is in chunk bounds; otherwise, <c>false</c>.</returns>
+	/// <param name="x">The x coordinate.</param>
+	/// <param name="y">The y coordinate.</param>
+	/// <param name="z">The z coordinate.</param>
     private bool IsInChunkBounds(int x, int y, int z) {
         return x >= 0 && x < CHUNK_SIZE && y >= 0 && y < CHUNK_SIZE && z >= 0 && z < CHUNK_SIZE;
     }
 
+	/// <summary>
+	/// Starts the process of water filling the space it is in on the map.
+	/// </summary>
+	/// <returns><c>true</c>, if the space can be filled, <c>false</c> otherwise.</returns>
     public bool waterProcess() {
         //WATER_GEN
         for (int x = 0; x < CHUNK_SIZE; x++) {
@@ -457,7 +500,14 @@ public class Chunk {
         return false;
     }
 
-    bool waterProcessBlock(int x2, int y2, int z2) {
+	/// <summary>
+	/// Helper method for waterProcess method.
+	/// </summary>
+	/// <returns><c>true</c>, if a water block was generated at the specified position, <c>false</c> otherwise.</returns>
+	/// <param name="x2">The second x value.</param>
+	/// <param name="y2">The second y value.</param>
+	/// <param name="z2">The second z value.</param>
+    private bool waterProcessBlock(int x2, int y2, int z2) {
         if (IsInChunkBounds(x2, y2, z2)) {
             if (blocks[x2, y2, z2] == null) {
                 Block block = CreateBlock("WaterBlock", x2, y2, z2);

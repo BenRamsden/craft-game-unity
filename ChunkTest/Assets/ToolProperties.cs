@@ -7,31 +7,44 @@ public class ToolProperties : MonoBehaviour {
     int toolQualityRating;
     int toolHealth = 100;
 
-    /**initialise(string, int)
-     * This function should be called directly after instantiating a tool in the world to set 
-     * what type of tool it is. We can then use the toolQualityRating and toolHealth properties
-     * to calculate how much damage a tool deals to a block/NPC/object.
-     * 
-     * @param toolType - the type of tool "pickaxe, sword, bucket, etc."
-     * @param toolQualityRating - the material the tool is made of "iron, gold, diamond, etc."
-     */
+	/// <summary>
+	/// Initialise the specified toolType and toolQualityRating.
+	/// </summary>
+	/// <param name="toolType">Tool type.</param>
+	/// <param name="toolQualityRating">Tool quality rating.</param>
     public void initialise(string toolType, int toolQualityRating) {
         this.toolType = toolType;
         this.toolQualityRating = toolQualityRating;
     }
 
-    //Setters
+    /// <summary>
+    /// Deals wear damage the tool.
+    /// </summary>
+    /// <param name="damage">Damage.</param>
     public void wearTool(int damage){
         toolHealth -= damage;
     }
 
-    //Getters
+    /// <summary>
+    /// Gets the quality rating.
+    /// </summary>
+    /// <returns>The quality rating.</returns>
     public int getQualityRating() {
         return toolQualityRating;
     }
+
+	/// <summary>
+	/// Gets the type of the tool.
+	/// </summary>
+	/// <returns>The tool type.</returns>
     public string getToolType(){
         return toolType;
     }
+
+	/// <summary>
+	/// Gets the current tool health.
+	/// </summary>
+	/// <returns>The health.</returns>
     public int getHealth() {
         return toolHealth;
     }

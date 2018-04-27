@@ -3,15 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class BotMove : MonoBehaviour {
-
 	public ProceduralGenerator pg;
-
 	public Rigidbody rb;
 	private  Animator animator;
 	public bool isGrounded;
 
 	public readonly Vector3 jump = new Vector3(0.0f, 5.0f, 0.0f);
-
 	private float rotY,rotYHead, rotX = 0.0f;
 	public float mouseSensitivity = 1000.0f;
 	public float moveSpeed = 10.0F;
@@ -45,7 +42,7 @@ public class BotMove : MonoBehaviour {
 	static Vector3 frontCollider = new Vector3(0.0f,-0.5f,0.0f);
 	static Vector3 rightCollider = new Vector3 (1.5f, -0.5f, 0.0f);
 
-	/* Moving player using unity physics */
+	// FixedUpdate is called once per tick
 	void FixedUpdate () {
 		if (avoidCollision (frontCollider)) {
 			jumpPlayer ();
@@ -57,6 +54,7 @@ public class BotMove : MonoBehaviour {
 		movePlayer (moveX, moveZ);
 	}
 
+	// Update is called once per frame
 	void Update () {
         // Rotating player with mouse
 		float mouseX = 0;// Input.GetAxis("Mouse X");
@@ -65,21 +63,17 @@ public class BotMove : MonoBehaviour {
 		moveCamera (mouseX, mouseY);
 	}
 
-	bool avoidCollision(Vector3 collider) {
+	/// <summary>
+	/// The basis of the bot AI, avoids colliding with the terrain.
+	/// </summary>
+	/// <returns><c>true</c>, if collision can be avoided, <c>false</c> otherwise.</returns>
+	/// <param name="collider">Collider.</param>
+	private bool avoidCollision(Vector3 collider) {
 		Vector3 forward = transform.forward;
 
 		Vector3 botPos = this.gameObject.transform.position;
 		botPos += collider;
 		botPos += forward * 3.0f;
-
-		/*if (cube == null) {
-			cube = GameObject.CreatePrimitive (PrimitiveType.Cube);
-			cube.transform.localScale = new Vector3 (0.1f, 0.1f, 0.1f);
-
-			Physics.IgnoreCollision (cube.GetComponent<Collider> (), GetComponent<Collider> ());
-		}
-			
-		cube.transform.position = botPos;*/
 
 		Vector3 chunkPos = HelperMethods.worldPositionToChunkPosition (botPos);
 		Vector3 blockPos = HelperMethods.vectorDifference (chunkPos,botPos);
@@ -100,7 +94,10 @@ public class BotMove : MonoBehaviour {
 		return true;
 	}
 
-	void jumpPlayer() {
+	/// <summary>
+	/// Causes the player to jump.
+	/// </summary>
+	private void jumpPlayer() {
 		if (isGrounded){
 			rb.AddForce(jump, ForceMode.Impulse);
 			isGrounded = false;
@@ -111,6 +108,11 @@ public class BotMove : MonoBehaviour {
 		}
 	}
 
+	/// <summary>
+	/// Moves the bot.
+	/// </summary>
+	/// <param name="moveX">Move x.</param>
+	/// <param name="moveZ">Move z.</param>
 	void movePlayer(float moveX, float moveZ) {
 		//float move
 		Vector3 movement = new Vector3 (moveX, 0.0f, moveZ);
@@ -126,6 +128,11 @@ public class BotMove : MonoBehaviour {
 		}
 	}
 
+	/// <summary>
+	/// Moves the camera.
+	/// </summary>
+	/// <param name="mouseX">Mouse x.</param>
+	/// <param name="mouseY">Mouse y.</param>
 	void moveCamera(float mouseX, float mouseY) {
 		rotYHead += mouseX * mouseSensitivity * Time.deltaTime;
 		rotX += mouseY * mouseSensitivity * Time.deltaTime;
@@ -154,30 +161,37 @@ public class BotMove : MonoBehaviour {
 		transform.rotation = rotationTorso;
 	}
 
-	void OnCollisionEnter(Collision collision)
-	{
+	/// <summary>
+	/// Raises the collision enter event.
+	/// </summary>
+	/// <param name="collision">Collision.</param>
+	public void OnCollisionEnter(Collision collision) {
 		// Get the walk sound from the collided block
 		walkSound = collision.gameObject.GetComponent<BlockProperties> ().PlayerWalkSound;
 	}
 		
-	void OnCollisionStay()
-	{
+	/// <summary>
+	/// Raises the collision stay event.
+	/// </summary>
+	public void OnCollisionStay() {
 		isGrounded = true;
 		animator.SetBool ("isJumping", false);
 	}
 
-	/**
-	 * Water blocks are triggers, check whether we are in water
-	 */
-
-	void OnTriggerStay(Collider trigger)
-	{
+	/// <summary>
+	/// Raises the trigger stay event.
+	/// </summary>
+	/// <param name="trigger">Trigger.</param>
+	public void OnTriggerStay(Collider trigger) {
 		if (trigger.gameObject.name == "WaterBlock")
 			isInWater = true;
 	}
 
-	void OnTriggerExit(Collider trigger)
-	{
+	/// <summary>
+	/// Raises the trigger exit event.
+	/// </summary>
+	/// <param name="trigger">Trigger.</param>
+	public void OnTriggerExit(Collider trigger) {
 		if (trigger.gameObject.name == "WaterBlock")
 			isInWater = false;
 	}

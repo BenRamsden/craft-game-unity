@@ -6,14 +6,16 @@ using UnityEngine.SceneManagement;
 
 public class GameMode : MonoBehaviour {
 
-	void Start()
-	{
+	// Use this for initialization
+	void Start() {
 		Button btn = gameObject.GetComponent<Button>();
 		btn.onClick.AddListener(TaskOnClick);
 	}
 
-	void TaskOnClick()
-	{
+	/// <summary>
+	/// Raises the on click event.
+	/// </summary>
+	void TaskOnClick() {
 		Debug.Log("You have clicked the button!");
 		SceneManager.LoadScene("scene1", LoadSceneMode.Single);
 	}
