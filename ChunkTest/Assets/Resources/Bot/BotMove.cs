@@ -11,7 +11,7 @@ public class BotMove : MonoBehaviour {
 	public readonly Vector3 jump = new Vector3(0.0f, 5.0f, 0.0f);
 	private float rotY,rotYHead, rotX = 0.0f;
 	public float mouseSensitivity = 1000.0f;
-	public float moveSpeed = 10.0F;
+	public float moveSpeed = 5.0F;
 
 	private AudioClip jumpSound;
 	private AudioClip grassWalkSound;
