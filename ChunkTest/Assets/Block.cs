@@ -87,4 +87,11 @@ public class Block : Item {
     public float getChunkZ() {
         return chunkPosition.z;
     }
+
+	/// <summary>
+	/// Delete this instance.
+	/// </summary>
+	public void Delete(){
+		base.Delete();
+	}
 }

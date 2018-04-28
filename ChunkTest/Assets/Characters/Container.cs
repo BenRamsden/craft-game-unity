@@ -173,6 +173,14 @@ public class Container {
 	}
 
 	/// <summary>
+	/// Gets the size of the container.
+	/// </summary>
+	/// <returns>The container size.</returns>
+	public int getContainerSize() {
+		return container.Length;
+	}
+
+	/// <summary>
 	/// Checks if there is a free list to put items in.
 	/// </summary>
 	/// <returns>The index of a free list.</returns>

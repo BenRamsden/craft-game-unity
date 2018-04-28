@@ -11,7 +11,7 @@ public class Inventory : MonoBehaviour {
 
 	private CraftingHandler ch;
 
-	public bool isToggled { get; set;}
+	public bool isToggled { get; set; }
 
 	enum containerNames {activeBar, mainBag, craftingMatrix, craftingProduce};
 
