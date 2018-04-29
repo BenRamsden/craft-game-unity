@@ -1,60 +1,100 @@
-﻿using UnityEngine;
-using UnityEngine.TestTools;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using System.Collections;
-using UnityEngine.SceneManagement;
+using UnityEngine;
+using UnityEngine.TestTools;
 
 public class ItemTests {
 	Block block = null;
+    string blockName = "LogBlock";
 
 	[SetUp]
-	public void Setup(){
-		if (block != null) {
-			block.Delete();
-		}
+	public void Setup()
+    {
 		block = new Block ();
-		block.resourceString = "LogBlock";
+		block.resourceString = blockName;
 		block.draw();
 	}
 
-	[UnityTest]
-	public IEnumerator createBlockTest() {
+    [TearDown]
+    public void TearDown()
+    {
+        if (block != null)
+        {
+            block.Delete();
+        }
+        block = null;
+    }
+
+    [UnityTest]
+	public IEnumerator createBlock_ExpectBlockWithCorrectDetails()
+    {
 		yield return null;
-		Assert.True(GameObject.Find("LogBlock") != null);
+        GameObject testBlock = GameObject.Find(blockName);
+        Assert.NotNull(testBlock);
+        Assert.AreEqual(blockName, testBlock.name);
+
+    }
+
+	[UnityTest]
+	public IEnumerator createWrongBlockTest_ExpectNull()
+    {
+		yield return null;
+		Assert.Null(GameObject.Find("Not_A_Block"));
 	}
 
 	[UnityTest]
-	public IEnumerator createWrongBlockTest() {
+	public IEnumerator blockChuckPositionSet1_2_3_ExpectBlockChuckX1ChuckZ3()
+    {
+		block.setChunkPosition(1, 2, 3);
 		yield return null;
-		Assert.True(GameObject.Find("WaterBlock") == null);
+        Assert.AreEqual(1, block.getChunkX());
+        Assert.AreEqual(3, block.getChunkZ());
 	}
 
-	[UnityTest]
-	public IEnumerator blockPositionTest() {
-		block.setChunkPosition(7,4,3);
-		yield return null;
-		Assert.True(block.getChunkX() == 7 && block.getChunkZ() == 3);
-	}
+    [UnityTest]
+    public IEnumerator blockWorldPositionSet1_2_3_ExpectBlockWorldPositionProperty1_2_3()
+    {
+        block.setPosition(1, 2, 3);
+        yield return null;
+        Vector3 blockPosition = block.getPosition();
+        Assert.AreEqual(1.0f, blockPosition.x);
+        Assert.AreEqual(2.0f, blockPosition.y);
+        Assert.AreEqual(3.0f, blockPosition.z);
+    }
 
-	[UnityTest]
-	public IEnumerator damageBlockTest(){
-		yield return null;
-		int previousHealth = block.getProperties().blockHealth;
-		block.damageBlock(10);
-		Assert.AreNotEqual (previousHealth, block.getProperties ().blockHealth);
-	}
+    [UnityTest]
+    public IEnumerator blockHealth100_Damage50_ExpectBlockHealth50()
+    {
+        block.damageBlock(50);
 
-	[UnityTest]
-	public IEnumerator dropBlockTest() {
+        yield return null;
+        Assert.AreEqual(50, block.getProperties().blockHealth);
+    }
+
+    [UnityTest]
+    public IEnumerator blockHealth100_Damage150_ExpectBlockHealthNegative50()
+    {
+        block.damageBlock(150);
+
+        yield return null;
+        Assert.AreEqual(-50, block.getProperties().blockHealth);
+    }
+
+    [UnityTest]
+	public IEnumerator dropBlock_ExpectBlock()
+    {
 		block.dropSelf();
+
 		yield return null;
-		Assert.True(GameObject.Find("LogBlock").GetComponent<Rigidbody>() != null);
+		Assert.NotNull(GameObject.Find(blockName).GetComponent<Rigidbody>());
 	}
 
 	[UnityTest]
-	public IEnumerator destroyBlockTest() {
+	public IEnumerator destroyBlock_ExpectNullBlock()
+    {
 		block.Delete();
+
 		yield return new WaitForSeconds(2.0f);
-		Assert.True(GameObject.Find("LogBlock") == null);
+		Assert.Null(GameObject.Find(blockName));
 	}
 }

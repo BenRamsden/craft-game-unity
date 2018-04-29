@@ -1,9 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Container {
+public class Container
+{
     private List<Item>[] container;
     private Text[] slotItemCounts;
     private Image[] slotItemImages;
@@ -18,23 +18,23 @@ public class Container {
 	/// </summary>
 	/// <param name="containerSize">Container size.</param>
 	/// <param name="name">Name.</param>
-    public Container(int containerSize, string name) {
+    public Container(int containerSize, string name, GameObject selfRef) {
         this.containerSize = containerSize;
 		this.name = name;
 
         container = new List<Item>[containerSize];
         slotItemCounts = new Text[containerSize];
         slotItemImages = new Image[containerSize];
-		selfRef = GameObject.Find(name);
+		this.selfRef = selfRef;
 
-        slotItemCounts = selfRef.GetComponentsInChildren<Text>();
-        slotItemImages = selfRef.GetComponentsInChildren<Image>();
+        slotItemCounts = this.selfRef.GetComponentsInChildren<Text>();
+        slotItemImages = this.selfRef.GetComponentsInChildren<Image>();
 
         for (int i = 0; i < containerSize; i++) {
             container[i] = new List<Item>(64);
 			slotItemImages[i].gameObject.AddComponent<ItemDragHandler>();
         }
-		selfRef.AddComponent<ItemDropHandler>();
+        this.selfRef.AddComponent<ItemDropHandler>();
     }
 
 	/// <summary>
@@ -58,7 +58,10 @@ public class Container {
         int currentIndex = checkIfListFree(item.resourceString);
         if (currentIndex != -1) {
             container[currentIndex].Add(item);
-			ObjectiveManager.Instance.ObjectiveCheck ("inventory", item.resourceString, container[currentIndex].Count);
+            if (ObjectiveManager.Instance != null)
+            {
+                ObjectiveManager.Instance.ObjectiveCheck("inventory", item.resourceString, container[currentIndex].Count);
+            }
             return true;
         }
         return false;

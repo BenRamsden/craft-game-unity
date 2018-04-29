@@ -22,10 +22,10 @@ public class Inventory : MonoBehaviour {
 		// Add an event to allow objectives to add to the inventory on objective complete
 		ObjectiveManager.Instance.ObjectiveCompleteHandlers.Add ("inventory", objectiveComplete);
 
-		activeBar = new Container(6, containerNames.activeBar.ToString());
-		mainBag = new Container(20, containerNames.mainBag.ToString());
-		craftingMatrix = new Container (9, containerNames.craftingMatrix.ToString());
-		craftingProduce = new Container (1, containerNames.craftingProduce.ToString ());
+		activeBar = new Container(6, containerNames.activeBar.ToString(), GameObject.Find(containerNames.activeBar.ToString()));
+		mainBag = new Container(20, containerNames.mainBag.ToString(), GameObject.Find(containerNames.mainBag.ToString()));
+		craftingMatrix = new Container (9, containerNames.craftingMatrix.ToString(), GameObject.Find(containerNames.craftingMatrix.ToString()));
+		craftingProduce = new Container (1, containerNames.craftingProduce.ToString (), GameObject.Find(containerNames.craftingProduce.ToString()));
 
 		mainBag.toggle();
 		craftingMatrix.toggle();

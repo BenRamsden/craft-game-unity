@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Player {
-    public GameObject gameObject { get; }
+    public GameObject gameObject { get; private set; }
     public enum Behaviour { Human, Bot };
 
     private WorldGenerator wg;
