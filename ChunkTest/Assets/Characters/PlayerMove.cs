@@ -12,7 +12,7 @@ public class PlayerMove : MonoBehaviour {
     public readonly Vector3 jump = new Vector3(0.0f, 1f, 0.0f);
 
     public float mouseSensitivity = 100.0f;
-    public float moveSpeed = 20f;
+	public float moveSpeed = 13.0f;
 
     private AudioClip jumpSound;
     private AudioClip grassWalkSound;
